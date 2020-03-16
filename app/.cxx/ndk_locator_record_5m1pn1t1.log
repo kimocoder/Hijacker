@@ -1,0 +1,34 @@
+[
+  {
+    "level": "INFO",
+    "message": "android.ndkVersion from module build.gradle is 21.0.6113669"
+  },
+  {
+    "level": "INFO",
+    "message": "ndk.dir in local.properties is /root/Android/Sdk/ndk-bundle"
+  },
+  {
+    "level": "INFO",
+    "message": "ANDROID_NDK_HOME environment variable is not set"
+  },
+  {
+    "level": "INFO",
+    "message": "sdkFolder is /root/Android/Sdk"
+  },
+  {
+    "level": "INFO",
+    "message": "NDK side-by-side folder from sdkFolder /root/Android/Sdk/ndk does not exist"
+  },
+  {
+    "level": "INFO",
+    "message": "Considering /root/Android/Sdk/ndk-bundle by ndk.dir"
+  },
+  {
+    "level": "INFO",
+    "message": "Considering /root/Android/Sdk/ndk-bundle in SDK ndk-bundle folder"
+  },
+  {
+    "level": "ERROR",
+    "message": "Requested NDK version 21.0.6113669 did not match the version 21.1.6210238 requested by ndk.dir at /root/Android/Sdk/ndk-bundle"
+  }
+]

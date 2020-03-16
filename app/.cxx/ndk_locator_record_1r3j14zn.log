@@ -1,0 +1,42 @@
+[
+  {
+    "level": "INFO",
+    "message": "android.ndkVersion from module build.gradle is 21.1.6210238 rc1"
+  },
+  {
+    "level": "INFO",
+    "message": "ndk.dir in local.properties is not set"
+  },
+  {
+    "level": "INFO",
+    "message": "ANDROID_NDK_HOME environment variable is not set"
+  },
+  {
+    "level": "INFO",
+    "message": "sdkFolder is /root/Android/Sdk"
+  },
+  {
+    "level": "INFO",
+    "message": "Considering /root/Android/Sdk/ndk-bundle in SDK ndk-bundle folder"
+  },
+  {
+    "level": "INFO",
+    "message": "Considering /root/Android/Sdk/ndk/21.1.6210238 in SDK ndk folder"
+  },
+  {
+    "level": "INFO",
+    "message": "Found 2 NDK folders that matched requested version 21.1.6210238:"
+  },
+  {
+    "level": "INFO",
+    "message": " (1) /root/Android/Sdk/ndk/21.1.6210238 in SDK ndk folder"
+  },
+  {
+    "level": "INFO",
+    "message": " (2) /root/Android/Sdk/ndk-bundle in SDK ndk-bundle folder"
+  },
+  {
+    "level": "INFO",
+    "message": "  choosing /root/Android/Sdk/ndk/21.1.6210238"
+  }
+]
