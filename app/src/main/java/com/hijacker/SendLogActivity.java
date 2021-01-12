@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static com.hijacker.MainActivity.createReport;
 import static com.hijacker.MainActivity.deviceModel;
@@ -76,7 +77,7 @@ public class SendLogActivity extends AppCompatActivity{
 
         busybox = getFilesDir().getAbsolutePath() + "/bin/busybox";
         stackTrace = getIntent().getStringExtra("exception");
-        Log.e("HIJACKER/SendLog", stackTrace);
+        Log.e("HIJACKER/SendLog", Objects.requireNonNull(stackTrace));
 
         //Load device info
         PackageManager manager = getPackageManager();
@@ -133,7 +134,7 @@ public class SendLogActivity extends AppCompatActivity{
         }
     }
     private class ReportTask extends AsyncTask<Void, String, Boolean>{
-        StringBuilder bugReport = new StringBuilder();
+        final StringBuilder bugReport = new StringBuilder();
         @Override
         protected Boolean doInBackground(Void... params){
             report = new File(Environment.getExternalStorageDirectory() + "/report.txt");

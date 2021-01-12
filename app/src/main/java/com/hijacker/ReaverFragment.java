@@ -108,15 +108,12 @@ public class ReaverFragment extends Fragment{
         select_button = fragmentView.findViewById(R.id.select_ap);
         start_button = fragmentView.findViewById(R.id.start_button);
 
-        pinDelayView.setOnEditorActionListener(new TextView.OnEditorActionListener(){
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event){
-                if(actionId == EditorInfo.IME_ACTION_NEXT){
-                    lockedDelayView.requestFocus();
-                    return true;
-                }
-                return false;
+        pinDelayView.setOnEditorActionListener((v, actionId, event) -> {
+            if(actionId == EditorInfo.IME_ACTION_NEXT){
+                lockedDelayView.requestFocus();
+                return true;
             }
+            return false;
         });
 
         if(task==null) task = new ReaverTask();
@@ -133,61 +130,50 @@ public class ReaverFragment extends Fragment{
             pixie_dust_enabled = true;
         }
 
-        select_button.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                PopupMenu popup = new PopupMenu(getActivity(), view);
+        select_button.setOnClickListener(view -> {
+            PopupMenu popup = new PopupMenu(getActivity(), view);
 
-                popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
-                int i = 0;
-                for(AP ap : AP.APs){
-                    popup.getMenu().add(0, i, i, ap.toString());
-                    if(ap.sec==UNKNOWN  || ap.sec==OPN){
-                        popup.getMenu().getItem(i).setEnabled(false);
-                    }
-                    i++;
+            popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
+            int i = 0;
+            for(AP ap : AP.APs){
+                popup.getMenu().add(0, i, i, ap.toString());
+                if(ap.sec==UNKNOWN  || ap.sec==OPN){
+                    popup.getMenu().getItem(i).setEnabled(false);
                 }
-                popup.getMenu().add(1, i, i, "Custom");
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    public boolean onMenuItemClick(android.view.MenuItem item) {
-                        //ItemId = i in for()
-                        if(item.getGroupId()==0){
-                            custom_mac = null;
-                            AP temp = AP.APs.get(item.getItemId());
-                            if(ap!=temp){
-                                ap = temp;
-                            }
-                            select_button.setText(ap.toString());
-                        }else{
-                            //Clcked custom
-                            final EditTextDialog dialog = new EditTextDialog();
-                            dialog.setTitle(getString(R.string.custom_ap_title));
-                            dialog.setHint(getString(R.string.mac_address));
-                            dialog.setRunnable(new Runnable(){
-                                @Override
-                                public void run(){
-                                    ap = null;
-                                    custom_mac = dialog.result;
-                                    select_button.setText(dialog.result);
-                                }
-                            });
-                            dialog.show(mFragmentManager, "EditTextDialog");
-                        }
-                        return true;
-                    }
-                });
-                popup.show();
+                i++;
             }
-        });
-        start_button.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                if(task.getStatus()!=AsyncTask.Status.RUNNING){
-                    attemptStart();
-                }else{
-                    stop(PROCESS_REAVER);
-                    task.cancel(true);
+            popup.getMenu().add(1, i, i, "Custom");
+            popup.setOnMenuItemClickListener(item -> {
+                //ItemId = i in for()
+                if (item.getGroupId() == 0) {
+                    custom_mac = null;
+                    AP temp = AP.APs.get(item.getItemId());
+                    if (ap != temp) {
+                        ap = temp;
+                    }
+                    select_button.setText(ap.toString());
+                } else {
+                    //Clcked custom
+                    final EditTextDialog dialog = new EditTextDialog();
+                    dialog.setTitle(getString(R.string.custom_ap_title));
+                    dialog.setHint(getString(R.string.mac_address));
+                    dialog.setRunnable(() -> {
+                        ap = null;
+                        custom_mac = dialog.result;
+                        select_button.setText(dialog.result);
+                    });
+                    dialog.show(mFragmentManager, "EditTextDialog");
                 }
+                return true;
+            });
+            popup.show();
+        });
+        start_button.setOnClickListener(view -> {
+            if(task.getStatus()!=AsyncTask.Status.RUNNING){
+                attemptStart();
+            }else{
+                stop(PROCESS_REAVER);
+                task.cancel(true);
             }
         });
 
@@ -215,8 +201,8 @@ public class ReaverFragment extends Fragment{
             task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
-    ReaverFragment setAutostart(boolean autostart){
-        this.autostart = autostart;
+    ReaverFragment setAutostart(){
+        this.autostart = true;
         return this;
     }
     static boolean isRunning(){
@@ -238,12 +224,7 @@ public class ReaverFragment extends Fragment{
 
         //Console text is saved/restored on pause/resume
         consoleView.setText(console_text);
-        consoleView.post(new Runnable() {
-            @Override
-            public void run() {
-                consoleScrollView.fullScroll(View.FOCUS_DOWN);
-            }
-        });
+        consoleView.post(() -> consoleScrollView.fullScroll(View.FOCUS_DOWN));
     }
     @Override
     public void onPause(){
@@ -287,12 +268,7 @@ public class ReaverFragment extends Fragment{
         }
 
         if(autostart){
-            optionsContainer.post(new Runnable(){
-                @Override
-                public void run(){
-                    attemptStart();
-                }
-            });
+            optionsContainer.post(() -> attemptStart());
             autostart = false;
         }
     }
@@ -339,12 +315,7 @@ public class ReaverFragment extends Fragment{
         }
         if(!custom_chroot_cmd.equals("")){
             if(custom_chroot_cmd.contains("'") && activity!=null){
-                runInHandler(new Runnable(){
-                    @Override
-                    public void run(){
-                        Toast.makeText(activity, activity.getString(R.string.custom_chroot_cmd_illegal), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                runInHandler(() -> Toast.makeText(activity, activity.getString(R.string.custom_chroot_cmd_illegal), Toast.LENGTH_SHORT).show());
             }else{
                 ENV_OUT.append(custom_chroot_cmd);
                 ENV_OUT.append(cont_on_fail ? "; " : " && ");
@@ -373,13 +344,10 @@ public class ReaverFragment extends Fragment{
 
             sizeAnimator = ValueAnimator.ofInt(optionsContainer.getHeight(), 0);
             sizeAnimator.setTarget(optionsContainer);
-            sizeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener(){
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation){
-                    ViewGroup.LayoutParams layoutParams = optionsContainer.getLayoutParams();
-                    layoutParams.height = (int)animation.getAnimatedValue();
-                    optionsContainer.setLayoutParams(layoutParams);
-                }
+            sizeAnimator.addUpdateListener(animation -> {
+                ViewGroup.LayoutParams layoutParams = optionsContainer.getLayoutParams();
+                layoutParams.height = (int)animation.getAnimatedValue();
+                optionsContainer.setLayoutParams(layoutParams);
             });
             sizeAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
             sizeAnimator.start();
@@ -406,7 +374,7 @@ public class ReaverFragment extends Fragment{
                         Runtime.getRuntime().exec("su -c " + bootkali_init_bin);       //Make sure kali has booted
                     }
                     args += " -K 1";
-                    cmd = "chroot " + MainActivity.chroot_dir + " /bin/bash -c \'" + get_chroot_env(getActivity()) + "reaver " + args + "\'";
+                    cmd = "chroot " + MainActivity.chroot_dir + " /bin/bash -c '" + get_chroot_env(getActivity()) + "reaver " + args + "'";
                     publishProgress("\nRunning: " + cmd);
                     ProcessBuilder pb = new ProcessBuilder("su");
                     pb.redirectErrorStream(true);
@@ -459,13 +427,10 @@ public class ReaverFragment extends Fragment{
 
             sizeAnimator = ValueAnimator.ofInt(0, normalOptHeight);
             sizeAnimator.setTarget(optionsContainer);
-            sizeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener(){
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation){
-                    ViewGroup.LayoutParams layoutparams = optionsContainer.getLayoutParams();
-                    layoutparams.height = (int)animation.getAnimatedValue();
-                    optionsContainer.setLayoutParams(layoutparams);
-                }
+            sizeAnimator.addUpdateListener(animation -> {
+                ViewGroup.LayoutParams layoutparams = optionsContainer.getLayoutParams();
+                layoutparams.height = (int)animation.getAnimatedValue();
+                optionsContainer.setLayoutParams(layoutparams);
             });
             sizeAnimator.addListener(new Animator.AnimatorListener() {
                 @Override

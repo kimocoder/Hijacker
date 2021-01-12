@@ -1,0 +1,7 @@
+Executable : /root/Android/Sdk/cmake/3.18.1/bin/ninja
+arguments : 
+-C
+/root/Hijacker/app/.cxx/cmake/debug/x86
+native-lib
+jvmArgs : 
+

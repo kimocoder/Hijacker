@@ -39,33 +39,26 @@ public class CustomDialog extends DialogFragment {
         if(title!=null) builder.setTitle(title);
         if(message!=null) builder.setMessage(message);
         if(positiveText!=null){
-            builder.setPositiveButton(positiveText, new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int id){
-                    if(onPositiveClick!=null) onPositiveClick.run();
-                    synchronized(CustomDialog.this){
-                        CustomDialog.this.notify();
-                    }
+            builder.setPositiveButton(positiveText, (dialog, id) -> {
+                if(onPositiveClick!=null) onPositiveClick.run();
+                synchronized(CustomDialog.this){
+                    CustomDialog.this.notify();
                 }
             });
         }
         if(neutralText!=null){
-            builder.setNeutralButton(neutralText, new DialogInterface.OnClickListener(){
-                @Override
-                public void onClick(DialogInterface dialog, int which){
-                    if(onNeutralClick!=null) onNeutralClick.run();
-                    synchronized(CustomDialog.this){
-                        CustomDialog.this.notify();
-                    }
+            builder.setNeutralButton(neutralText, (dialog, which) -> {
+                if(onNeutralClick!=null) onNeutralClick.run();
+                synchronized(CustomDialog.this){
+                    CustomDialog.this.notify();
                 }
             });
         }
         if(negativeText!=null){
-            builder.setNegativeButton(negativeText, new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int id){
-                    if(onNegativeClick!=null) onNegativeClick.run();
-                    synchronized(CustomDialog.this){
-                        CustomDialog.this.notify();
-                    }
+            builder.setNegativeButton(negativeText, (dialog, id) -> {
+                if(onNegativeClick!=null) onNegativeClick.run();
+                synchronized(CustomDialog.this){
+                    CustomDialog.this.notify();
                 }
             });
         }

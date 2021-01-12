@@ -1,39 +1,34 @@
 {
-  "stringTable": {
-    "0": "/root/Hijacker/app/.cxx/cmake/debug/x86",
-    "1": "--target=i686-none-linux-android21 --gcc-toolchain=/root/Android/Sdk/ndk/21.1.6210238/toolchains/llvm/prebuilt/linux-x86_64 --sysroot=/root/Android/Sdk/ndk/21.1.6210238/toolchains/llvm/prebuilt/linux-x86_64/sysroot -Dnative_lib_EXPORTS -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -O0 -fno-limit-debug-info -fPIC"
-  },
   "buildFiles": [
-    "/root/Android/Sdk/ndk/21.1.6210238/build/cmake/android.toolchain.cmake",
-    "/root/Android/Sdk/ndk/21.1.6210238/build/cmake/platforms.cmake",
     "/root/Hijacker/app/CMakeLists.txt"
   ],
-  "cleanCommands": [
-    "/root/Android/Sdk/cmake/3.10.2.4988404/bin/ninja -C \"/root/Hijacker/app/.cxx/cmake/debug/x86\" clean"
+  "cleanCommandsComponents": [
+    [
+      "/root/Android/Sdk/cmake/3.18.1/bin/ninja",
+      "-C",
+      "/root/Hijacker/app/.cxx/cmake/debug/x86",
+      "clean"
+    ]
   ],
-  "buildTargetsCommand": "/root/Android/Sdk/cmake/3.10.2.4988404/bin/ninja  -C \"/root/Hijacker/app/.cxx/cmake/debug/x86\" {LIST_OF_TARGETS_TO_BUILD}",
+  "buildTargetsCommandComponents": [
+    "/root/Android/Sdk/cmake/3.18.1/bin/ninja",
+    "-C",
+    "/root/Hijacker/app/.cxx/cmake/debug/x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
   "libraries": {
-    "native-lib-Debug-x86": {
-      "buildCommand": "/root/Android/Sdk/cmake/3.10.2.4988404/bin/ninja -C \"/root/Hijacker/app/.cxx/cmake/debug/x86\" native-lib",
-      "buildType": "debug",
-      "toolchain": "2805632567",
+    "native-lib::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
       "abi": "x86",
       "artifactName": "native-lib",
-      "files": [
-        {
-          "src": "/root/Hijacker/app/src/main/cpp/native-lib.cpp",
-          "flagsOrdinal": 1,
-          "workingDirectoryOrdinal": 0
-        }
-      ],
-      "headers": [],
       "output": "/root/Hijacker/app/build/intermediates/cmake/debug/obj/x86/libnative-lib.so",
       "runtimeFiles": []
     }
   },
   "toolchains": {
-    "2805632567": {
-      "cppCompilerExecutable": "/root/Android/Sdk/ndk/21.1.6210238/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++"
+    "toolchain": {
+      "cCompilerExecutable": "/root/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/bin/clang.lld",
+      "cppCompilerExecutable": "/root/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++.lld"
     }
   },
   "cFileExtensions": [],

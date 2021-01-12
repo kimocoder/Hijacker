@@ -25,7 +25,6 @@ import androidx.annotation.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,7 +33,6 @@ import static com.hijacker.AP.getAPByMac;
 import static com.hijacker.MainActivity.BAND_2;
 import static com.hijacker.MainActivity.BAND_5;
 import static com.hijacker.MainActivity.BAND_BOTH;
-import static com.hijacker.MainActivity.MAX_READLINE_SIZE;
 import static com.hijacker.MainActivity.airodump_dir;
 import static com.hijacker.MainActivity.always_cap;
 import static com.hijacker.MainActivity.band;
@@ -87,7 +85,7 @@ class Airodump{
         }
         mac = new_mac;
     }
-    static void setForWPA(boolean bool){
+    static void setForWPA(){
         if(isRunning()){
             Log.e(TAG, "Can't change settings while airodump is running");
             throw new IllegalStateException("Airodump is still running");
@@ -96,9 +94,9 @@ class Airodump{
             Log.e(TAG, "Can't set forWPA when forWEP is enabled");
             throw new IllegalStateException("Tried to set forWPA when forWEP is enabled");
         }
-        forWPA = bool;
+        forWPA = true;
     }
-    static void setForWEP(boolean bool){
+    static void setForWEP(){
         if(isRunning()){
             Log.e(TAG, "Can't change setting while airodump is running");
             throw new IllegalStateException("Airodump is still running");
@@ -107,7 +105,7 @@ class Airodump{
             Log.e(TAG, "Can't set forWEP when forWPA is enabled");
             throw new IllegalStateException("Tried to set forWEP when forWPA is enabled");
         }
-        forWEP = bool;
+        forWEP = true;
     }
     static void setAP(AP ap){
         if(isRunning()){
@@ -183,29 +181,23 @@ class Airodump{
             Log.e("HIJACKER/Exception", "Caught Exception in Airodump.start() read thread: " + e.toString());
         }
 
-        runInHandler(new Runnable(){
-            @Override
-            public void run(){
-                if(menu!=null){
-                    menu.getItem(1).setIcon(R.drawable.stop_drawable);
-                    menu.getItem(1).setTitle(R.string.stop);
-                }
-                refreshState();
-                notification();
+        runInHandler(() -> {
+            if(menu!=null){
+                menu.getItem(1).setIcon(R.drawable.stop_drawable);
+                menu.getItem(1).setTitle(R.string.stop);
             }
+            refreshState();
+            notification();
         });
     }
     static void stop(){
         last_action = System.currentTimeMillis();
         running = false;
         capFileObserver.stopWatching();
-        runInHandler(new Runnable(){
-            @Override
-            public void run(){
-                if(menu!=null){
-                    menu.getItem(1).setIcon(R.drawable.start_drawable);
-                    menu.getItem(1).setTitle(R.string.start);
-                }
+        runInHandler(() -> {
+            if(menu!=null){
+                menu.getItem(1).setIcon(R.drawable.start_drawable);
+                menu.getItem(1).setTitle(R.string.start);
             }
         });
         stopWPA();
@@ -213,12 +205,9 @@ class Airodump{
         AP.saveAll();
         ST.saveAll();
 
-        runInHandler(new Runnable(){
-            @Override
-            public void run(){
-                refreshState();
-                notification();
-            }
+        runInHandler(() -> {
+            refreshState();
+            notification();
         });
     }
     static boolean isRunning(){
@@ -255,7 +244,7 @@ class Airodump{
             for(i=123; i<buffer.length(); i++){
                 if(buffer.charAt(i)==' ' && buffer.charAt(i+1)==' '){
                     for(j=i;j<buffer.length();j++){
-                        buffer = buffer.substring(0, 123) + buffer.substring(124, buffer.length());
+                        buffer = buffer.substring(0, 123) + buffer.substring(124);
                     }
                     i--;
                 }
@@ -311,8 +300,8 @@ class Airodump{
     }
 
     static class CapFileObserver extends FileObserver{
-        static String TAG = "HIJACKER/CapFileObs";
-        String master_path;
+        static final String TAG = "HIJACKER/CapFileObs";
+        final String master_path;
         Shell shell = null;
         boolean found_cap_file = false;
         public CapFileObserver(String path, int mask) {
@@ -446,19 +435,19 @@ class Airodump{
                         String bssid = fields[5];
                         if(bssid.charAt(0)=='(') bssid = null;
 
-                        String probes = "";
+                        StringBuilder probes = new StringBuilder();
                         if(fields.length==7) {
-                            probes = fields[6];
+                            probes = new StringBuilder(fields[6]);
                         }else if(fields.length>7){
                             // Multiple probes are separated by comma, so concatenate them
-                            probes = "";
+                            probes = new StringBuilder();
                             for(int i=6; i<fields.length; i++){
-                                probes += fields[i] + ", ";
+                                probes.append(fields[i]).append(", ");
                             }
-                            probes = probes.substring(0, probes.length()-2);
+                            probes = new StringBuilder(probes.substring(0, probes.length() - 2));
                         }
 
-                        addST(mac, bssid, probes, pwr, 0, packets);
+                        addST(mac, bssid, probes.toString(), pwr, 0, packets);
                     }
                 }
             } catch (IOException e) {

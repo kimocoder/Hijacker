@@ -46,26 +46,20 @@ public class StatsDialog extends DialogFragment {
             connected_count = view.findViewById(R.id.connected_count);
         }
 
-        runnable = new Runnable(){
-            @Override
-            public void run(){
-                wpa_count.setText(Integer.toString(AP.wpa));
-                wpa2_count.setText(Integer.toString(AP.wpa2));
-                wep_count.setText(Integer.toString(AP.wep));
-                opn_count.setText(Integer.toString(AP.opn));
-                hidden_count.setText(Integer.toString(AP.hidden));
-                connected_count.setText(Integer.toString(ST.connected) + '/' + ST.STs.size());
-            }
+        runnable = () -> {
+            wpa_count.setText(Integer.toString(AP.wpa));
+            wpa2_count.setText(Integer.toString(AP.wpa2));
+            wep_count.setText(Integer.toString(AP.wep));
+            opn_count.setText(Integer.toString(AP.opn));
+            hidden_count.setText(Integer.toString(AP.hidden));
+            connected_count.setText(Integer.toString(ST.connected) + '/' + ST.STs.size());
         };
         runnable.run();
 
         builder.setView(view);
         builder.setTitle(R.string.ap_stats);
-        builder.setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //close
-            }
+        builder.setNegativeButton(R.string.close, (dialog, which) -> {
+            //close
         });
         return builder.create();
     }

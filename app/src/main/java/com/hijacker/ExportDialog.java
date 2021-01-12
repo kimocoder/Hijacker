@@ -51,42 +51,28 @@ public class ExportDialog extends DialogFragment{
         dialogView = getActivity().getLayoutInflater().inflate(R.layout.export, null);
 
         filenameView = dialogView.findViewById(R.id.output_file);
-        filenameView.setOnEditorActionListener(new TextView.OnEditorActionListener(){
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event){
-                if(actionId == EditorInfo.IME_ACTION_DONE){
-                    attemptExport(false);
-                    return true;
-                }
-                return false;
+        filenameView.setOnEditorActionListener((v, actionId, event) -> {
+            if(actionId == EditorInfo.IME_ACTION_DONE){
+                attemptExport(false);
+                return true;
             }
+            return false;
         });
-        dialogView.findViewById(R.id.export_fe_btn).setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                final FileExplorerDialog dialog = new FileExplorerDialog();
-                dialog.setStartingDir(new RootFile(Environment.getExternalStorageDirectory().toString()));
-                dialog.setToSelect(FileExplorerDialog.SELECT_DIR);
-                dialog.setOnSelect(new Runnable(){
-                    @Override
-                    public void run(){
-                        filenameView.setText(dialog.result.getAbsolutePath() + "/output.txt");
-                        filenameView.setError(null);
-                    }
-                });
-                dialog.show(getFragmentManager(), "FileExplorerDialog");
-            }
+        dialogView.findViewById(R.id.export_fe_btn).setOnClickListener(v -> {
+            final FileExplorerDialog dialog = new FileExplorerDialog();
+            dialog.setStartingDir(new RootFile(Environment.getExternalStorageDirectory().toString()));
+            dialog.setToSelect(FileExplorerDialog.SELECT_DIR);
+            dialog.setOnSelect(() -> {
+                filenameView.setText(dialog.result.getAbsolutePath() + "/output.txt");
+                filenameView.setError(null);
+            });
+            dialog.show(getFragmentManager(), "FileExplorerDialog");
         });
 
         builder.setView(dialogView);
         builder.setTitle(R.string.export);
-        builder.setPositiveButton(R.string.export, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {}
-        });
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) { }
-        });
+        builder.setPositiveButton(R.string.export, (dialog, id) -> {});
+        builder.setNegativeButton(R.string.cancel, (dialog, which) -> { });
         return builder.create();
     }
     @Override
@@ -95,20 +81,12 @@ public class ExportDialog extends DialogFragment{
         AlertDialog d = (AlertDialog)getDialog();
         if(d != null){
             Button positiveButton = d.getButton(Dialog.BUTTON_POSITIVE);
-            positiveButton.setOnLongClickListener(new View.OnLongClickListener(){
-                @Override
-                public boolean onLongClick(View v){
-                    v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-                    attemptExport(true);
-                    return false;
-                }
+            positiveButton.setOnLongClickListener(v -> {
+                v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                attemptExport(true);
+                return false;
             });
-            positiveButton.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v){
-                    attemptExport(false);
-                }
-            });
+            positiveButton.setOnClickListener(v -> attemptExport(false));
         }
     }
     void attemptExport(boolean override){

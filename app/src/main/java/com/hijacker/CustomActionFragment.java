@@ -82,29 +82,16 @@ public class CustomActionFragment extends Fragment{
 
         if(task==null) task = new CustomActionTask();
 
-        actionBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                showActionSelector();
-            }
-        });
-        targetBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                showTargetSelector();
-            }
-        });
-        startBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                if(isRunning()){
-                    //Stop
-                    startBtn.setEnabled(false);
-                    task.cancel(true);
-                }else{
-                    task = new CustomActionTask();
-                    task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                }
+        actionBtn.setOnClickListener(view -> showActionSelector());
+        targetBtn.setOnClickListener(view -> showTargetSelector());
+        startBtn.setOnClickListener(view -> {
+            if(isRunning()){
+                //Stop
+                startBtn.setEnabled(false);
+                task.cancel(true);
+            }else{
+                task = new CustomActionTask();
+                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
         });
 
@@ -118,12 +105,7 @@ public class CustomActionFragment extends Fragment{
 
         //Console text is saved/restored on pause/resume
         consoleView.setText(console_text);
-        consoleView.post(new Runnable() {
-            @Override
-            public void run() {
-                consoleScrollView.fullScroll(View.FOCUS_DOWN);
-            }
-        });
+        consoleView.post(() -> consoleScrollView.fullScroll(View.FOCUS_DOWN));
     }
     @Override
     public void onPause(){
@@ -185,20 +167,18 @@ public class CustomActionFragment extends Fragment{
         }
         popup.getMenu().add(-1, 0, i+1, getString(R.string.manage_actions));
 
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(android.view.MenuItem item){
-                if(item.getGroupId()==-1){
-                    //Open actions manager
-                    FragmentTransaction ft = mFragmentManager.beginTransaction();
-                    ft.replace(R.id.fragment1, new CustomActionManagerFragment());
-                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                    ft.addToBackStack(null);
-                    ft.commitAllowingStateLoss();
-                }else{
-                    onActionSelected(cmds.get(item.getItemId()));
-                }
-                return true;
+        popup.setOnMenuItemClickListener(item -> {
+            if(item.getGroupId()==-1){
+                //Open actions manager
+                FragmentTransaction ft = mFragmentManager.beginTransaction();
+                ft.replace(R.id.fragment1, new CustomActionManagerFragment());
+                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                ft.addToBackStack(null);
+                ft.commitAllowingStateLoss();
+            }else{
+                onActionSelected(cmds.get(item.getItemId()));
             }
+            return true;
         });
         popup.show();
     }
@@ -228,20 +208,18 @@ public class CustomActionFragment extends Fragment{
             }
         }
 
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener(){
-            public boolean onMenuItemClick(android.view.MenuItem item){
-                switch(item.getGroupId()){
-                    case TYPE_AP:
-                        //ap
-                        onTargetSelected(AP.APs.get(item.getItemId()));
-                        break;
-                    case TYPE_ST:
-                        //st
-                        onTargetSelected(ST.STs.get(item.getItemId()));
-                        break;
-                }
-                return true;
+        popup.setOnMenuItemClickListener(item -> {
+            switch(item.getGroupId()){
+                case TYPE_AP:
+                    //ap
+                    onTargetSelected(AP.APs.get(item.getItemId()));
+                    break;
+                case TYPE_ST:
+                    //st
+                    onTargetSelected(ST.STs.get(item.getItemId()));
+                    break;
             }
+            return true;
         });
         if(popup.getMenu().size()>0) popup.show();
     }
@@ -286,13 +264,10 @@ public class CustomActionFragment extends Fragment{
 
             sizeAnimator = ValueAnimator.ofInt(optionsContainer.getHeight(), 0);
             sizeAnimator.setTarget(optionsContainer);
-            sizeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener(){
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation){
-                    ViewGroup.LayoutParams layoutParams = optionsContainer.getLayoutParams();
-                    layoutParams.height = (int)animation.getAnimatedValue();
-                    optionsContainer.setLayoutParams(layoutParams);
-                }
+            sizeAnimator.addUpdateListener(animation -> {
+                ViewGroup.LayoutParams layoutParams = optionsContainer.getLayoutParams();
+                layoutParams.height = (int)animation.getAnimatedValue();
+                optionsContainer.setLayoutParams(layoutParams);
             });
             sizeAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
             sizeAnimator.start();
@@ -369,13 +344,10 @@ public class CustomActionFragment extends Fragment{
 
             sizeAnimator = ValueAnimator.ofInt(0, normalOptHeight);
             sizeAnimator.setTarget(optionsContainer);
-            sizeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener(){
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation){
-                    ViewGroup.LayoutParams layoutparams = optionsContainer.getLayoutParams();
-                    layoutparams.height = (int)animation.getAnimatedValue();
-                    optionsContainer.setLayoutParams(layoutparams);
-                }
+            sizeAnimator.addUpdateListener(animation -> {
+                ViewGroup.LayoutParams layoutparams = optionsContainer.getLayoutParams();
+                layoutparams.height = (int)animation.getAnimatedValue();
+                optionsContainer.setLayoutParams(layoutparams);
             });
             sizeAnimator.addListener(new Animator.AnimatorListener() {
                 @Override

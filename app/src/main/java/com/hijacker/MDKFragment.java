@@ -67,41 +67,20 @@ public class MDKFragment extends Fragment{
         ados_switch = fragmentView.findViewById(R.id.ados_switch);
         select_button = fragmentView.findViewById(R.id.select_ap_ados);
 
-        fragmentView.findViewById(R.id.ssid_file_fe_btn).setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                final FileExplorerDialog dialog = new FileExplorerDialog();
-                dialog.setToSelect(FileExplorerDialog.SELECT_EXISTING_FILE);
-                dialog.setStartingDir(new RootFile(Environment.getExternalStorageDirectory().toString()));
-                dialog.setOnSelect(new Runnable(){
-                    @Override
-                    public void run(){
-                        ssidView.setText(dialog.result.getAbsolutePath());
-                        ssidView.setError(null);
-                    }
-                });
-                dialog.show(getFragmentManager(), "FileExplorerDialog");
-            }
+        fragmentView.findViewById(R.id.ssid_file_fe_btn).setOnClickListener(v -> {
+            final FileExplorerDialog dialog = new FileExplorerDialog();
+            dialog.setToSelect(FileExplorerDialog.SELECT_EXISTING_FILE);
+            dialog.setStartingDir(new RootFile(Environment.getExternalStorageDirectory().toString()));
+            dialog.setOnSelect(() -> {
+                ssidView.setText(dialog.result.getAbsolutePath());
+                ssidView.setError(null);
+            });
+            dialog.show(getFragmentManager(), "FileExplorerDialog");
         });
 
-        bf_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b){
-                onBfSwitch(b);
-            }
-        });
-        ados_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b){
-                onDosSwitch(b);
-            }
-        });
-        select_button.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                onSelectClick(view);
-            }
-        });
+        bf_switch.setOnCheckedChangeListener((compoundButton, b) -> onBfSwitch(b));
+        ados_switch.setOnCheckedChangeListener((compoundButton, b) -> onDosSwitch(b));
+        select_button.setOnClickListener(view -> onSelectClick(view));
 
         return fragmentView;
     }
@@ -119,12 +98,7 @@ public class MDKFragment extends Fragment{
             select_button.setText(ados_ap.toString());
         }
         if(ssid_file!=null) ssidView.setText(ssid_file);
-        CompoundButton.OnCheckedChangeListener listener = new CompoundButton.OnCheckedChangeListener(){
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked){
-                bf_switch.setChecked(false);
-            }
-        };
+        CompoundButton.OnCheckedChangeListener listener = (buttonView, isChecked) -> bf_switch.setChecked(false);
         managed_cb.setChecked(managed);
         managed_cb.setOnCheckedChangeListener(listener);
         adhoc_cb.setChecked(adhoc);
@@ -162,40 +136,32 @@ public class MDKFragment extends Fragment{
             i++;
         }
         popup.getMenu().add(1, i, i, "Custom");
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(android.view.MenuItem item) {
-                //ItemId = i in for()
-                if(item.getGroupId()==0){
-                    custom_mac=null;
-                    AP temp = AP.APs.get(item.getItemId());
-                    if(ados_ap!=temp){
-                        ados_ap = temp;
-                        runInHandler(new Runnable(){
-                            @Override
-                            public void run(){
-                                ados_switch.setChecked(false);
-                                stop(PROCESS_MDK_DOS);
-                            }
-                        });
-                    }
-                    select_button.setText(ados_ap.toString());
-                }else{
-                    //Clcked custom
-                    final EditTextDialog dialog = new EditTextDialog();
-                    dialog.setTitle(getString(R.string.custom_ap_title));
-                    dialog.setHint(getString(R.string.mac_address));
-                    dialog.setRunnable(new Runnable(){
-                        @Override
-                        public void run(){
-                            ados_ap = null;
-                            custom_mac = dialog.result;
-                            select_button.setText(dialog.result);
-                        }
+        popup.setOnMenuItemClickListener(item -> {
+            //ItemId = i in for()
+            if(item.getGroupId()==0){
+                custom_mac=null;
+                AP temp = AP.APs.get(item.getItemId());
+                if(ados_ap!=temp){
+                    ados_ap = temp;
+                    runInHandler(() -> {
+                        ados_switch.setChecked(false);
+                        stop(PROCESS_MDK_DOS);
                     });
-                    dialog.show(mFragmentManager, "EditTextDialog");
                 }
-                return true;
+                select_button.setText(ados_ap.toString());
+            }else{
+                //Clcked custom
+                final EditTextDialog dialog = new EditTextDialog();
+                dialog.setTitle(getString(R.string.custom_ap_title));
+                dialog.setHint(getString(R.string.mac_address));
+                dialog.setRunnable(() -> {
+                    ados_ap = null;
+                    custom_mac = dialog.result;
+                    select_button.setText(dialog.result);
+                });
+                dialog.show(mFragmentManager, "EditTextDialog");
             }
+            return true;
         });
         popup.show();
     }

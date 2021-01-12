@@ -1,0 +1,1 @@
+/root/Hijacker/app/build/intermediates/cmake/debug/obj/x86

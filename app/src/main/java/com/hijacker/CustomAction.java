@@ -41,8 +41,11 @@ import static com.hijacker.MainActivity.reaver_dir;
 class CustomAction{
     static final int TYPE_AP=0, TYPE_ST=1;
     static final List<CustomAction> cmds = new ArrayList<>();
-    private String title, start_cmd, stop_cmd, process_name;
-    private int type;
+    private String title;
+    private String start_cmd;
+    private String stop_cmd;
+    private final String process_name;
+    private final int type;
     private boolean requires_clients=false, requires_connected=false, has_process_name=false;
     CustomAction(String title, String start_cmd, String stop_cmd, String process_name, int type){
         this.title = title;
@@ -124,7 +127,7 @@ class CustomAction{
         if(!folder.exists()){
             folder.mkdir();
         }
-        File actions[] = folder.listFiles();
+        File[] actions = folder.listFiles();
         if(actions!=null){
             if(debug) Log.d("HIJACKER/CustomAction", "Reading custom actions...");
             for(File file : actions){

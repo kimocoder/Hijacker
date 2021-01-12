@@ -1,117 +1,85 @@
 {
   "abi": "X86_64",
-  "abiPlatformVersion": 21,
-  "buildSettings": {
-    "environmentVariables": []
-  },
-  "cmake": {
-    "cmakeArtifactsBaseFolder": "/root/Hijacker/app/.cxx/cmake/debug/x86_64",
-    "cmakeServerLogFile": "/root/Hijacker/app/.cxx/cmake/debug/x86_64/cmake_server_log.txt",
-    "cmakeWrappingBaseFolder": "/root/Hijacker/app/.cxx/cxx/debug/x86_64",
-    "effectiveConfiguration": {
-      "name": "traditional-android-studio-cmake-environment",
-      "description": "Composite reified CMakeSettings configuration",
-      "generator": "Ninja",
-      "inheritEnvironments": [
-        "ndk"
-      ],
-      "buildRoot": "/root/Hijacker/app/.cxx/cmake/debug/x86_64",
-      "cmakeToolchain": "/root/Android/Sdk/ndk/21.1.6210238/build/cmake/android.toolchain.cmake",
-      "cmakeExecutable": "/root/Android/Sdk/cmake/3.10.2.4988404/bin/cmake",
-      "variables": [
-        {
-          "name": "CMAKE_FIND_ROOT_PATH",
-          "value": "/root/Hijacker/app/.cxx/cmake/debug/prefab/x86_64/prefab"
-        },
-        {
-          "name": "CMAKE_BUILD_TYPE",
-          "value": "Debug"
-        },
-        {
-          "name": "CMAKE_TOOLCHAIN_FILE",
-          "value": "/root/Android/Sdk/ndk/21.1.6210238/build/cmake/android.toolchain.cmake"
-        },
-        {
-          "name": "ANDROID_ABI",
-          "value": "x86_64"
-        },
-        {
-          "name": "ANDROID_NDK",
-          "value": "/root/Android/Sdk/ndk/21.1.6210238"
-        },
-        {
-          "name": "ANDROID_PLATFORM",
-          "value": "android-21"
-        },
-        {
-          "name": "CMAKE_ANDROID_ARCH_ABI",
-          "value": "x86_64"
-        },
-        {
-          "name": "CMAKE_ANDROID_NDK",
-          "value": "/root/Android/Sdk/ndk/21.1.6210238"
-        },
-        {
-          "name": "CMAKE_EXPORT_COMPILE_COMMANDS",
-          "value": "ON"
-        },
-        {
-          "name": "CMAKE_LIBRARY_OUTPUT_DIRECTORY",
-          "value": "/root/Hijacker/app/build/intermediates/cmake/debug/obj/x86_64"
-        },
-        {
-          "name": "CMAKE_MAKE_PROGRAM",
-          "value": "/root/Android/Sdk/cmake/3.10.2.4988404/bin/ninja"
-        },
-        {
-          "name": "CMAKE_SYSTEM_NAME",
-          "value": "Android"
-        },
-        {
-          "name": "CMAKE_SYSTEM_VERSION",
-          "value": "21"
-        }
-      ]
-    }
-  },
-  "cxxBuildFolder": "/root/Hijacker/app/.cxx/cmake/debug/x86_64",
   "info": {
     "abi": "X86_64",
     "bitness": 64,
     "deprecated": false,
     "default": true
   },
-  "originalCxxBuildFolder": "/root/Hijacker/app/.cxx/cmake/debug/x86_64",
+  "cxxBuildFolder": "/root/Hijacker/app/.cxx/cmake/debug/x86_64",
+  "soFolder": "/root/Hijacker/app/build/intermediates/cmake/debug/obj/x86_64",
+  "abiPlatformVersion": 21,
+  "cmake": {
+    "effectiveConfiguration": {
+      "inheritEnvironments": [],
+      "variables": []
+    }
+  },
   "variant": {
     "buildSystemArgumentList": [],
-    "buildTargetSet": [],
     "cFlagsList": [],
-    "cmakeSettingsConfiguration": "android-gradle-plugin-predetermined-name",
     "cppFlagsList": [
       ""
     ],
+    "variantName": "debug",
+    "soFolder": "/root/Hijacker/app/build/intermediates/cmake/debug/obj",
+    "cxxBuildFolder": "/root/Hijacker/app/.cxx/cmake/debug",
+    "intermediatesFolder": "/root/Hijacker/app/build/intermediates/cmake/debug",
     "isDebuggableEnabled": true,
+    "validAbiList": [
+      "ARMEABI_V7A",
+      "ARM64_V8A",
+      "X86",
+      "X86_64"
+    ],
+    "buildTargetSet": [],
+    "implicitBuildTargetSet": [],
+    "cmakeSettingsConfiguration": "android-gradle-plugin-predetermined-name",
     "module": {
-      "buildSystem": "CMAKE",
-      "cmake": {
-        "cmakeExe": "/root/Android/Sdk/cmake/3.10.2.4988404/bin/cmake",
-        "minimumCmakeVersion": "3.10.2",
-        "ninjaExe": "/root/Android/Sdk/cmake/3.10.2.4988404/bin/ninja"
-      },
-      "cmakeToolchainFile": "/root/Android/Sdk/ndk/21.1.6210238/build/cmake/android.toolchain.cmake",
       "cxxFolder": "/root/Hijacker/app/.cxx",
-      "gradleModulePathName": ":app",
       "intermediatesFolder": "/root/Hijacker/app/build/intermediates",
-      "makeFile": "/root/Hijacker/app/CMakeLists.txt",
-      "moduleBuildFile": "/root/Hijacker/app/build.gradle",
+      "gradleModulePathName": ":app",
       "moduleRootFolder": "/root/Hijacker/app",
+      "moduleBuildFile": "/root/Hijacker/app/build.gradle",
+      "makeFile": "/root/Hijacker/app/CMakeLists.txt",
+      "buildSystem": "CMAKE",
+      "ndkFolder": "/root/Android/Sdk/ndk/22.0.7026061",
+      "ndkVersion": "22.0.7026061",
+      "ndkSupportedAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
       "ndkDefaultAbiList": [
         "ARMEABI_V7A",
         "ARM64_V8A",
         "X86",
         "X86_64"
       ],
-      "ndkFolder": "/root/Android/Sdk/ndk/21.1.6210238",
+      "ndkDefaultStl": "LIBCXX_STATIC",
+      "ndkMetaPlatforms": {
+        "min": 16,
+        "max": 30,
+        "aliases": {
+          "20": 19,
+          "25": 24,
+          "J": 16,
+          "J-MR1": 17,
+          "J-MR2": 18,
+          "K": 19,
+          "L": 21,
+          "L-MR1": 22,
+          "M": 23,
+          "N": 24,
+          "N-MR1": 24,
+          "O": 26,
+          "O-MR1": 27,
+          "P": 28,
+          "Q": 29,
+          "R": 30
+        }
+      },
       "ndkMetaAbiList": [
         {
           "abi": "ARMEABI_V7A",
@@ -138,69 +106,63 @@
           "default": true
         }
       ],
-      "ndkMetaPlatforms": {
-        "min": 16,
-        "max": 30,
-        "aliases": {
-          "20": 19,
-          "25": 24,
-          "J": 16,
-          "J-MR1": 17,
-          "J-MR2": 18,
-          "K": 19,
-          "L": 21,
-          "L-MR1": 22,
-          "M": 23,
-          "N": 24,
-          "N-MR1": 24,
-          "O": 26,
-          "O-MR1": 27,
-          "P": 28,
-          "Q": 29,
-          "R": 30
-        }
+      "cmakeToolchainFile": "/root/Android/Sdk/ndk/22.0.7026061/build/cmake/android.toolchain.cmake",
+      "cmake": {
+        "isValidCmakeAvailable": true,
+        "cmakeExe": "/root/Android/Sdk/cmake/3.18.1/bin/cmake",
+        "minimumCmakeVersion": "3.18.1",
+        "ninjaExe": "/root/Android/Sdk/cmake/3.18.1/bin/ninja",
+        "isPreferCmakeFileApiEnabled": true
       },
-      "ndkSupportedAbiList": [
-        "ARMEABI_V7A",
-        "ARM64_V8A",
-        "X86",
-        "X86_64"
-      ],
-      "ndkDefaultStl": "LIBCXX_STATIC",
-      "ndkVersion": "21.1.6210238-rc1",
-      "project": {
-        "compilerSettingsCacheFolder": "/root/Hijacker/.cxx",
-        "cxxFolder": "/root/Hijacker/.cxx",
-        "isBuildOnlyTargetAbiEnabled": true,
-        "isCmakeBuildCohabitationEnabled": false,
-        "isNativeCompilerSettingsCacheEnabled": false,
-        "rootBuildGradleFolder": "/root/Hijacker",
-        "sdkFolder": "/root/Android/Sdk",
-        "isPrefabEnabled": false
-      },
-      "splitsAbiFilterSet": [],
       "stlSharedObjectMap": {
         "LIBCXX_SHARED": {
-          "ARMEABI_V7A": "/root/Android/Sdk/ndk/21.1.6210238/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/libc++_shared.so",
-          "ARM64_V8A": "/root/Android/Sdk/ndk/21.1.6210238/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so",
-          "X86": "/root/Android/Sdk/ndk/21.1.6210238/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/i686-linux-android/libc++_shared.so",
-          "X86_64": "/root/Android/Sdk/ndk/21.1.6210238/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/x86_64-linux-android/libc++_shared.so"
+          "ARMEABI_V7A": "/root/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/arm-linux-androideabi/libc++_shared.so",
+          "ARM64_V8A": "/root/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so",
+          "X86": "/root/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/i686-linux-android/libc++_shared.so",
+          "X86_64": "/root/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/x86_64-linux-android/libc++_shared.so"
         },
         "LIBCXX_STATIC": {},
         "NONE": {},
         "SYSTEM": {}
+      },
+      "project": {
+        "rootBuildGradleFolder": "/root/Hijacker",
+        "sdkFolder": "/root/Android/Sdk",
+        "isBuildOnlyTargetAbiEnabled": true,
+        "isCmakeBuildCohabitationEnabled": false,
+        "isConfigurationFoldingEnabled": false,
+        "isPrefabEnabled": false
       }
     },
-    "objFolder": "/root/Hijacker/app/build/intermediates/cmake/debug/obj",
-    "variantName": "debug",
-    "validAbiList": [
-      "ARMEABI_V7A",
-      "ARM64_V8A",
-      "X86",
-      "X86_64"
-    ],
-    "prefabDirectory": "/root/Hijacker/app/.cxx/cmake/debug/prefab",
-    "prefabPackageDirectoryList": []
+    "prefabClassPathFileCollection": [],
+    "prefabPackageDirectoryListFileCollection": [],
+    "stlType": "c++_static",
+    "optimizationTag": "Debug"
   },
-  "prefabFolder": "/root/Hijacker/app/.cxx/cmake/debug/prefab/x86_64"
+  "buildSettings": {
+    "environmentVariables": []
+  },
+  "prefabFolder": "/root/Hijacker/app/.cxx/cmake/debug/prefab/x86_64",
+  "isActiveAbi": true,
+  "fullConfigurationHash": "6m725ib5p6f26z582d54tr4xr2x223a3f13635y2m5j30413i1066234s2y",
+  "configurationArguments": [
+    "-H/root/Hijacker/app",
+    "-DCMAKE_SYSTEM_NAME\u003dAndroid",
+    "-DCMAKE_EXPORT_COMPILE_COMMANDS\u003dON",
+    "-DCMAKE_SYSTEM_VERSION\u003d21",
+    "-DANDROID_PLATFORM\u003dandroid-21",
+    "-DANDROID_ABI\u003dx86_64",
+    "-DCMAKE_ANDROID_ARCH_ABI\u003dx86_64",
+    "-DANDROID_NDK\u003d/root/Android/Sdk/ndk/22.0.7026061",
+    "-DCMAKE_ANDROID_NDK\u003d/root/Android/Sdk/ndk/22.0.7026061",
+    "-DCMAKE_TOOLCHAIN_FILE\u003d/root/Android/Sdk/ndk/22.0.7026061/build/cmake/android.toolchain.cmake",
+    "-DCMAKE_MAKE_PROGRAM\u003d/root/Android/Sdk/cmake/3.18.1/bin/ninja",
+    "-DCMAKE_C_FLAGS\u003d",
+    "-DCMAKE_CXX_FLAGS\u003d",
+    "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY\u003d/root/Hijacker/app/build/intermediates/cmake/debug/obj/x86_64",
+    "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY\u003d/root/Hijacker/app/build/intermediates/cmake/debug/obj/x86_64",
+    "-DCMAKE_BUILD_TYPE\u003dDebug",
+    "-B/root/Hijacker/app/.cxx/cmake/debug/x86_64",
+    "-GNinja"
+  ]
 }

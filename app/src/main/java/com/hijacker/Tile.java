@@ -57,7 +57,7 @@ class Tile {
     static final ArrayList<Tile> tiles = new ArrayList<>();
     static final List<Tile> allTiles = new ArrayList<>();
     static int i=0;                                //End of APs in items
-    Device device;
+    final Device device;
     boolean show=true;
     Tile(int index, Device dev){
         this.device = dev;
@@ -188,40 +188,25 @@ class Tile {
         notification();
     }
 
-    static Comparator<Tile> AP_ESSID = new Comparator<Tile>(){
-        @Override
-        public int compare(Tile o1, Tile o2){
-            if(sort_reverse) return ((AP)o2.device).getESSID().compareToIgnoreCase(((AP)o1.device).getESSID());
-            else return ((AP)o1.device).getESSID().compareToIgnoreCase(((AP)o2.device).getESSID());
-        }
+    static final Comparator<Tile> AP_ESSID = (o1, o2) -> {
+        if(sort_reverse) return ((AP)o2.device).getESSID().compareToIgnoreCase(((AP)o1.device).getESSID());
+        else return ((AP)o1.device).getESSID().compareToIgnoreCase(((AP)o2.device).getESSID());
     };
-    static Comparator<Tile> AP_BEACONS = new Comparator<Tile>(){
-        @Override
-        public int compare(Tile o1, Tile o2){
-            if(sort_reverse) return ((AP)o1.device).getBeacons() - ((AP)o2.device).getBeacons();
-            else return ((AP)o2.device).getBeacons() - ((AP)o1.device).getBeacons();
-        }
+    static final Comparator<Tile> AP_BEACONS = (o1, o2) -> {
+        if(sort_reverse) return ((AP)o1.device).getBeacons() - ((AP)o2.device).getBeacons();
+        else return ((AP)o2.device).getBeacons() - ((AP)o1.device).getBeacons();
     };
-    static Comparator<Tile> AP_DATA = new Comparator<Tile>(){
-        @Override
-        public int compare(Tile o1, Tile o2){
-            if(sort_reverse) return ((AP)o1.device).getData() - ((AP)o2.device).getData();
-            else return ((AP)o2.device).getData() - ((AP)o1.device).getData();
-        }
+    static final Comparator<Tile> AP_DATA = (o1, o2) -> {
+        if(sort_reverse) return ((AP)o1.device).getData() - ((AP)o2.device).getData();
+        else return ((AP)o2.device).getData() - ((AP)o1.device).getData();
     };
-    static Comparator<Tile> ST_FRAMES = new Comparator<Tile>(){
-        @Override
-        public int compare(Tile o1, Tile o2){
-            if(sort_reverse) return ((ST)o1.device).getFrames() - ((ST)o2.device).getFrames();
-            else return ((ST)o2.device).getFrames() - ((ST)o1.device).getFrames();
-        }
+    static final Comparator<Tile> ST_FRAMES = (o1, o2) -> {
+        if(sort_reverse) return ((ST)o1.device).getFrames() - ((ST)o2.device).getFrames();
+        else return ((ST)o2.device).getFrames() - ((ST)o1.device).getFrames();
     };
-    static Comparator<Tile> AP_ST_PWR = new Comparator<Tile>(){
-        @Override
-        public int compare(Tile o1, Tile o2){
-            if(sort_reverse) return o1.device.pwr - o2.device.pwr;
-            else return o2.device.pwr - o1.device.pwr;
-        }
+    static final Comparator<Tile> AP_ST_PWR = (o1, o2) -> {
+        if(sort_reverse) return o1.device.pwr - o2.device.pwr;
+        else return o2.device.pwr - o1.device.pwr;
     };
     static Comparator<Tile> getComparatorForAP(){
         switch(sort){

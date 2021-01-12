@@ -52,13 +52,13 @@ import static com.hijacker.MainActivity.wep;
 import static com.hijacker.MainActivity.wpa;
 
 public class FiltersDialog extends DialogFragment {
-    String sort_texts[];
+    String[] sort_texts;
     View view;
     EditText manufView;
     TextView pwrTv;
     Button sortSelectBtn;
     CheckBox apCb, stCb, stNaCb, wpaCb, wepCb, opnCb, sortReverseCb;
-    CheckBox[] channelCb = new CheckBox[15];
+    final CheckBox[] channelCb = new CheckBox[15];
     SeekBar seek;
     int temp_sort;
     @Override
@@ -112,39 +112,23 @@ public class FiltersDialog extends DialogFragment {
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
-        manufView.setOnEditorActionListener(new TextView.OnEditorActionListener(){
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event){
-                if(actionId == EditorInfo.IME_ACTION_DONE){
-                    apply();
-                    dismissAllowingStateLoss();
-                    return true;
-                }
-                return false;
+        manufView.setOnEditorActionListener((v, actionId, event) -> {
+            if(actionId == EditorInfo.IME_ACTION_DONE){
+                apply();
+                dismissAllowingStateLoss();
+                return true;
             }
+            return false;
         });
 
-        sortSelectBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                showSortingPopup(v);
-            }
-        });
+        sortSelectBtn.setOnClickListener(v -> showSortingPopup(v));
 
         builder.setView(view);
         builder.setTitle(R.string.filters);
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //close
-            }
+        builder.setNegativeButton(R.string.cancel, (dialog, which) -> {
+            //close
         });
-        builder.setPositiveButton(R.string.apply, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                apply();
-            }
-        });
+        builder.setPositiveButton(R.string.apply, (dialog, which) -> apply());
 
         return builder.create();
     }
@@ -202,12 +186,10 @@ public class FiltersDialog extends DialogFragment {
         popup.getMenu().add(0, SORT_BEACONS_FRAMES, 2, sort_texts[SORT_BEACONS_FRAMES]);
         popup.getMenu().add(0, SORT_DATA_FRAMES, 3, sort_texts[SORT_DATA_FRAMES]);
         popup.getMenu().add(0, SORT_PWR, 4, sort_texts[SORT_PWR]);
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(android.view.MenuItem item) {
-                temp_sort = item.getItemId();
-                sortSelectBtn.setText(sort_texts[temp_sort]);
-                return true;
-            }
+        popup.setOnMenuItemClickListener(item -> {
+            temp_sort = item.getItemId();
+            sortSelectBtn.setText(sort_texts[temp_sort]);
+            return true;
         });
         popup.show();
     }

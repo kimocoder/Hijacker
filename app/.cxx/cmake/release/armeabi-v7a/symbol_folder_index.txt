@@ -1,0 +1,1 @@
+/root/Hijacker/app/build/intermediates/cmake/release/obj/armeabi-v7a

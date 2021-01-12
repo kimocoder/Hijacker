@@ -36,15 +36,8 @@ public class ErrorDialog extends DialogFragment {
         if(title==null) title = getString(R.string.error);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {}
-        });
-        builder.setNeutralButton(R.string.exit, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                getActivity().finish();
-            }
-        });
+        builder.setPositiveButton(R.string.ok, (dialog, id) -> {});
+        builder.setNeutralButton(R.string.exit, (dialog, which) -> getActivity().finish());
         if(message!=null) {
             builder.setTitle(title);
             builder.setMessage(this.message);

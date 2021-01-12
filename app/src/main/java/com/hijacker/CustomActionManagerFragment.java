@@ -44,65 +44,54 @@ public class CustomActionManagerFragment extends Fragment{
 
         ListView list = v.findViewById(R.id.list);
         list.setAdapter(custom_action_adapter);
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, final int index, long l){
-                PopupMenu popup = new PopupMenu(getActivity(), view);
-                popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
+        list.setOnItemClickListener((adapterView, view, index, l) -> {
+            PopupMenu popup = new PopupMenu(getActivity(), view);
+            popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
 
-                //add(groupId, itemId, order, title)
-                popup.getMenu().add(0, 0, 0, getString(R.string.edit));
-                popup.getMenu().add(0, 1, 1, getString(R.string.delete));
+            //add(groupId, itemId, order, title)
+            popup.getMenu().add(0, 0, 0, getString(R.string.edit));
+            popup.getMenu().add(0, 1, 1, getString(R.string.delete));
 
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    public boolean onMenuItemClick(android.view.MenuItem item){
-                        switch(item.getItemId()){
-                            case 0:
-                                //Open editor for this
-                                CustomActionEditorFragment fragment = new CustomActionEditorFragment();
-                                fragment.action = CustomAction.cmds.get(index);
+            popup.setOnMenuItemClickListener(item -> {
+                switch (item.getItemId()) {
+                    case 0:
+                        //Open editor for this
+                        CustomActionEditorFragment fragment = new CustomActionEditorFragment();
+                        fragment.action = CustomAction.cmds.get(index);
 
-                                FragmentTransaction ft = mFragmentManager.beginTransaction();
-                                ft.replace(R.id.fragment1, fragment);
-                                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                                ft.addToBackStack(null);
-                                ft.commitAllowingStateLoss();
-                                break;
-                            case 1:
-                                //Delete action
-                                CustomDialog dialog = new CustomDialog();
-                                dialog.setTitle(getString(R.string.action_delete_title));
-                                dialog.setMessage(getString(R.string.action_delete_message));
-                                dialog.setPositiveButton(getString(R.string.delete), new Runnable(){
-                                    @Override
-                                    public void run(){
-                                        new File(actions_path + "/" + cmds.get(index).getTitle() + ".action").delete();
-                                        cmds.remove(index);
-                                        custom_action_adapter.notifyDataSetChanged();
-                                    }
-                                });
-                                dialog.setNegativeButton(getString(R.string.cancel), null);
-                                dialog.show(getFragmentManager(), "CustomDialog for action delete");
-                                break;
-                        }
-                        return true;
-                    }
-                });
-                popup.show();
-            }
+                        FragmentTransaction ft = mFragmentManager.beginTransaction();
+                        ft.replace(R.id.fragment1, fragment);
+                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                        ft.addToBackStack(null);
+                        ft.commitAllowingStateLoss();
+                        break;
+                    case 1:
+                        //Delete action
+                        CustomDialog dialog = new CustomDialog();
+                        dialog.setTitle(getString(R.string.action_delete_title));
+                        dialog.setMessage(getString(R.string.action_delete_message));
+                        dialog.setPositiveButton(getString(R.string.delete), () -> {
+                            new File(actions_path + "/" + cmds.get(index).getTitle() + ".action").delete();
+                            cmds.remove(index);
+                            custom_action_adapter.notifyDataSetChanged();
+                        });
+                        dialog.setNegativeButton(getString(R.string.cancel), null);
+                        dialog.show(getFragmentManager(), "CustomDialog for action delete");
+                        break;
+                }
+                return true;
+            });
+            popup.show();
         });
 
         FloatingActionButton fab = v.findViewById(R.id.floatingActionButton);
-        fab.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                //Open editor for new
-                FragmentTransaction ft = mFragmentManager.beginTransaction();
-                ft.replace(R.id.fragment1, new CustomActionEditorFragment());
-                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                ft.addToBackStack(null);
-                ft.commitAllowingStateLoss();
-            }
+        fab.setOnClickListener(view -> {
+            //Open editor for new
+            FragmentTransaction ft = mFragmentManager.beginTransaction();
+            ft.replace(R.id.fragment1, new CustomActionEditorFragment());
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            ft.addToBackStack(null);
+            ft.commitAllowingStateLoss();
         });
 
         return v;

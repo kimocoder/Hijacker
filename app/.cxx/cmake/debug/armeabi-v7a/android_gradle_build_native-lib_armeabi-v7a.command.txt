@@ -1,7 +1,0 @@
-Executable : /root/Android/Sdk/cmake/3.10.2.4988404/bin/ninja
-arguments : 
--C
-/root/Hijacker/app/.cxx/cmake/debug/armeabi-v7a
-native-lib
-jvmArgs : 
-

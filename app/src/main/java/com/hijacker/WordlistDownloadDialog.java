@@ -61,7 +61,7 @@ public class WordlistDownloadDialog extends DialogFragment{
 
     LoadTask task;
     WordlistAdapter adapter;
-    ArrayList<Wordlist> wordlists = new ArrayList<>();
+    final ArrayList<Wordlist> wordlists = new ArrayList<>();
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -72,19 +72,13 @@ public class WordlistDownloadDialog extends DialogFragment{
 
         builder.setView(dialogView);
         builder.setTitle(R.string.wordlist_dialog_title);
-        builder.setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which){}
-        });
+        builder.setNeutralButton(R.string.cancel, (dialog, which) -> {});
 
         adapter = new WordlistAdapter();
         listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l){
-                beginDownload(wordlists.get(i));
-                dismissAllowingStateLoss();
-            }
+        listView.setOnItemClickListener((adapterView, view, i, l) -> {
+            beginDownload(wordlists.get(i));
+            dismissAllowingStateLoss();
         });
 
 
@@ -226,8 +220,9 @@ public class WordlistDownloadDialog extends DialogFragment{
         }
     }
     private class Wordlist{
-        int size;
-        String filename, download_url;
+        final int size;
+        final String filename;
+        final String download_url;
         Wordlist(String filename, int size, String url){
             this.filename = filename;
             this.size = size;

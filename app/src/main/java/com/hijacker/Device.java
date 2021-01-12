@@ -28,7 +28,9 @@ import static com.hijacker.MainActivity.sort;
 import static com.hijacker.MainActivity.toSort;
 
 abstract class Device{
-    String mac, manuf, alias;
+    final String mac;
+    final String manuf;
+    String alias;
     int pwr;
     long lastseen = 0;
     boolean isMarked = false;

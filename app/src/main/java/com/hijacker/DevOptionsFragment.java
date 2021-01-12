@@ -41,47 +41,41 @@ public class DevOptionsFragment extends PreferenceFragment{
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.dev_options);
 
-        findPreference("causeNPE").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener(){
-            @Override
-            public boolean onPreferenceClick(Preference preference){
-                getAPByMac(null).crack();
-                return false;
-            }
+        findPreference("causeNPE").setOnPreferenceClickListener(preference -> {
+            getAPByMac(null).crack();
+            return false;
         });
-        findPreference("testChroot").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                try {
-                    if(bootkali_init_bin.equals(NETHUNTER_BOOTKALI_BASH)){
-                        //Not in nethunter, need to initialize the chroot environment
-                        Log.d("TESTESTEST", "Initializing chroot environment");
-                        Runtime.getRuntime().exec("su -c " + bootkali_init_bin);       //Make sure kali has booted
-                    }else{
-                        Log.d("TESTESTEST", "No need to initialize chroot environment");
-                    }
-
-                    String cmd = "su -c chroot " + MainActivity.chroot_dir + " /bin/bash -c \"" + get_chroot_env(getActivity()) + "echo asd; echo asd; if [[ -r /dev/urandom ]]; then echo Success; else echo Fail; fi; \"; exit";
-                    Log.d("TESTESTEST", "CMD: " + cmd);
-
-                    ProcessBuilder pb = new ProcessBuilder("su");
-                    pb.redirectErrorStream(true);
-                    Process dc = pb.start();
-                    BufferedReader out = new BufferedReader(new InputStreamReader(dc.getInputStream()));
-                    PrintWriter in = new PrintWriter(dc.getOutputStream());
-                    in.print(cmd + "\nexit\n");
-                    in.flush();
-
-                    String buffer = out.readLine();
-                    while(buffer!=null){
-                        Log.d("TESTESTEST Output", buffer);
-                        buffer = out.readLine();
-                    }
-                    Log.d("TESTESTEST", "Finished reading output");
-                }catch(Exception e){
-                    e.printStackTrace();
+        findPreference("testChroot").setOnPreferenceClickListener(preference -> {
+            try {
+                if(bootkali_init_bin.equals(NETHUNTER_BOOTKALI_BASH)){
+                    //Not in nethunter, need to initialize the chroot environment
+                    Log.d("TESTESTEST", "Initializing chroot environment");
+                    Runtime.getRuntime().exec("su -c " + bootkali_init_bin);       //Make sure kali has booted
+                }else{
+                    Log.d("TESTESTEST", "No need to initialize chroot environment");
                 }
-                return false;
+
+                String cmd = "su -c chroot " + MainActivity.chroot_dir + " /bin/bash -c \"" + get_chroot_env(getActivity()) + "echo asd; echo asd; if [[ -r /dev/urandom ]]; then echo Success; else echo Fail; fi; \"; exit";
+                Log.d("TESTESTEST", "CMD: " + cmd);
+
+                ProcessBuilder pb = new ProcessBuilder("su");
+                pb.redirectErrorStream(true);
+                Process dc = pb.start();
+                BufferedReader out = new BufferedReader(new InputStreamReader(dc.getInputStream()));
+                PrintWriter in = new PrintWriter(dc.getOutputStream());
+                in.print(cmd + "\nexit\n");
+                in.flush();
+
+                String buffer = out.readLine();
+                while(buffer!=null){
+                    Log.d("TESTESTEST Output", buffer);
+                    buffer = out.readLine();
+                }
+                Log.d("TESTESTEST", "Finished reading output");
+            }catch(Exception e){
+                e.printStackTrace();
             }
+            return false;
         });
     }
     @Override

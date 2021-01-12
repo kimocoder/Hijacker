@@ -30,7 +30,7 @@ import static com.hijacker.MainActivity.getLastSeen;
 
 public class APDialog extends DeviceDialog {
     AP ap;
-    TextView[] views = {null, null, null, null, null, null, null, null, null, null, null, null, null};
+    final TextView[] views = {null, null, null, null, null, null, null, null, null, null, null, null, null};
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -52,10 +52,7 @@ public class APDialog extends DeviceDialog {
 
         builder.setView(view);
         builder.setTitle(ap.getESSID());
-        builder.setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {}
-        });
+        builder.setNegativeButton(R.string.close, (dialog, which) -> {});
         return builder.create();
     }
     APDialog setAP(AP ap){

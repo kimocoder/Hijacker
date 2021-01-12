@@ -23,7 +23,7 @@ import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import androidx.appcompat.app.AlertDialog;
-import android.view.View;
+
 import android.widget.Button;
 
 import static com.hijacker.MainActivity.isArchValid;
@@ -36,21 +36,12 @@ public class FirstRunDialog extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(R.string.first_run);
         builder.setTitle(R.string.first_run_title);
-        builder.setPositiveButton(R.string.install_firmware, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {}
+        builder.setPositiveButton(R.string.install_firmware, (dialog, id) -> {});
+        builder.setNegativeButton(R.string.home, (dialog, id) -> {
+            // Go to Home
+            dismissAllowingStateLoss();
         });
-        builder.setNegativeButton(R.string.home, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                // Go to Home
-                dismissAllowingStateLoss();
-            }
-        });
-        builder.setNeutralButton(R.string.exit, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                getActivity().finish();
-            }
-        });
+        builder.setNeutralButton(R.string.exit, (dialog, which) -> getActivity().finish());
         return builder.create();
     }
     @Override
@@ -65,15 +56,12 @@ public class FirstRunDialog extends DialogFragment {
         if(d==null) return;
 
         Button positiveButton = d.getButton(Dialog.BUTTON_POSITIVE);
-        if(!isArchValid()){
+        if(isArchValid()){
             positiveButton.setEnabled(false);
         }else{
-            positiveButton.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v){
-                    // Open InstallFirmwareDialog to install Nexmon
-                    new InstallFirmwareDialog().show(getFragmentManager(), "InstallFirmwareDialog");
-                }
+            positiveButton.setOnClickListener(v -> {
+                // Open InstallFirmwareDialog to install Nexmon
+                new InstallFirmwareDialog().show(getFragmentManager(), "InstallFirmwareDialog");
             });
         }
     }

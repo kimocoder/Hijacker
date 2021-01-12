@@ -50,17 +50,14 @@ public class IsolatedFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         fragmentView = inflater.inflate(R.layout.isolated_fragment, container, false);
 
-        runnable = new Runnable(){
-            @Override
-            public void run(){
-                cont = true;
-                try{
-                    while(cont){
-                        Thread.sleep(1000);
-                        runInHandler(refreshRunnable);
-                    }
-                }catch(InterruptedException ignored){}
-            }
+        runnable = () -> {
+            cont = true;
+            try{
+                while(cont){
+                    Thread.sleep(1000);
+                    runInHandler(refreshRunnable);
+                }
+            }catch(InterruptedException ignored){}
         };
         thread = new Thread(runnable);
 
@@ -73,16 +70,11 @@ public class IsolatedFragment extends Fragment{
 
         ListView listview = fragmentView.findViewById(R.id.listview);
         listview.setAdapter(MainActivity.adapter);
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, final View v, int i, long l){
-                Tile.tiles.get(i).device.getPopupMenu((MainActivity)getActivity(), v).show();
-            }
-        });
+        listview.setOnItemClickListener((adapterView, v, i, l) -> Tile.tiles.get(i).device.getPopupMenu((MainActivity)getActivity(), v).show());
 
         return fragmentView;
     }
-    Runnable refreshRunnable = new Runnable(){
+    final Runnable refreshRunnable = new Runnable(){
         @Override
         public void run(){
             if(cont && is_ap !=null){

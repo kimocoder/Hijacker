@@ -43,15 +43,12 @@ public class EditTextDialog extends DialogFragment {
         dialogView = getActivity().getLayoutInflater().inflate(R.layout.edit_text_dialog, null);
 
         fieldView = dialogView.findViewById(R.id.edit_text);
-        fieldView.setOnEditorActionListener(new TextView.OnEditorActionListener(){
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event){
-                if(actionId == EditorInfo.IME_ACTION_DONE){
-                    onOK();
-                    return true;
-                }
-                return false;
+        fieldView.setOnEditorActionListener((v, actionId, event) -> {
+            if(actionId == EditorInfo.IME_ACTION_DONE){
+                onOK();
+                return true;
             }
+            return false;
         });
 
         if(title!=null) builder.setTitle(title);
@@ -59,13 +56,8 @@ public class EditTextDialog extends DialogFragment {
         if(defaultText!=null) fieldView.setText(defaultText);
 
         builder.setView(dialogView);
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id){}
-        });
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which){}
-        });
+        builder.setPositiveButton(R.string.ok, (dialog, id) -> {});
+        builder.setNegativeButton(R.string.cancel, (dialog, which) -> {});
         return builder.create();
     }
     @Override
@@ -77,12 +69,7 @@ public class EditTextDialog extends DialogFragment {
         super.onStart();
         AlertDialog d = (AlertDialog)getDialog();
         if(d != null){
-            d.getButton(Dialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v){
-                    onOK();
-                }
-            });
+            d.getButton(Dialog.BUTTON_POSITIVE).setOnClickListener(v -> onOK());
         }
     }
     void onOK(){
@@ -105,8 +92,8 @@ public class EditTextDialog extends DialogFragment {
     void setHint(String hint){
         this.hint = hint;
     }
-    void setAllowEmpty(boolean allowEmpty){
-        this.allowEmpty = allowEmpty;
+    void setAllowEmpty(){
+        this.allowEmpty = true;
     }
     void setDefaultText(String text){ this.defaultText = text; }
 }

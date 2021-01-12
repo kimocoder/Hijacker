@@ -41,7 +41,7 @@ import static com.hijacker.MainActivity.stop;
 
 class WatchdogTask extends AsyncTask<Void, String, Boolean>{
     static final int SLEEP_TIME = 5000, PAUSE_TIME = 1000;
-    Context con;
+    final Context con;
     WatchdogTask(Context context){
         this.con = context;
     }

@@ -59,103 +59,92 @@ public class CustomActionEditorFragment extends Fragment{
         has_process_name_cb = fragmentView.findViewById(R.id.has_process_name);
         save_btn = fragmentView.findViewById(R.id.save_button);
 
-        ((RadioGroup)fragmentView.findViewById(R.id.radio_group)).setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int i){
-                titleView.setEnabled(true);
-                startCmdView.setEnabled(true);
-                stopCmdView.setEnabled(true);
-                requirement_cb.setEnabled(true);
-                has_process_name_cb.setEnabled(true);
-                save_btn.setEnabled(true);
-                requirement_cb.setText(i==R.id.st_rb ? R.string.requires_associated : R.string.requires_clients);
-            }
+        ((RadioGroup)fragmentView.findViewById(R.id.radio_group)).setOnCheckedChangeListener((radioGroup, i) -> {
+            titleView.setEnabled(true);
+            startCmdView.setEnabled(true);
+            stopCmdView.setEnabled(true);
+            requirement_cb.setEnabled(true);
+            has_process_name_cb.setEnabled(true);
+            save_btn.setEnabled(true);
+            requirement_cb.setText(i==R.id.st_rb ? R.string.requires_associated : R.string.requires_clients);
         });
 
-        has_process_name_cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked){
-                processNameView.setEnabled(isChecked);
-            }
-        });
+        has_process_name_cb.setOnCheckedChangeListener((buttonView, isChecked) -> processNameView.setEnabled(isChecked));
 
-        save_btn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                titleView.setError(null);
-                startCmdView.setError(null);
-                stopCmdView.setError(null);
-                processNameView.setError(null);
+        save_btn.setOnClickListener(view -> {
+            titleView.setError(null);
+            startCmdView.setError(null);
+            stopCmdView.setError(null);
+            processNameView.setError(null);
 
-                String title = titleView.getText().toString();
-                String start_cmd = startCmdView.getText().toString();
-                String stop_cmd = stopCmdView.getText().toString();
-                String process_name = processNameView.getText().toString();
-                if(title.equals("")){
-                    titleView.setError(getString(R.string.title_empty));
-                    titleView.requestFocus();
-                }else if(title.contains("\n")){
-                    titleView.setError(getString(R.string.title_newline));
-                    titleView.requestFocus();
-                }else if(start_cmd.equals("")){
-                    startCmdView.setError(getString(R.string.start_cmd_empty));
-                    startCmdView.requestFocus();
-                }else if(start_cmd.contains("\n")){
-                    startCmdView.setError(getString(R.string.start_cmd_newline));
-                    startCmdView.requestFocus();
-                }else if(stop_cmd.contains("\n")){
-                    stopCmdView.setError(getString(R.string.stop_cmd_newline));
-                    stopCmdView.requestFocus();
-                }else if(process_name.contains("\n")){
-                    processNameView.setError(getString(R.string.process_name_newline));
-                    processNameView.requestFocus();
-                }else if(process_name.equals("") && has_process_name_cb.isChecked()){
-                    processNameView.setError(getString(R.string.process_name_empty));
-                    processNameView.requestFocus();
-                }else if(action!=null){
-                    //update existing action
-                    if(!action.getTitle().equals(title)){
-                        String filename_before = actions_path + "/" + action.getTitle() + ".action";
-                        String filename_after = actions_path + "/" + title + ".action";
-                        new File(filename_before).renameTo(new File(filename_after));
+            String title = titleView.getText().toString();
+            String start_cmd = startCmdView.getText().toString();
+            String stop_cmd = stopCmdView.getText().toString();
+            String process_name = processNameView.getText().toString();
+            if(title.equals("")){
+                titleView.setError(getString(R.string.title_empty));
+                titleView.requestFocus();
+            }else if(title.contains("\n")){
+                titleView.setError(getString(R.string.title_newline));
+                titleView.requestFocus();
+            }else if(start_cmd.equals("")){
+                startCmdView.setError(getString(R.string.start_cmd_empty));
+                startCmdView.requestFocus();
+            }else if(start_cmd.contains("\n")){
+                startCmdView.setError(getString(R.string.start_cmd_newline));
+                startCmdView.requestFocus();
+            }else if(stop_cmd.contains("\n")){
+                stopCmdView.setError(getString(R.string.stop_cmd_newline));
+                stopCmdView.requestFocus();
+            }else if(process_name.contains("\n")){
+                processNameView.setError(getString(R.string.process_name_newline));
+                processNameView.requestFocus();
+            }else if(process_name.equals("") && has_process_name_cb.isChecked()){
+                processNameView.setError(getString(R.string.process_name_empty));
+                processNameView.requestFocus();
+            }else if(action!=null){
+                //update existing action
+                if(!action.getTitle().equals(title)){
+                    String filename_before = actions_path + "/" + action.getTitle() + ".action";
+                    String filename_after = actions_path + "/" + title + ".action";
+                    new File(filename_before).renameTo(new File(filename_after));
+                }
+                action.setTitle(title);
+                action.setStartCmd(start_cmd);
+                action.setStopCmd(stop_cmd);
+                if(action.getType()==TYPE_AP){
+                    action.setRequiresClients(requirement_cb.isChecked());
+                }else{
+                    action.setRequiresConnected(requirement_cb.isChecked());
+                }
+                save();
+                Snackbar.make(fragmentView, getString(R.string.saved) + " " + action.getTitle(), Snackbar.LENGTH_SHORT).show();
+                mFragmentManager.popBackStackImmediate();
+            }else{
+                boolean found = false;
+                for(int i=0;i<cmds.size();i++){
+                    if(cmds.get(i).getTitle().equals(title)){
+                        found = true;
+                        break;
                     }
-                    action.setTitle(title);
-                    action.setStartCmd(start_cmd);
-                    action.setStopCmd(stop_cmd);
-                    if(action.getType()==TYPE_AP){
+                }
+                if(found){
+                    titleView.setError(getString(R.string.action_exists));
+                    titleView.requestFocus();
+                }else{
+                    //create new action
+                    if(((RadioGroup) fragmentView.findViewById(R.id.radio_group)).getCheckedRadioButtonId()==R.id.ap_rb){
+                        //this action is for ap
+                        action = new CustomAction(title, start_cmd, stop_cmd, process_name, TYPE_AP);
                         action.setRequiresClients(requirement_cb.isChecked());
                     }else{
+                        //this action is for st
+                        action = new CustomAction(title, start_cmd, stop_cmd, process_name, TYPE_ST);
                         action.setRequiresConnected(requirement_cb.isChecked());
                     }
                     save();
                     Snackbar.make(fragmentView, getString(R.string.saved) + " " + action.getTitle(), Snackbar.LENGTH_SHORT).show();
                     mFragmentManager.popBackStackImmediate();
-                }else{
-                    boolean found = false;
-                    for(int i=0;i<cmds.size();i++){
-                        if(cmds.get(i).getTitle().equals(title)){
-                            found = true;
-                            break;
-                        }
-                    }
-                    if(found){
-                        titleView.setError(getString(R.string.action_exists));
-                        titleView.requestFocus();
-                    }else{
-                        //create new action
-                        if(((RadioGroup) fragmentView.findViewById(R.id.radio_group)).getCheckedRadioButtonId()==R.id.ap_rb){
-                            //this action is for ap
-                            action = new CustomAction(title, start_cmd, stop_cmd, process_name, TYPE_AP);
-                            action.setRequiresClients(requirement_cb.isChecked());
-                        }else{
-                            //this action is for st
-                            action = new CustomAction(title, start_cmd, stop_cmd, process_name, TYPE_ST);
-                            action.setRequiresConnected(requirement_cb.isChecked());
-                        }
-                        save();
-                        Snackbar.make(fragmentView, getString(R.string.saved) + " " + action.getTitle(), Snackbar.LENGTH_SHORT).show();
-                        mFragmentManager.popBackStackImmediate();
-                    }
                 }
             }
         });

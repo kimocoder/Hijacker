@@ -30,7 +30,7 @@ import static com.hijacker.MainActivity.getLastSeen;
 
 public class STDialog extends DeviceDialog {
     ST st;
-    TextView[] views = {null, null, null, null, null, null, null, null};
+    final TextView[] views = {null, null, null, null, null, null, null, null};
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -47,11 +47,8 @@ public class STDialog extends DeviceDialog {
 
         builder.setView(view);
         builder.setTitle(st.mac);
-        builder.setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //close
-            }
+        builder.setNegativeButton(R.string.close, (dialog, which) -> {
+            //close
         });
         return builder.create();
     }

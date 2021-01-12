@@ -1,17 +1,24 @@
 {
   "buildFiles": [
-    "/root/Android/Sdk/ndk/21.1.6210238/build/cmake/android.toolchain.cmake",
-    "/root/Android/Sdk/ndk/21.1.6210238/build/cmake/platforms.cmake",
     "/root/Hijacker/app/CMakeLists.txt"
   ],
-  "cleanCommands": [
-    "/root/Android/Sdk/cmake/3.10.2.4988404/bin/ninja -C \"/root/Hijacker/app/.cxx/cmake/debug/x86_64\" clean"
+  "cleanCommandsComponents": [
+    [
+      "/root/Android/Sdk/cmake/3.18.1/bin/ninja",
+      "-C",
+      "/root/Hijacker/app/.cxx/cmake/debug/x86_64",
+      "clean"
+    ]
   ],
-  "buildTargetsCommand": "/root/Android/Sdk/cmake/3.10.2.4988404/bin/ninja  -C \"/root/Hijacker/app/.cxx/cmake/debug/x86_64\" {LIST_OF_TARGETS_TO_BUILD}",
+  "buildTargetsCommandComponents": [
+    "/root/Android/Sdk/cmake/3.18.1/bin/ninja",
+    "-C",
+    "/root/Hijacker/app/.cxx/cmake/debug/x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
   "libraries": {
-    "native-lib-Debug-x86_64": {
+    "native-lib::@6890427a1f51a3e7e1df": {
       "artifactName": "native-lib",
-      "buildCommand": "/root/Android/Sdk/cmake/3.10.2.4988404/bin/ninja -C \"/root/Hijacker/app/.cxx/cmake/debug/x86_64\" native-lib",
       "abi": "x86_64",
       "output": "/root/Hijacker/app/build/intermediates/cmake/debug/obj/x86_64/libnative-lib.so",
       "runtimeFiles": []

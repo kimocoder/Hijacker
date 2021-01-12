@@ -81,7 +81,9 @@ class AP extends Device{
     static final ArrayList<AP> marked = new ArrayList<>();
     static final ArrayList<AP> currentTargetDeauth = new ArrayList<>();
     boolean isHidden = false;
-    int ch, id, sec=UNKNOWN;
+    int ch;
+    final int id;
+    int sec=UNKNOWN;
     private int beacons, data, ivs, total_beacons=0, total_data=0, total_ivs=0;
     private String essid;
     String enc, cipher, auth;
@@ -183,14 +185,11 @@ class AP extends Device{
                 (this.enc.length()==0 ? "" : " | SEC: " + this.enc) +
                 (this.ch==-1 ? "" : " | CH: " + this.ch) +
                 " | B:" + this.getBeacons() + " | D:" + this.getData();
-        runInHandler(new Runnable(){
-            @Override
-            public void run(){
-                if(tile!=null) tile.update();
-                else tile = new Tile(id, AP.this);
+        runInHandler(() -> {
+            if(tile!=null) tile.update();
+            else tile = new Tile(id, AP.this);
 
-                if(toSort) Tile.sort();
-            }
+            if(toSort) Tile.sort();
         });
     }
     void removeClient(ST st){
@@ -207,7 +206,7 @@ class AP extends Device{
             if(debug) Log.d("HIJACKER/AP", "Cracking WEP");
             Airodump.reset();
             Airodump.setAP(this);
-            Airodump.setForWEP(true);
+            Airodump.setForWEP();
             Airodump.start();
             if(essid!=null) startAireplayWEP(this);
             progress.setIndeterminate(true);
@@ -217,7 +216,7 @@ class AP extends Device{
             if(debug) Log.d("HIJACKER/AP", "Cracking WPA/WPA2");
             Airodump.reset();
             Airodump.setAP(this);
-            Airodump.setForWPA(true);
+            Airodump.setForWPA();
             Airodump.start();
             startAireplay(this.mac);
             wpa_thread = new Thread(wpa_runnable);
@@ -230,7 +229,7 @@ class AP extends Device{
 
         ReaverFragment.ap = this;
         FragmentTransaction ft = fragmentManager.beginTransaction();
-        ft.replace(R.id.fragment1, activity.reaverFragment.setAutostart(true));
+        ft.replace(R.id.fragment1, activity.reaverFragment.setAutostart());
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         ft.addToBackStack(null);
         ft.commitAllowingStateLoss();
@@ -337,175 +336,167 @@ class AP extends Device{
         popup.getMenu().add(0, 5, 4, "Set alias");
         popup.getMenu().add(0, 4, 5, "Attack...");
 
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(android.view.MenuItem item) {
-                if(debug) Log.d("HIJACKER/MyListFragment", "Clicked " + item.getItemId() + " for ap");
-                switch(item.getItemId()) {
-                    case 0:
-                        //Info
-                        AP.this.showInfo(activity.getFragmentManager());
-                        break;
-                    case 1:
-                        //mark or unmark
-                        if(AP.this.isMarked){
-                            AP.this.unmark();
-                        }else{
-                            AP.this.mark();
-                        }
-                        break;
-                    case 2:
-                        //copy mac to clipboard
-                        copy(AP.this.mac, v);
-                        break;
-                    case 3:
-                        //Watch
-                        MainActivity.isolate(AP.this.mac);
-                        Airodump.startClean(AP.this);
-                        break;
-                    case 4:
-                        //attack
-                        PopupMenu popup2 = new PopupMenu(activity, v);
-                        popup2.getMenuInflater().inflate(R.menu.popup_menu, popup2.getMenu());
+        popup.setOnMenuItemClickListener(item -> {
+            if(debug) Log.d("HIJACKER/MyListFragment", "Clicked " + item.getItemId() + " for ap");
+            switch(item.getItemId()) {
+                case 0:
+                    //Info
+                    AP.this.showInfo(activity.getFragmentManager());
+                    break;
+                case 1:
+                    //mark or unmark
+                    if(AP.this.isMarked){
+                        AP.this.unmark();
+                    }else{
+                        AP.this.mark();
+                    }
+                    break;
+                case 2:
+                    //copy mac to clipboard
+                    copy(AP.this.mac, v);
+                    break;
+                case 3:
+                    //Watch
+                    MainActivity.isolate(AP.this.mac);
+                    Airodump.startClean(AP.this);
+                    break;
+                case 4:
+                    //attack
+                    PopupMenu popup2 = new PopupMenu(activity, v);
+                    popup2.getMenuInflater().inflate(R.menu.popup_menu, popup2.getMenu());
 
-                        //add(groupId, itemId, order, title)
-                        popup2.getMenu().add(0, 0, 0, "Disconnect...");
-                        if(AP.this.clients.size()>0) popup2.getMenu().add(0, 1, 1, "Disconnect Client");
-                        popup2.getMenu().add(0, 2, 2, "Copy disconnect command");
+                    //add(groupId, itemId, order, title)
+                    popup2.getMenu().add(0, 0, 0, "Disconnect...");
+                    if(AP.this.clients.size()>0) popup2.getMenu().add(0, 1, 1, "Disconnect Client");
+                    popup2.getMenu().add(0, 2, 2, "Copy disconnect command");
 
-                        popup2.getMenu().add(0, 3, 3, "DoS");
-                        if(AP.this.sec==WPA || AP.this.sec==WPA2 || AP.this.sec==WEP){
-                            popup2.getMenu().add(0, 4, 4, "Crack");
-                            popup2.getMenu().add(0, 5, 5, "Copy crack command");
-                        }
-                        popup2.getMenu().add(0, 6, 6, "Crack with Reaver");
+                    popup2.getMenu().add(0, 3, 3, "DoS");
+                    if(AP.this.sec==WPA || AP.this.sec==WPA2 || AP.this.sec==WEP){
+                        popup2.getMenu().add(0, 4, 4, "Crack");
+                        popup2.getMenu().add(0, 5, 5, "Copy crack command");
+                    }
+                    popup2.getMenu().add(0, 6, 6, "Crack with Reaver");
 
-                        popup2.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener(){
-                            @Override
-                            public boolean onMenuItemClick(MenuItem item){
-                                switch(item.getItemId()){
-                                    case 0:
-                                        //Disconnect
-                                        AP.this.disconnectAll();
-                                        break;
-                                    case 1:
-                                        //Disconnect client
-                                        PopupMenu popup = new PopupMenu(activity, v);
+                    popup2.setOnMenuItemClickListener(item12 -> {
+                        switch (item12.getItemId()) {
+                            case 0:
+                                //Disconnect
+                                AP.this.disconnectAll();
+                                break;
+                            case 1:
+                                //Disconnect client
+                                PopupMenu popup1 = new PopupMenu(activity, v);
 
-                                        popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
-                                        for (int i = 0; i < AP.this.clients.size(); i++) {
-                                            popup.getMenu().add(0, i, i, AP.this.clients.get(i).toString());
-                                        }
-                                        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                                            public boolean onMenuItemClick(android.view.MenuItem item) {
-                                                //ItemId = i (in for())
-                                                AP.this.clients.get(item.getItemId()).disconnect();
-                                                return true;
-                                            }
-                                        });
-                                        popup.show();
-                                        break;
-                                    case 2:
-                                        //Copy disconnect command
-                                        String str2 = prefix + " " + aireplay_dir + " --deauth 0 -a " + AP.this.mac + " " + iface;
-                                        copy(str2, v);
-                                        break;
-                                    case 3:
-                                        //DoS
-                                        stop(PROCESS_MDK_DOS);
-                                        MDKFragment.ados_ap = AP.this;
-                                        FragmentTransaction ft = mFragmentManager.beginTransaction();
-                                        ft.replace(R.id.fragment1, new MDKFragment());
-                                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                                        ft.addToBackStack(null);
-                                        ft.commitAllowingStateLoss();
-                                        mFragmentManager.executePendingTransactions();
-                                        MDKFragment.ados_switch.setChecked(true);
-                                        break;
-                                    case 4:
-                                        //Crack
-                                        AP.this.crack();
-                                        break;
-                                    case 5:
-                                        //copy crack command
-                                        String str;
-                                        if(AP.this.sec==WEP) str = prefix + " " + airodump_dir + " --channel " + AP.this.ch + " --bssid " + AP.this.mac + " --ivs -w " + cap_path + "/wep_ivs " + iface;
-                                        else str = prefix + " " + airodump_dir + " --channel " + AP.this.ch + " --bssid " + AP.this.mac + " -w " + cap_path + "/handshake " + iface;
-
-                                        copy(str, v);
-                                        break;
-                                    case 6:
-                                        //crack with reaver
-                                        if(ReaverFragment.isRunning()){
-                                            Toast.makeText(activity, activity.getString(R.string.reaver_already_running), Toast.LENGTH_SHORT).show();
-                                        }else{
-                                            AP.this.crackReaver(activity);
-                                        }
-                                        break;
+                                popup1.getMenuInflater().inflate(R.menu.popup_menu, popup1.getMenu());
+                                for (int i = 0; i < AP.this.clients.size(); i++) {
+                                    popup1.getMenu().add(0, i, i, AP.this.clients.get(i).toString());
                                 }
-                                return false;
-                            }
-                        });
-                        popup2.show();
-                        break;
-                    case 5:
-                        //Set alias
-                        final EditTextDialog dialog = new EditTextDialog();
-                        dialog.setTitle(activity.getString(R.string.set_alias));
-                        dialog.setDefaultText(AP.this.alias);
-                        dialog.setAllowEmpty(true);
-                        dialog.setRunnable(new Runnable(){
-                            @Override
-                            public void run(){
-                                if(dialog.result.equals("")) dialog.result = null;
-                                try{
-                                    if(AP.this.alias==null ^ dialog.result==null){
-                                        //Need to remove previous alias
-                                        File temp_aliases = new File(data_path + "/temp_aliases");
-                                        if(temp_aliases.exists()) temp_aliases.delete();
-                                        temp_aliases.createNewFile();
-                                        PrintWriter temp_in = new PrintWriter(new FileWriter(temp_aliases));
+                                popup1.setOnMenuItemClickListener(item1 -> {
+                                    //ItemId = i (in for())
+                                    AP.this.clients.get(item1.getItemId()).disconnect();
+                                    return true;
+                                });
+                                popup1.show();
+                                break;
+                            case 2:
+                                //Copy disconnect command
+                                String str2 = prefix + " " + aireplay_dir + " --deauth 0 -a " + AP.this.mac + " " + iface;
+                                copy(str2, v);
+                                break;
+                            case 3:
+                                //DoS
+                                stop(PROCESS_MDK_DOS);
+                                MDKFragment.ados_ap = AP.this;
+                                FragmentTransaction ft = mFragmentManager.beginTransaction();
+                                ft.replace(R.id.fragment1, new MDKFragment());
+                                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                                ft.addToBackStack(null);
+                                ft.commitAllowingStateLoss();
+                                mFragmentManager.executePendingTransactions();
+                                MDKFragment.ados_switch.setChecked(true);
+                                break;
+                            case 4:
+                                //Crack
+                                AP.this.crack();
+                                break;
+                            case 5:
+                                //copy crack command
+                                String str;
+                                if (AP.this.sec == WEP)
+                                    str = prefix + " " + airodump_dir + " --channel " + AP.this.ch + " --bssid " + AP.this.mac + " --ivs -w " + cap_path + "/wep_ivs " + iface;
+                                else
+                                    str = prefix + " " + airodump_dir + " --channel " + AP.this.ch + " --bssid " + AP.this.mac + " -w " + cap_path + "/handshake " + iface;
 
-                                        BufferedReader aliases_out = new BufferedReader(new FileReader(aliases_file));
-
-                                        //Copy current aliases to temp file, except the one we are changing
-                                        String buffer = aliases_out.readLine();
-                                        while(buffer!=null){
-                                            //Line format: 00:11:22:33:44:55 Alias
-                                            if(buffer.charAt(17)==' ' && buffer.length()>18){
-                                                String mac = buffer.substring(0, 17);
-                                                String alias = buffer.substring(18);
-                                                if(!mac.equals(AP.this.mac)){
-                                                    temp_in.println(mac + ' ' + alias);
-                                                }
-                                            }else{
-                                                Log.e("HIJACKER/setup", "Aliases file format error: " + buffer);
-                                            }
-                                            buffer = aliases_out.readLine();
-                                        }
-                                        temp_in.flush();
-                                        temp_in.close();
-                                        aliases_out.close();
-
-                                        aliases_file.delete();
-                                        temp_aliases.renameTo(aliases_file);
-                                        aliases_in = new FileWriter(aliases_file, true);
-                                    }
-                                    if(dialog.result!=null){
-                                        aliases_in.write(AP.this.mac + ' ' + dialog.result + '\n');
-                                        aliases_in.flush();
-                                    }
-                                }catch(IOException e){
-                                    Log.e("HIJACKER/MyListFrgm", e.toString());
+                                copy(str, v);
+                                break;
+                            case 6:
+                                //crack with reaver
+                                if (ReaverFragment.isRunning()) {
+                                    Toast.makeText(activity, activity.getString(R.string.reaver_already_running), Toast.LENGTH_SHORT).show();
+                                } else {
+                                    AP.this.crackReaver(activity);
                                 }
-                                aliases.put(AP.this.mac, dialog.result);
-                                AP.this.alias = dialog.result;
-                                AP.this.update();
+                                break;
+                        }
+                        return false;
+                    });
+                    popup2.show();
+                    break;
+                case 5:
+                    //Set alias
+                    final EditTextDialog dialog = new EditTextDialog();
+                    dialog.setTitle(activity.getString(R.string.set_alias));
+                    dialog.setDefaultText(AP.this.alias);
+                    dialog.setAllowEmpty();
+                    dialog.setRunnable(() -> {
+                        if (dialog.result.equals("")) dialog.result = null;
+                        try {
+                            if (AP.this.alias == null ^ dialog.result == null) {
+                                //Need to remove previous alias
+                                File temp_aliases = new File(data_path + "/temp_aliases");
+                                if (temp_aliases.exists()) temp_aliases.delete();
+                                temp_aliases.createNewFile();
+                                PrintWriter temp_in = new PrintWriter(new FileWriter(temp_aliases));
+
+                                BufferedReader aliases_out = new BufferedReader(new FileReader(aliases_file));
+
+                                //Copy current aliases to temp file, except the one we are changing
+                                String buffer = aliases_out.readLine();
+                                while (buffer != null) {
+                                    //Line format: 00:11:22:33:44:55 Alias
+                                    if (buffer.charAt(17) == ' ' && buffer.length() > 18) {
+                                        String mac = buffer.substring(0, 17);
+                                        String alias = buffer.substring(18);
+                                        if (!mac.equals(AP.this.mac)) {
+                                            temp_in.println(mac + ' ' + alias);
+                                        }
+                                    } else {
+                                        Log.e("HIJACKER/setup", "Aliases file format error: " + buffer);
+                                    }
+                                    buffer = aliases_out.readLine();
+                                }
+                                temp_in.flush();
+                                temp_in.close();
+                                aliases_out.close();
+
+                                aliases_file.delete();
+                                temp_aliases.renameTo(aliases_file);
+                                aliases_in = new FileWriter(aliases_file, true);
                             }
-                        });
-                        dialog.show(activity.getFragmentManager(), "EditTextDialog");
-                }
-                return true;
+                            if (dialog.result != null) {
+                                aliases_in.write(AP.this.mac + ' ' + dialog.result + '\n');
+                                aliases_in.flush();
+                            }
+                        } catch (IOException e) {
+                            Log.e("HIJACKER/MyListFrgm", e.toString());
+                        }
+                        aliases.put(AP.this.mac, dialog.result);
+                        AP.this.alias = dialog.result;
+                        AP.this.update();
+                    });
+                    dialog.show(activity.getFragmentManager(), "EditTextDialog");
             }
+            return true;
         });
         return popup;
     }

@@ -1,0 +1,38 @@
+{
+  "buildFiles": [
+    "/root/Hijacker/app/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/root/Android/Sdk/cmake/3.18.1/bin/ninja",
+      "-C",
+      "/root/Hijacker/app/.cxx/cmake/release/arm64-v8a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/root/Android/Sdk/cmake/3.18.1/bin/ninja",
+    "-C",
+    "/root/Hijacker/app/.cxx/cmake/release/arm64-v8a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "native-lib::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "native-lib",
+      "output": "/root/Hijacker/app/build/intermediates/cmake/release/obj/arm64-v8a/libnative-lib.so",
+      "runtimeFiles": []
+    }
+  },
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "/root/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/bin/clang.lld",
+      "cppCompilerExecutable": "/root/Android/Sdk/ndk/22.0.7026061/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++.lld"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}

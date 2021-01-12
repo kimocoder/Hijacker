@@ -85,18 +85,9 @@ public class InstallFirmwareDialog extends DialogFragment {
 
         builder.setView(dialogView);
         builder.setTitle(R.string.install_nexmon_title);
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {}
-        });
-        builder.setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {}
-        });
-        builder.setNeutralButton(R.string.restore, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {}
-        });
+        builder.setNegativeButton(R.string.cancel, (dialog, which) -> {});
+        builder.setPositiveButton(R.string.install, (dialog, which) -> {});
+        builder.setNeutralButton(R.string.restore, (dialog, which) -> {});
         return builder.create();
     }
 
@@ -108,21 +99,11 @@ public class InstallFirmwareDialog extends DialogFragment {
         if(d != null) {
             positiveButton = d.getButton(Dialog.BUTTON_POSITIVE);
             positiveButton.setEnabled(false);
-            positiveButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    attemptInstall();
-                }
-            });
+            positiveButton.setOnClickListener(v -> attemptInstall());
 
             neutralButton = d.getButton(Dialog.BUTTON_NEUTRAL);
             neutralButton.setEnabled(false);
-            neutralButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    attemptRestore();
-                }
-            });
+            neutralButton.setOnClickListener(view -> attemptRestore());
 
             new InitTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
@@ -152,7 +133,7 @@ public class InstallFirmwareDialog extends DialogFragment {
 
     boolean determineFS(){
         // Determine whether we are running on a system-as-root device by examining /proc/mounts
-        if(fs!=null) return true;
+        if(fs!=null) return false;
 
         shell.clearOutput();
         shell.run("cat /proc/mounts; echo; echo ENDOFCAT");
@@ -165,7 +146,7 @@ public class InstallFirmwareDialog extends DialogFragment {
                 if(split.length >= 2){
                     if(str.split(" ")[1].equals("/system")){
                         fs = "/system";
-                        return true;
+                        return false;
                     }
                 }
 
@@ -174,20 +155,20 @@ public class InstallFirmwareDialog extends DialogFragment {
 
             // If the loop finished, '/system' was not found in /proc/mounts so fs must be /
             fs = "/";
-            return true;
+            return false;
 
         }catch(IOException e){
             Log.e(TAG, "Exception while reading from /proc/mounts", e);
             Snackbar.make(dialogView, R.string.error_reading_mounts, Snackbar.LENGTH_LONG).show();
         }
 
-        return false;
+        return true;
     }
     boolean verifyRW(){
         // Make sure the filesystem has been remounted correctly
         if(fs==null){
             Log.e(TAG, "checkRW called but fs is null");
-            return false;
+            return true;
         }
 
         shell.clearOutput();
@@ -209,9 +190,9 @@ public class InstallFirmwareDialog extends DialogFragment {
                             // fs is still mounted as read-only
                             Log.e(TAG, fs + " appears to still be read-only: " + str);
                             Snackbar.make(dialogView, R.string.error_remounting_system, Snackbar.LENGTH_LONG).show();
-                            return false;
-                        }else if(props[0].equals("rw")){
                             return true;
+                        }else if(props[0].equals("rw")){
+                            return false;
                         }else{
                             Log.e(TAG, "Encountered unknown property while checking for fs rw/ro: " + props[0]);
                             break;
@@ -230,7 +211,7 @@ public class InstallFirmwareDialog extends DialogFragment {
             Snackbar.make(dialogView, R.string.error_reading_mounts, Snackbar.LENGTH_LONG).show();
         }
 
-        return false;
+        return true;
     }
 
     void install(String firm_location, String util_location){
@@ -260,7 +241,7 @@ public class InstallFirmwareDialog extends DialogFragment {
         }
 
         // Determine whether we should remount / or /system
-        if(!determineFS()) return;
+        if(determineFS()) return;
 
         Log.d(TAG, "Remounting " + fs + " as rw...");
 
@@ -268,16 +249,16 @@ public class InstallFirmwareDialog extends DialogFragment {
         shell.run(busybox + " mount -o rw,remount " + fs);
 
         // Verify that fs has been remounted successfully
-        if(!verifyRW()) return;
+        if(verifyRW()) return;
 
         Log.d(TAG, fs + " has been remounted as rw successfully");
 
         // Extract the files in 'path'
-        if(!extract(fw_filename, path)){
+        if(extract(fw_filename, path)){
             Log.e(TAG, "Error extracting fw file in " + firm_location);
             Snackbar.make(dialogView, R.string.error_extracting_firmware, Snackbar.LENGTH_LONG).show();
         }
-        if(!extract("nexutil", path)){
+        if(extract("nexutil", path)){
             Log.e(TAG, "Error extracting nexutil in " + util_location);
             Snackbar.make(dialogView, R.string.error_extracting_utility, Snackbar.LENGTH_LONG).show();
         }
@@ -309,13 +290,13 @@ public class InstallFirmwareDialog extends DialogFragment {
         if(wifiManager!=null) wifiManager.setWifiEnabled(false);
 
         // Determine whether we should remount / or /system
-        if(!determineFS()) return;
+        if(determineFS()) return;
 
         // Remount fs as rw
         shell.run(busybox + " mount -o rw,remount " + fs);
 
         // Verify that fs has been remounted successfully
-        if(!verifyRW()) return;
+        if(verifyRW()) return;
 
         // Replace the firmware with the backup file and chmod to 644
         shell.run("cp " + firm_backup_file + " " + firm_location);
@@ -345,10 +326,10 @@ public class InstallFirmwareDialog extends DialogFragment {
                 out.close();
             }catch(IOException e){
                 Log.e("HIJACKER/InstFirm", "Exception copying from assets", e);
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     class InitTask extends AsyncTask<Void, Void, Void>{

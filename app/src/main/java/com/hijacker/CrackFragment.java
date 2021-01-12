@@ -97,15 +97,12 @@ public class CrackFragment extends Fragment{
         startBtn = fragmentView.findViewById(R.id.start);
         speedTestBtn = fragmentView.findViewById(R.id.speed_test_btn);
 
-        capfileView.setOnEditorActionListener(new TextView.OnEditorActionListener(){
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event){
-                if(actionId == EditorInfo.IME_ACTION_NEXT){
-                    wordlistView.requestFocus();
-                    return true;
-                }
-                return false;
+        capfileView.setOnEditorActionListener((v, actionId, event) -> {
+            if(actionId == EditorInfo.IME_ACTION_NEXT){
+                wordlistView.requestFocus();
+                return true;
             }
+            return false;
         });
 
         for (int i = 0; i < wepRG.getChildCount(); i++) {
@@ -115,82 +112,49 @@ public class CrackFragment extends Fragment{
 
         if(task==null) task = new CrackTask(CrackTask.JOB_CRACK, null, null);
 
-        wepRB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b){
-                for (int i = 0; i < wepRG.getChildCount(); i++) {
-                    //If wep is now checked, enable the wep options, otherwise disable them
-                    wepRG.getChildAt(i).setEnabled(b);
-                }
-                wordlistView.setEnabled(!b);
+        wepRB.setOnCheckedChangeListener((compoundButton, b) -> {
+            for (int i = 0; i < wepRG.getChildCount(); i++) {
+                //If wep is now checked, enable the wep options, otherwise disable them
+                wepRG.getChildAt(i).setEnabled(b);
+            }
+            wordlistView.setEnabled(!b);
+        });
+        startBtn.setOnClickListener(view -> {
+            if(!isRunning()){
+                attemptStart();
+            }else{
+                task.cancel(true);
             }
         });
-        startBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                if(!isRunning()){
-                    attemptStart();
-                }else{
-                    task.cancel(true);
-                }
-            }
+        speedTestBtn.setOnClickListener(view -> startSpeedTest());
+        capFeBtn.setOnClickListener(v -> {
+            final FileExplorerDialog dialog = new FileExplorerDialog();
+            dialog.setStartingDir(new RootFile(cap_path));
+            dialog.setToSelect(FileExplorerDialog.SELECT_EXISTING_FILE);
+            dialog.setOnSelect(() -> {
+                capfileView.setText(dialog.result.getAbsolutePath());
+                capfileView.setError(null);
+            });
+            dialog.show(getFragmentManager(), "FileExplorerDialog");
         });
-        speedTestBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                startSpeedTest();
-            }
+        wordlistFeBtn.setOnClickListener(v -> {
+            final FileExplorerDialog dialog = new FileExplorerDialog();
+            dialog.setStartingDir(new RootFile(wl_path));
+            dialog.setToSelect(FileExplorerDialog.SELECT_EXISTING_FILE);
+            dialog.setOnSelect(() -> {
+                wordlistView.setText(dialog.result.getAbsolutePath());
+                wordlistView.setError(null);
+            });
+            dialog.show(getFragmentManager(), "FileExplorerDialog");
         });
-        capFeBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                final FileExplorerDialog dialog = new FileExplorerDialog();
-                dialog.setStartingDir(new RootFile(cap_path));
-                dialog.setToSelect(FileExplorerDialog.SELECT_EXISTING_FILE);
-                dialog.setOnSelect(new Runnable(){
-                    @Override
-                    public void run(){
-                        capfileView.setText(dialog.result.getAbsolutePath());
-                        capfileView.setError(null);
-                    }
-                });
-                dialog.show(getFragmentManager(), "FileExplorerDialog");
-            }
-        });
-        wordlistFeBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                final FileExplorerDialog dialog = new FileExplorerDialog();
-                dialog.setStartingDir(new RootFile(wl_path));
-                dialog.setToSelect(FileExplorerDialog.SELECT_EXISTING_FILE);
-                dialog.setOnSelect(new Runnable(){
-                    @Override
-                    public void run(){
-                        wordlistView.setText(dialog.result.getAbsolutePath());
-                        wordlistView.setError(null);
-                    }
-                });
-                dialog.show(getFragmentManager(), "FileExplorerDialog");
-            }
-        });
-        wordlistDownloadBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                new WordlistDownloadDialog().show(getFragmentManager(), "WordlistDownloadDialog");
-            }
-        });
+        wordlistDownloadBtn.setOnClickListener(view -> new WordlistDownloadDialog().show(getFragmentManager(), "WordlistDownloadDialog"));
 
         if(capfile_text==null){
             //Retrieve the last captured handshake
             long latest = 0;
             File result = null;
 
-            File files[] = new File(cap_path).listFiles(new FilenameFilter(){
-                @Override
-                public boolean accept(File file, String s){
-                    return s.startsWith("handshake-") && s.endsWith(".cap");
-                }
-            });
+            File[] files = new File(cap_path).listFiles((file, s) -> s.startsWith("handshake-") && s.endsWith(".cap"));
 
             if(files!=null){    //Only if the directory is deleted while the app is running, apparently it happens
                 for(File f : files){
@@ -211,7 +175,7 @@ public class CrackFragment extends Fragment{
             long latest = 0;
             File result = null;
 
-            File files[] = new File(wl_path).listFiles();
+            File[] files = new File(wl_path).listFiles();
 
             if(files!=null){    //Only if the directory is deleted while the app is running, apparently it happens
                 for(File f : files){
@@ -237,12 +201,7 @@ public class CrackFragment extends Fragment{
 
         //Console text is saved/restored on pause/resume
         consoleView.setText(console_text);
-        consoleView.post(new Runnable() {
-            @Override
-            public void run() {
-                consoleScrollView.fullScroll(View.FOCUS_DOWN);
-            }
-        });
+        consoleView.post(() -> consoleScrollView.fullScroll(View.FOCUS_DOWN));
     }
     @Override
     public void onPause(){
@@ -372,11 +331,13 @@ public class CrackFragment extends Fragment{
     }
     class CrackTask extends AsyncTask<Void, String, Boolean>{
         static final int JOB_CRACK = 0, JOB_TEST = 1;
-        int mode, job;
+        int mode;
+        final int job;
         String cmd, key;
         long startTime = -1;
         AnimatorSet animator;
-        String capfile, wordlist;
+        final String capfile;
+        final String wordlist;
         CrackTask(int job, String capfile, String wordlist){
             this.job = job;
             this.capfile = capfile;
@@ -445,24 +406,18 @@ public class CrackFragment extends Fragment{
 
             ValueAnimator optionsAnimator = ValueAnimator.ofInt(optionsContainer.getHeight(), 0);
             optionsAnimator.setTarget(optionsContainer);
-            optionsAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener(){
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation){
-                    ViewGroup.LayoutParams layoutParams = optionsContainer.getLayoutParams();
-                    layoutParams.height = (int)animation.getAnimatedValue();
-                    optionsContainer.setLayoutParams(layoutParams);
-                }
+            optionsAnimator.addUpdateListener(animation -> {
+                ViewGroup.LayoutParams layoutParams = optionsContainer.getLayoutParams();
+                layoutParams.height = (int)animation.getAnimatedValue();
+                optionsContainer.setLayoutParams(layoutParams);
             });
 
             ValueAnimator testBtnAnimator = ValueAnimator.ofInt(speedTestBtn.getWidth(), 0);
             testBtnAnimator.setTarget(speedTestBtn);
-            testBtnAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener(){
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation){
-                    ViewGroup.LayoutParams layoutParams = speedTestBtn.getLayoutParams();
-                    layoutParams.width = (int)animation.getAnimatedValue();
-                    speedTestBtn.setLayoutParams(layoutParams);
-                }
+            testBtnAnimator.addUpdateListener(animation -> {
+                ViewGroup.LayoutParams layoutParams = speedTestBtn.getLayoutParams();
+                layoutParams.width = (int)animation.getAnimatedValue();
+                speedTestBtn.setLayoutParams(layoutParams);
             });
 
             animator = new AnimatorSet();
@@ -556,24 +511,18 @@ public class CrackFragment extends Fragment{
 
             ValueAnimator optionsAnimator = ValueAnimator.ofInt(0, normalOptHeight);
             optionsAnimator.setTarget(optionsContainer);
-            optionsAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener(){
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation){
-                    ViewGroup.LayoutParams layoutparams = optionsContainer.getLayoutParams();
-                    layoutparams.height = (int)animation.getAnimatedValue();
-                    optionsContainer.setLayoutParams(layoutparams);
-                }
+            optionsAnimator.addUpdateListener(animation -> {
+                ViewGroup.LayoutParams layoutparams = optionsContainer.getLayoutParams();
+                layoutparams.height = (int)animation.getAnimatedValue();
+                optionsContainer.setLayoutParams(layoutparams);
             });
 
             ValueAnimator testBtnAnimator = ValueAnimator.ofInt(0, normalTestBtnWidth);
             testBtnAnimator.setTarget(speedTestBtn);
-            testBtnAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener(){
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation){
-                    ViewGroup.LayoutParams layoutparams = speedTestBtn.getLayoutParams();
-                    layoutparams.width = (int)animation.getAnimatedValue();
-                    speedTestBtn.setLayoutParams(layoutparams);
-                }
+            testBtnAnimator.addUpdateListener(animation -> {
+                ViewGroup.LayoutParams layoutparams = speedTestBtn.getLayoutParams();
+                layoutparams.width = (int)animation.getAnimatedValue();
+                speedTestBtn.setLayoutParams(layoutparams);
             });
 
             animator = new AnimatorSet();

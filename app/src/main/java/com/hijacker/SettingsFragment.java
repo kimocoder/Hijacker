@@ -47,7 +47,7 @@ public class SettingsFragment extends PreferenceFragment {
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
 
-        if(!isArchValid()){
+        if(isArchValid()){
             Preference pref = findPreference("install_nexmon");
             pref.setSummary(getString(R.string.incorrect_arch) + ' ' + arch);
             pref.setEnabled(false);
@@ -56,111 +56,78 @@ public class SettingsFragment extends PreferenceFragment {
         }
         if(allow_prefix) findPreference("prefix").setEnabled(true);
 
-        findPreference("test_tools").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                new TestDialog().show(mFragmentManager, "TestDialog");
-                return false;
-            }
+        findPreference("test_tools").setOnPreferenceClickListener(preference -> {
+            new TestDialog().show(mFragmentManager, "TestDialog");
+            return false;
         });
-        findPreference("reset_pref").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                CustomDialog dialog = new CustomDialog();
-                dialog.setTitle(getString(R.string.reset_dialog_title));
-                dialog.setMessage(getString(R.string.reset_dialog_message));
-                dialog.setPositiveButton(getString(R.string.yes), new Runnable(){
-                    @Override
-                    public void run(){
-                        pref_edit.putString("iface", getString(R.string.iface));
-                        pref_edit.putString("prefix", getString(R.string.prefix));
-                        pref_edit.putString("enable_monMode", getString(R.string.enable_monMode));
-                        pref_edit.putString("disable_monMode", getString(R.string.disable_monMode));
-                        pref_edit.putBoolean("enable_on_airodump", Boolean.parseBoolean(getString(R.string.enable_on_airodump)));
-                        pref_edit.putString("deauthWait", getString(R.string.deauthWait));
-                        pref_edit.putBoolean("show_notif", Boolean.parseBoolean(getString(R.string.show_notif)));
-                        pref_edit.putBoolean("show_details", Boolean.parseBoolean(getString(R.string.show_details)));
-                        pref_edit.putBoolean("airOnStartup", Boolean.parseBoolean(getString(R.string.airOnStartup)));
-                        pref_edit.putBoolean("debug", Boolean.parseBoolean(getString(R.string.debug)));
-                        pref_edit.putBoolean("always_cap", Boolean.parseBoolean(getString(R.string.always_cap)));
-                        pref_edit.putString("chroot_dir", getString(R.string.chroot_dir));
-                        pref_edit.putBoolean("monstart", Boolean.parseBoolean(getString(R.string.monstart)));
-                        pref_edit.putString("custom_chroot_cmd", "");
-                        pref_edit.putBoolean("cont_on_fail", Boolean.parseBoolean(getString(R.string.cont_on_fail)));
-                        pref_edit.putBoolean("watchdog", Boolean.parseBoolean(getString(R.string.watchdog)));
-                        pref_edit.putBoolean("target_deauth", Boolean.parseBoolean(getString(R.string.target_deauth)));
-                        pref_edit.putBoolean("update_on_startup", Boolean.parseBoolean(getString(R.string.auto_update)));
-                        pref_edit.apply();
-                        loadPreferences();
-                    }
-                });
-                dialog.setNegativeButton(getString(R.string.cancel), null);
-                dialog.show(getFragmentManager(), "CustomDialog for reset confirmation");
-                return false;
-            }
+        findPreference("reset_pref").setOnPreferenceClickListener(preference -> {
+            CustomDialog dialog = new CustomDialog();
+            dialog.setTitle(getString(R.string.reset_dialog_title));
+            dialog.setMessage(getString(R.string.reset_dialog_message));
+            dialog.setPositiveButton(getString(R.string.yes), () -> {
+                pref_edit.putString("iface", getString(R.string.iface));
+                pref_edit.putString("prefix", getString(R.string.prefix));
+                pref_edit.putString("enable_monMode", getString(R.string.enable_monMode));
+                pref_edit.putString("disable_monMode", getString(R.string.disable_monMode));
+                pref_edit.putBoolean("enable_on_airodump", Boolean.parseBoolean(getString(R.string.enable_on_airodump)));
+                pref_edit.putString("deauthWait", getString(R.string.deauthWait));
+                pref_edit.putBoolean("show_notif", Boolean.parseBoolean(getString(R.string.show_notif)));
+                pref_edit.putBoolean("show_details", Boolean.parseBoolean(getString(R.string.show_details)));
+                pref_edit.putBoolean("airOnStartup", Boolean.parseBoolean(getString(R.string.airOnStartup)));
+                pref_edit.putBoolean("debug", Boolean.parseBoolean(getString(R.string.debug)));
+                pref_edit.putBoolean("always_cap", Boolean.parseBoolean(getString(R.string.always_cap)));
+                pref_edit.putString("chroot_dir", getString(R.string.chroot_dir));
+                pref_edit.putBoolean("monstart", Boolean.parseBoolean(getString(R.string.monstart)));
+                pref_edit.putString("custom_chroot_cmd", "");
+                pref_edit.putBoolean("cont_on_fail", Boolean.parseBoolean(getString(R.string.cont_on_fail)));
+                pref_edit.putBoolean("watchdog", Boolean.parseBoolean(getString(R.string.watchdog)));
+                pref_edit.putBoolean("target_deauth", Boolean.parseBoolean(getString(R.string.target_deauth)));
+                pref_edit.putBoolean("update_on_startup", Boolean.parseBoolean(getString(R.string.auto_update)));
+                pref_edit.apply();
+                loadPreferences();
+            });
+            dialog.setNegativeButton(getString(R.string.cancel), null);
+            dialog.show(getFragmentManager(), "CustomDialog for reset confirmation");
+            return false;
         });
-        findPreference("copy_sample_button").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                new CopySampleDialog().show(mFragmentManager, "CopySampleDialog");
-                return false;
-            }
+        findPreference("copy_sample_button").setOnPreferenceClickListener(preference -> {
+            new CopySampleDialog().show(mFragmentManager, "CopySampleDialog");
+            return false;
         });
-        findPreference("install_nexmon").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                new InstallFirmwareDialog().show(mFragmentManager, "InstallFirmwareDialog");
-                return false;
-            }
+        findPreference("install_nexmon").setOnPreferenceClickListener(preference -> {
+            new InstallFirmwareDialog().show(mFragmentManager, "InstallFirmwareDialog");
+            return false;
         });
-        findPreference("send_feedback").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener(){
-            @Override
-            public boolean onPreferenceClick(Preference preference){
-                new FeedbackDialog().show(getFragmentManager(), "FeedbackDialog");
-                return false;
-            }
+        findPreference("send_feedback").setOnPreferenceClickListener(preference -> {
+            new FeedbackDialog().show(getFragmentManager(), "FeedbackDialog");
+            return false;
         });
-        findPreference("github").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener(){
-            @Override
-            public boolean onPreferenceClick(Preference preference){
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse("https://github.com/chrisk44/Hijacker"));
-                startActivity(intent);
-                return false;
-            }
+        findPreference("github").setOnPreferenceClickListener(preference -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse("https://github.com/chrisk44/Hijacker"));
+            startActivity(intent);
+            return false;
         });
-        findPreference("chroot_dir").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener(){
-            @Override
-            public boolean onPreferenceClick(Preference preference){
-                final FileExplorerDialog dialog = new FileExplorerDialog();
-                dialog.setToSelect(FileExplorerDialog.SELECT_DIR);
-                dialog.setStartingDir(new RootFile("/data/local/"));
-                dialog.setOnSelect(new Runnable(){
-                    @Override
-                    public void run(){
-                        pref_edit.putString("chroot_dir", dialog.result.getAbsolutePath());
-                        pref_edit.apply();
-                        loadPreferences();
-                    }
-                });
-                dialog.show(getFragmentManager(), "FileExplorerDialog");
-                return false;
-            }
+        findPreference("chroot_dir").setOnPreferenceClickListener(preference -> {
+            final FileExplorerDialog dialog = new FileExplorerDialog();
+            dialog.setToSelect(FileExplorerDialog.SELECT_DIR);
+            dialog.setStartingDir(new RootFile("/data/local/"));
+            dialog.setOnSelect(() -> {
+                pref_edit.putString("chroot_dir", dialog.result.getAbsolutePath());
+                pref_edit.apply();
+                loadPreferences();
+            });
+            dialog.show(getFragmentManager(), "FileExplorerDialog");
+            return false;
         });
-        findPreference("update_on_startup").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue){
-                if((boolean)newValue){
-                    new Thread(new Runnable(){
-                        @Override
-                        public void run(){
-                            Looper.prepare();
-                            ((MainActivity)getActivity()).checkForUpdate(true);
-                        }
-                    }).start();
-                }
-                return true;
+        findPreference("update_on_startup").setOnPreferenceChangeListener((preference, newValue) -> {
+            if((boolean)newValue){
+                new Thread(() -> {
+                    Looper.prepare();
+                    ((MainActivity) getActivity()).checkForUpdate(true);
+                }).start();
             }
+            return true;
         });
         findPreference("version").setSummary(versionName);
         /*
@@ -195,19 +162,16 @@ public class SettingsFragment extends PreferenceFragment {
         currentFragment = FRAGMENT_SETTINGS;
         final MainActivity mainActivity = (MainActivity)getActivity();
         mainActivity.refreshDrawer();
-        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                loadPreferences();
-                boolean running = mainActivity.watchdogTask.isRunning();
-                if(watchdog && !running){
-                    //Turned off
-                    mainActivity.watchdogTask = new WatchdogTask(getActivity());
-                    mainActivity.watchdogTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                }else if(!watchdog && running){
-                    //Turned on
-                    mainActivity.watchdogTask.cancel(true);
-                }
+        listener = (sharedPreferences, key) -> {
+            loadPreferences();
+            boolean running = mainActivity.watchdogTask.isRunning();
+            if(watchdog && !running){
+                //Turned off
+                mainActivity.watchdogTask = new WatchdogTask(getActivity());
+                mainActivity.watchdogTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            }else if(!watchdog && running){
+                //Turned on
+                mainActivity.watchdogTask.cancel(true);
             }
         };
         getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(listener);

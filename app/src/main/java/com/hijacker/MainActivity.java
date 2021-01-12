@@ -83,6 +83,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Objects;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -115,7 +116,7 @@ public class MainActivity extends AppCompatActivity{
     static String last_airodump = null, last_aireplay = null, last_mdk = null, last_reaver = null;
     //Filters
     static boolean show_ap = true, show_st = true, show_na_st = true, wpa = true, wep = true, opn = true;
-    static boolean[] show_ch = {true, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+    static final boolean[] show_ch = {true, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
     static int pwr_filter = 120;
     static String manuf_filter = "";
     //Airodump list sort 
@@ -127,9 +128,9 @@ public class MainActivity extends AppCompatActivity{
     static ProgressBar progress;
     static Toolbar toolbar;
     static View rootView;
-    static SparseArray<String> navTitlesMap = new SparseArray<>();             //SparseArray to map fragment IDs to their respective navigation titles
-    static Drawable[] overflow = {null, null, null, null, null, null, null, null};      //Drawables to use for overflow button icon
-    static ImageView[] status = {null, null, null, null, null};                         //Icons in TestDialog, set in TestDialog class
+    static final SparseArray<String> navTitlesMap = new SparseArray<>();             //SparseArray to map fragment IDs to their respective navigation titles
+    static final Drawable[] overflow = {null, null, null, null, null, null, null, null};      //Drawables to use for overflow button icon
+    static final ImageView[] status = {null, null, null, null, null};                         //Icons in TestDialog, set in TestDialog class
     static int progress_int;
     static long last_action;                        //Timestamp for the last action. Used in watchdog to avoid false positives
     static Thread wpa_thread;
@@ -164,33 +165,30 @@ public class MainActivity extends AppCompatActivity{
 
     WatchdogTask watchdogTask;
 
-    ReaverFragment reaverFragment = new ReaverFragment();
-    CrackFragment crackFragment = new CrackFragment();
-    CustomActionFragment customActionFragment = new CustomActionFragment();
+    final ReaverFragment reaverFragment = new ReaverFragment();
+    final CrackFragment crackFragment = new CrackFragment();
+    final CustomActionFragment customActionFragment = new CustomActionFragment();
     DrawerLayout mDrawerLayout;
     NavigationView navigationView;
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler(){
-            @Override
-            public void uncaughtException(Thread thread, Throwable throwable){
-                throwable.printStackTrace();
-                StringBuilder stackTrace = new StringBuilder();
-                stackTrace.append(throwable.getMessage()).append('\n');
-                for(int i=0;i<throwable.getStackTrace().length;i++){
-                    stackTrace.append(throwable.getStackTrace()[i].toString()).append('\n');
-                }
-
-                Intent intent = new Intent();
-                intent.setAction("com.hijacker.SendLogActivity");
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra("exception", stackTrace.toString());
-                startActivity(intent);
-
-                finish();
-                System.exit(1);
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+            throwable.printStackTrace();
+            StringBuilder stackTrace = new StringBuilder();
+            stackTrace.append(throwable.getMessage()).append('\n');
+            for(int i=0;i<throwable.getStackTrace().length;i++){
+                stackTrace.append(throwable.getStackTrace()[i].toString()).append('\n');
             }
+
+            Intent intent = new Intent();
+            intent.setAction("com.hijacker.SendLogActivity");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("exception", stackTrace.toString());
+            startActivity(intent);
+
+            finish();
+            System.exit(1);
         });
         adapter = new MyListAdapter();              //ALWAYS BEFORE setContentView AND setup(), can't stress it enough...
         adapter.setNotifyOnChange(true);
@@ -223,19 +221,13 @@ public class MainActivity extends AppCompatActivity{
                 customDialog.setCancelable(false);
                 customDialog.setTitle(getString(R.string.disclaimer_title));
                 customDialog.setMessage(getString(R.string.disclaimer));
-                customDialog.setPositiveButton(getString(R.string.agree), new Runnable(){
-                    @Override
-                    public void run(){
-                        pref_edit.putBoolean("disclaimerAccepted", true);
-                        pref_edit.apply();
-                    }
+                customDialog.setPositiveButton(getString(R.string.agree), () -> {
+                    pref_edit.putBoolean("disclaimerAccepted", true);
+                    pref_edit.apply();
                 });
-                customDialog.setNeutralButton(getString(R.string.not_agree), new Runnable(){
-                    @Override
-                    public void run(){
-                        // Exit
-                        MainActivity.this.finish();
-                    }
+                customDialog.setNeutralButton(getString(R.string.not_agree), () -> {
+                    // Exit
+                    MainActivity.this.finish();
                 });
 
                 customDialog.show(getFragmentManager(), "CustomDialog for disclaimer");
@@ -246,46 +238,43 @@ public class MainActivity extends AppCompatActivity{
             navigationView = findViewById(R.id.nav_view);
             navigationView.getMenu().getItem(0).setChecked(true);
             navigationView.setNavigationItemSelectedListener(
-                    new NavigationView.OnNavigationItemSelectedListener() {
-                        @Override
-                        public boolean onNavigationItemSelected(MenuItem menuItem) {
-                            // set item as selected to persist highlight
-                            menuItem.setChecked(true);
-                            // close drawer when item is tapped
-                            mDrawerLayout.closeDrawers();
+                    menuItem -> {
+                        // set item as selected to persist highlight
+                        menuItem.setChecked(true);
+                        // close drawer when item is tapped
+                        mDrawerLayout.closeDrawers();
 
-                            if(currentFragment!=menuItem.getItemId()){
-                                FragmentTransaction ft = mFragmentManager.beginTransaction();
-                                switch(menuItem.getItemId()){
-                                    case FRAGMENT_AIRODUMP:
-                                        ft.replace(R.id.fragment1, is_ap==null ? new MyListFragment() : new IsolatedFragment());
-                                        break;
-                                    case FRAGMENT_MDK:
-                                        ft.replace(R.id.fragment1, new MDKFragment());
-                                        break;
-                                    case FRAGMENT_REAVER:
-                                        ft.replace(R.id.fragment1, reaverFragment);
-                                        break;
-                                    case FRAGMENT_CRACK:
-                                        ft.replace(R.id.fragment1, crackFragment);
-                                        break;
-                                    case FRAGMENT_CUSTOM:
-                                        ft.replace(R.id.fragment1, customActionFragment);
-                                        break;
-                                    case FRAGMENT_SETTINGS:
-                                        ft.replace(R.id.fragment1, new SettingsFragment());
-                                        break;
-                                }
-                                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                                ft.addToBackStack(null);
-                                ft.commitAllowingStateLoss();
-                                mFragmentManager.executePendingTransactions();
+                        if(currentFragment!=menuItem.getItemId()){
+                            FragmentTransaction ft = mFragmentManager.beginTransaction();
+                            switch(menuItem.getItemId()){
+                                case FRAGMENT_AIRODUMP:
+                                    ft.replace(R.id.fragment1, is_ap==null ? new MyListFragment() : new IsolatedFragment());
+                                    break;
+                                case FRAGMENT_MDK:
+                                    ft.replace(R.id.fragment1, new MDKFragment());
+                                    break;
+                                case FRAGMENT_REAVER:
+                                    ft.replace(R.id.fragment1, reaverFragment);
+                                    break;
+                                case FRAGMENT_CRACK:
+                                    ft.replace(R.id.fragment1, crackFragment);
+                                    break;
+                                case FRAGMENT_CUSTOM:
+                                    ft.replace(R.id.fragment1, customActionFragment);
+                                    break;
+                                case FRAGMENT_SETTINGS:
+                                    ft.replace(R.id.fragment1, new SettingsFragment());
+                                    break;
                             }
-
-                            actionBar.setTitle(navTitlesMap.get(currentFragment));
-
-                            return true;
+                            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                            ft.addToBackStack(null);
+                            ft.commitAllowingStateLoss();
+                            mFragmentManager.executePendingTransactions();
                         }
+
+                        actionBar.setTitle(navTitlesMap.get(currentFragment));
+
+                        return true;
                     });
 
             //Initialize toolbar
@@ -415,7 +404,7 @@ public class MainActivity extends AppCompatActivity{
                     File[] files = old_dir.listFiles();
                     if(files!=null){
                         Toast.makeText(MainActivity.this, "Moving cap files from " + old_dir.getAbsolutePath() + " to " + cap_path, Toast.LENGTH_LONG).show();
-                        for(File f : old_dir.listFiles()){
+                        for(File f : Objects.requireNonNull(old_dir.listFiles())){
                             //Move all the files to the new directory
                             f.renameTo(new File(cap_path, f.getName()));
                         }
@@ -553,12 +542,12 @@ public class MainActivity extends AppCompatActivity{
                 }
 
                 //Extract busybox
-                extract("busybox", tools_location, true);
+                extract("busybox", tools_location);
                 busybox = path + "/bin/busybox";
 
                 //Extract tools
                 boolean install = true;
-                if(bin.list().length==21 && lib.list().length==2 && info!=null){
+                if(Objects.requireNonNull(bin.list()).length==21 && Objects.requireNonNull(lib.list()).length==2 && info!=null){
                     if(info.versionCode==pref.getInt("tools_version", 0)){
                         if(debug) Log.d("HIJACKER/SetupTask", "Tools already installed");
                         install = false;
@@ -568,27 +557,27 @@ public class MainActivity extends AppCompatActivity{
                     }
                 }
                 if(install){
-                    extract("airbase-ng", tools_location, true);
-                    extract("aircrack-ng", tools_location, true);
-                    extract("aireplay-ng", tools_location, true);
-                    extract("airodump-ng", tools_location, true);
-                    extract("besside-ng", tools_location, true);
-                    extract("ivstools", tools_location, true);
-                    extract("iw", tools_location, true);
-                    extract("iwconfig", tools_location, true);
-                    extract("iwlist", tools_location, true);
-                    extract("iwpriv", tools_location, true);
-                    extract("kstats", tools_location, true);
-                    extract("makeivs-ng", tools_location, true);
-                    extract("mdk3", tools_location, true);
-                    extract("nc", tools_location, true);
-                    extract("packetforge-ng", tools_location, true);
-                    extract("reaver", tools_location, true);
-                    extract("reaver-wash", tools_location, true);
-                    extract("wesside-ng", tools_location, true);
-                    extract("wpaclean", tools_location, true);
-                    extract("libfakeioctl.so", lib_location, true);
-                    extract("libnexmon.so", lib_location, true);
+                    extract("airbase-ng", tools_location);
+                    extract("aircrack-ng", tools_location);
+                    extract("aireplay-ng", tools_location);
+                    extract("airodump-ng", tools_location);
+                    extract("besside-ng", tools_location);
+                    extract("ivstools", tools_location);
+                    extract("iw", tools_location);
+                    extract("iwconfig", tools_location);
+                    extract("iwlist", tools_location);
+                    extract("iwpriv", tools_location);
+                    extract("kstats", tools_location);
+                    extract("makeivs-ng", tools_location);
+                    extract("mdk3", tools_location);
+                    extract("nc", tools_location);
+                    extract("packetforge-ng", tools_location);
+                    extract("reaver", tools_location);
+                    extract("reaver-wash", tools_location);
+                    extract("wesside-ng", tools_location);
+                    extract("wpaclean", tools_location);
+                    extract("libfakeioctl.so", lib_location);
+                    extract("libnexmon.so", lib_location);
 
                     runOne("cd " + path + "/bin; mv mdk3 mdk3bf; cp mdk3bf mdk3dos");
 
@@ -662,129 +651,108 @@ public class MainActivity extends AppCompatActivity{
 
             //Initialize threads
             publishProgress(getString(R.string.init_threads));
-            wpa_runnable = new Runnable(){
-                @Override
-                public void run(){
-                    if(debug) Log.d("HIJACKER/wpa_thread", "Started wpa_thread");
+            wpa_runnable = () -> {
+                if(debug) Log.d("HIJACKER/wpa_thread", "Started wpa_thread");
 
-                    Thread counter_thread = new Thread(new Runnable(){
-                        @Override
-                        public void run(){
-                            if(debug) Log.d("HIJACKER/wpa_subthread", "wpa_subthread started");
-                            try{
-                                progress_int = 0;
-                                while(progress_int<=deauthWait && wpacheckcont){
-                                    Thread.sleep(1000);
-                                    progress_int++;
-                                    runInHandler(new Runnable(){
-                                        @Override
-                                        public void run(){
-                                            progress.setProgress(progress_int);
-                                        }
-                                    });
-                                }
-                                if(wpacheckcont){
-                                    runInHandler(new Runnable(){
-                                        @Override
-                                        public void run(){
-                                            if(!background) Snackbar.make(findViewById(R.id.fragment1), getString(R.string.stopped_to_capture), Snackbar.LENGTH_SHORT).show();
-                                            else Toast.makeText(MainActivity.this, getString(R.string.stopped_to_capture), Toast.LENGTH_SHORT).show();
-                                            progress.setProgress(deauthWait);
-                                            progress.setIndeterminate(true);
-                                        }
-                                    });
-                                }
-                            }catch(InterruptedException e){
-                                Log.e("HIJACKER/Exception", "Caught Exception in wpa_subthread: " + e.toString());
-                                runInHandler(new Runnable(){
-                                    @Override
-                                    public void run(){
-                                        progress.setIndeterminate(false);
-                                        progress.setProgress(deauthWait);
-                                    }
-                                });
-                            }finally{
-                                stop(PROCESS_AIREPLAY);
-                            }
-                            if(debug) Log.d("HIJACKER/wpa_subthread", "wpa_subthread finished");
+                Thread counter_thread = new Thread(() -> {
+                    if (debug) Log.d("HIJACKER/wpa_subthread", "wpa_subthread started");
+                    try {
+                        progress_int = 0;
+                        while (progress_int <= deauthWait && wpacheckcont) {
+                            Thread.sleep(1000);
+                            progress_int++;
+                            runInHandler(() -> progress.setProgress(progress_int));
                         }
-                    });
-
-                    boolean handshake_captured = false;
-                    final String capfile = Airodump.getCapFile();
-                    Shell shell = getFreeShell();
-                    try{
-                        if(capfile==null){
-                            if(debug) Log.d("HIJACKER/wpa_thread", "cap file not found, airodump is probably not running...");
-                        }else{
-                            if(debug) Log.d("HIJACKER/wpa_thread", capfile);
-                            wpacheckcont = true;
-                            counter_thread.start();
-
-                            BufferedReader out = shell.getShell_out();
-                            String buffer;
-                            while(!handshake_captured && wpacheckcont){
-                                //Check loop
-                                if(debug) Log.d("HIJACKER/wpa_thread", "Checking cap file...");
-                                shell.run(aircrack_dir + " " + capfile + "; echo ENDOFAIR");
-                                buffer = out.readLine();
-                                if(buffer==null) break;
-                                else{
-                                    while(!buffer.equals("ENDOFAIR")){
-                                        if(buffer.length()>=56){
-                                            if(buffer.charAt(56)=='1' || buffer.charAt(56)=='2' || buffer.charAt(56)=='3'){
-                                                handshake_captured = true;
-                                                break;
-                                            }
-                                        }
-                                        buffer = out.readLine();
-                                    }
-                                    Thread.sleep(700);
-                                }
-                            }
+                        if (wpacheckcont) {
+                            runInHandler(() -> {
+                                if (!background)
+                                    Snackbar.make(findViewById(R.id.fragment1), getString(R.string.stopped_to_capture), Snackbar.LENGTH_SHORT).show();
+                                else
+                                    Toast.makeText(MainActivity.this, getString(R.string.stopped_to_capture), Toast.LENGTH_SHORT).show();
+                                progress.setProgress(deauthWait);
+                                progress.setIndeterminate(true);
+                            });
                         }
-                    }catch(IOException | InterruptedException e){
-                        Log.e("HIJACKER/Exception", "Caught Exception in wpa_thread: " + e.toString());
-                    }finally{
-                        wpacheckcont = false;
-                        counter_thread.interrupt();
-                        shell.done();
-                        final boolean found = handshake_captured;
-                        if(found) Airodump.startClean(is_ap);
-                        runInHandler(new Runnable(){
-                            @Override
-                            public void run(){
-                                Button crack_btn = findViewById(R.id.crack);
-                                if(crack_btn!=null){
-                                    //We are in IsolatedFragment
-                                    crack_btn.setText(getString(R.string.crack));
-                                }
-
-                                if(found){
-                                    if(!background){
-                                        Snackbar s = Snackbar.make(findViewById(R.id.fragment1), getString(R.string.handshake_captured) + ' ' + capfile, Snackbar.LENGTH_LONG);
-                                        s.setAction(R.string.crack, new View.OnClickListener(){
-                                            @Override
-                                            public void onClick(View v){
-                                                CrackFragment.capfile_text = capfile;
-                                                FragmentTransaction ft = mFragmentManager.beginTransaction();
-                                                ft.replace(R.id.fragment1, MainActivity.this.crackFragment);
-                                                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                                                ft.addToBackStack(null);
-                                                ft.commitAllowingStateLoss();
-                                            }
-                                        });
-                                        s.show();
-                                    }else{
-                                        handshake_notif.setContentText(getString(R.string.saved_in_file) + ' ' + capfile);
-                                        mNotificationManager.notify(2, handshake_notif.build());
-                                    }
-                                    progress.setIndeterminate(false);
-                                }
-                                if(debug) Log.d("HIJACKER/wpa_thread", "wpa_thread finished");
-                            }
+                    } catch (InterruptedException e) {
+                        Log.e("HIJACKER/Exception", "Caught Exception in wpa_subthread: " + e.toString());
+                        runInHandler(() -> {
+                            progress.setIndeterminate(false);
+                            progress.setProgress(deauthWait);
                         });
+                    } finally {
+                        stop(PROCESS_AIREPLAY);
                     }
+                    if (debug) Log.d("HIJACKER/wpa_subthread", "wpa_subthread finished");
+                });
+
+                boolean handshake_captured = false;
+                final String capfile = Airodump.getCapFile();
+                Shell shell = getFreeShell();
+                try{
+                    if(capfile==null){
+                        if(debug) Log.d("HIJACKER/wpa_thread", "cap file not found, airodump is probably not running...");
+                    }else{
+                        if(debug) Log.d("HIJACKER/wpa_thread", capfile);
+                        wpacheckcont = true;
+                        counter_thread.start();
+
+                        BufferedReader out = shell.getShell_out();
+                        String buffer;
+                        while(!handshake_captured && wpacheckcont){
+                            //Check loop
+                            if(debug) Log.d("HIJACKER/wpa_thread", "Checking cap file...");
+                            shell.run(aircrack_dir + " " + capfile + "; echo ENDOFAIR");
+                            buffer = out.readLine();
+                            if(buffer==null) break;
+                            else{
+                                while(!buffer.equals("ENDOFAIR")){
+                                    if(buffer.length()>=56){
+                                        if(buffer.charAt(56)=='1' || buffer.charAt(56)=='2' || buffer.charAt(56)=='3'){
+                                            handshake_captured = true;
+                                            break;
+                                        }
+                                    }
+                                    buffer = out.readLine();
+                                }
+                                Thread.sleep(700);
+                            }
+                        }
+                    }
+                }catch(IOException | InterruptedException e){
+                    Log.e("HIJACKER/Exception", "Caught Exception in wpa_thread: " + e.toString());
+                }finally{
+                    wpacheckcont = false;
+                    counter_thread.interrupt();
+                    shell.done();
+                    final boolean found = handshake_captured;
+                    if(found) Airodump.startClean(is_ap);
+                    runInHandler(() -> {
+                        Button crack_btn = findViewById(R.id.crack);
+                        if (crack_btn != null) {
+                            //We are in IsolatedFragment
+                            crack_btn.setText(getString(R.string.crack));
+                        }
+
+                        if (found) {
+                            if (!background) {
+                                Snackbar s = Snackbar.make(findViewById(R.id.fragment1), getString(R.string.handshake_captured) + ' ' + capfile, Snackbar.LENGTH_LONG);
+                                s.setAction(R.string.crack, v -> {
+                                    CrackFragment.capfile_text = capfile;
+                                    FragmentTransaction ft = mFragmentManager.beginTransaction();
+                                    ft.replace(R.id.fragment1, MainActivity.this.crackFragment);
+                                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                                    ft.addToBackStack(null);
+                                    ft.commitAllowingStateLoss();
+                                });
+                                s.show();
+                            } else {
+                                handshake_notif.setContentText(getString(R.string.saved_in_file) + ' ' + capfile);
+                                mNotificationManager.notify(2, handshake_notif.build());
+                            }
+                            progress.setIndeterminate(false);
+                        }
+                        if (debug) Log.d("HIJACKER/wpa_thread", "wpa_thread finished");
+                    });
                 }
             };
             wpa_thread = new Thread(wpa_runnable);
@@ -881,16 +849,13 @@ public class MainActivity extends AppCompatActivity{
                 }else{
                     //Spawn new thread to wait for internet connection
                     //This should be changed to a broadcast receiver
-                    new Thread(new Runnable(){
-                        @Override
-                        public void run(){
-                            try{
-                                while(!internetAvailable()){
-                                    Thread.sleep(1000);
-                                }
-                                checkForUpdate(false);
-                            }catch(InterruptedException ignored){}
-                        }
+                    new Thread(() -> {
+                        try{
+                            while(!internetAvailable()){
+                                Thread.sleep(1000);
+                            }
+                            checkForUpdate(false);
+                        }catch(InterruptedException ignored){}
                     }).start();
                 }
             }
@@ -961,7 +926,7 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-    void extract(String filename, String out_dir, boolean chmod){
+    void extract(String filename, String out_dir){
         File f = new File(out_dir, filename);
         if(f.exists()) f.delete();          //Delete file in case it's outdated
         try{
@@ -975,7 +940,7 @@ public class MainActivity extends AppCompatActivity{
             }
             in.close();
             out.close();
-            if(chmod){
+            if(true){
                 runOne("chmod 755 " + out_dir + "/" + filename);
             }
         }catch(IOException e){
@@ -990,13 +955,10 @@ public class MainActivity extends AppCompatActivity{
             Runtime.getRuntime().exec(cmd);
             last_action = System.currentTimeMillis();
         }catch(IOException e){ Log.e("HIJACKER/Exception", "Caught Exception in _startAireplay() start block: " + e.toString()); }
-        runInHandler(new Runnable(){
-            @Override
-            public void run(){
-                menu.getItem(3).setEnabled(true);       //Enable 'Stop aireplay' button
-                refreshState();
-                notification();
-            }
+        runInHandler(() -> {
+            menu.getItem(3).setEnabled(true);       //Enable 'Stop aireplay' button
+            refreshState();
+            notification();
         });
     }
     public static void startAireplay(String mac){
@@ -1029,12 +991,9 @@ public class MainActivity extends AppCompatActivity{
         last_action = System.currentTimeMillis();
         bf = true;
 
-        runInHandler(new Runnable(){
-            @Override
-            public void run(){
-                refreshState();
-                notification();
-            }
+        runInHandler(() -> {
+            refreshState();
+            notification();
         });
     }
     public static void startAdos(String str){
@@ -1048,12 +1007,9 @@ public class MainActivity extends AppCompatActivity{
         last_action = System.currentTimeMillis();
         ados = true;
 
-        runInHandler(new Runnable(){
-            @Override
-            public void run(){
-                refreshState();
-                notification();
-            }
+        runInHandler(() -> {
+            refreshState();
+            notification();
         });
     }
 
@@ -1112,11 +1068,8 @@ public class MainActivity extends AppCompatActivity{
                 Airodump.stop();
                 return;
             case PROCESS_AIREPLAY:
-                runInHandler(new Runnable(){
-                    @Override
-                    public void run(){
-                        if(menu!=null) menu.getItem(3).setEnabled(false);
-                    }
+                runInHandler(() -> {
+                    if(menu!=null) menu.getItem(3).setEnabled(false);
                 });
                 progress_int = deauthWait;
                 runOne(busybox + " kill $(" + busybox + " pidof aireplay-ng)");
@@ -1129,12 +1082,7 @@ public class MainActivity extends AppCompatActivity{
                 break;
             case PROCESS_MDK_BF:
                 if(currentFragment==FRAGMENT_MDK){
-                    runInHandler(new Runnable(){
-                        @Override
-                        public void run(){
-                            MDKFragment.bf_switch.setChecked(false);
-                        }
-                    });
+                    runInHandler(() -> MDKFragment.bf_switch.setChecked(false));
                 }
 
                 bf = false;
@@ -1142,12 +1090,7 @@ public class MainActivity extends AppCompatActivity{
                 break;
             case PROCESS_MDK_DOS:
                 if(currentFragment==FRAGMENT_MDK){
-                    runInHandler(new Runnable(){
-                        @Override
-                        public void run(){
-                            MDKFragment.ados_switch.setChecked(false);
-                        }
-                    });
+                    runInHandler(() -> MDKFragment.ados_switch.setChecked(false));
                 }
 
                 ados = false;
@@ -1164,12 +1107,9 @@ public class MainActivity extends AppCompatActivity{
                 runOne(busybox + " kill " + pr);
                 break;
         }
-        runInHandler(new Runnable(){
-            @Override
-            public void run(){
-                refreshState();
-                notification();
-            }
+        runInHandler(() -> {
+            refreshState();
+            notification();
         });
     }
     public static void stopWPA(){
@@ -1177,7 +1117,7 @@ public class MainActivity extends AppCompatActivity{
         if(wpa_thread!=null) wpa_thread.interrupt();
     }
 
-    public static Handler handler = new Handler();
+    public static final Handler handler = new Handler();
     public static void runInHandler(Runnable runnable){
         handler.post(runnable);
     }
@@ -1187,10 +1127,10 @@ public class MainActivity extends AppCompatActivity{
         Log.d("HIJACKER/load", "Loading preferences...");
 
         iface = pref.getString("iface", iface);
-        if(!isArchValid()){
+        if(isArchValid()){
             prefix = pref.getString("prefix", prefix);
         }
-        deauthWait = Integer.parseInt(pref.getString("deauthWait", Integer.toString(deauthWait)));
+        deauthWait = Integer.parseInt(Objects.requireNonNull(pref.getString("deauthWait", Integer.toString(deauthWait))));
         chroot_dir = pref.getString("chroot_dir", chroot_dir);
         monstart = pref.getBoolean("monstart", monstart);
         enable_monMode = pref.getString("enable_monMode", enable_monMode);
@@ -1211,7 +1151,7 @@ public class MainActivity extends AppCompatActivity{
         custom_chroot_cmd = pref.getString("custom_chroot_cmd", custom_chroot_cmd);
         cont_on_fail = pref.getBoolean("cont_on_fail", cont_on_fail);
         update_on_startup = pref.getBoolean("update_on_startup", update_on_startup);
-        band = Integer.parseInt(pref.getString("band", Integer.toString(band)));
+        band = Integer.parseInt(Objects.requireNonNull(pref.getString("band", Integer.toString(band))));
         show_client_count = pref.getBoolean("show_client_count", show_client_count);
 
         progress.setMax(deauthWait);
@@ -1357,12 +1297,9 @@ public class MainActivity extends AppCompatActivity{
                 CustomDialog customDialog = new CustomDialog();
                 customDialog.setTitle(getString(R.string.exit_dialog_title));
                 customDialog.setMessage(getString(R.string.exit_dialog_message));
-                customDialog.setPositiveButton(getString(R.string.exit), new Runnable(){
-                    @Override
-                    public void run(){
-                        show_notif = false;
-                        finish();
-                    }
+                customDialog.setPositiveButton(getString(R.string.exit), () -> {
+                    show_notif = false;
+                    finish();
                 });
                 customDialog.setNegativeButton(getString(R.string.cancel), null);
                 customDialog.show(getFragmentManager(), "CustomDialog for exit");
@@ -1717,12 +1654,7 @@ public class MainActivity extends AppCompatActivity{
     void checkForUpdate(final boolean showMessages){
         //Can be called from any thread, blocks until the job is finished
         if(showMessages){
-            runInHandler(new Runnable(){
-                @Override
-                public void run(){
-                    progress.setIndeterminate(true);
-                }
-            });
+            runInHandler(() -> progress.setIndeterminate(true));
         }
 
         try{
@@ -1788,29 +1720,21 @@ public class MainActivity extends AppCompatActivity{
                 final CustomDialog customDialog = new CustomDialog();
                 customDialog.setTitle(getString(R.string.update_title));
                 customDialog.setMessage(text);
-                customDialog.setPositiveButton(getString(R.string.download), new Runnable(){
-                    @Override
-                    public void run(){
-                        String filename = link.substring(link.lastIndexOf('/') + 1);
+                customDialog.setPositiveButton(getString(R.string.download), () -> {
+                    String filename = link.substring(link.lastIndexOf('/') + 1);
 
-                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(link));
-                        request.setTitle(filename);
-                        request.allowScanningByMediaScanner();
-                        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
+                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse(link));
+                    request.setTitle(filename);
+                    request.allowScanningByMediaScanner();
+                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
 
-                        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-                        if(manager!=null) manager.enqueue(request);
-                    }
+                    DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                    if(manager!=null) manager.enqueue(request);
                 });
                 customDialog.setNeutralButton(getString(R.string.cancel), null);
 
-                runInHandler(new Runnable(){
-                    @Override
-                    public void run(){
-                        customDialog.show(getFragmentManager(), "CustomDialog for update");
-                    }
-                });
+                runInHandler(() -> customDialog.show(getFragmentManager(), "CustomDialog for update"));
             }else{
                 if(showMessages) Snackbar.make(rootView, getString(R.string.already_on_latest), Snackbar.LENGTH_SHORT).show();
             }
@@ -1818,17 +1742,12 @@ public class MainActivity extends AppCompatActivity{
             Log.e("HIJACKER/update", e.toString());
             if(showMessages) Snackbar.make(rootView, getString(R.string.unknown_error), Snackbar.LENGTH_SHORT).show();
         }finally{
-            if(showMessages) runInHandler(new Runnable(){
-                @Override
-                public void run(){
-                    progress.setIndeterminate(false);
-                }
-            });
+            if(showMessages) runInHandler(() -> progress.setIndeterminate(false));
         }
     }
     boolean internetAvailable(){
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        return connectivityManager.getNetworkInfo(1).getState()==NetworkInfo.State.CONNECTED || connectivityManager.getNetworkInfo(0).getState()==NetworkInfo.State.CONNECTED;
+        return Objects.requireNonNull(connectivityManager.getNetworkInfo(1)).getState()==NetworkInfo.State.CONNECTED || Objects.requireNonNull(connectivityManager.getNetworkInfo(0)).getState()==NetworkInfo.State.CONNECTED;
     }
     static boolean createReport(File out, String filesDir, String stackTrace, Process shell){
         if(!out.exists()){
@@ -1937,7 +1856,7 @@ public class MainActivity extends AppCompatActivity{
         return firmware;
     }
     static boolean isArchValid(){
-        return arch.matches("(.*)arm(.*)") || arch.matches("aarch64");
+        return !arch.matches("(.*)arm(.*)") && !arch.matches("aarch64");
     }
 
     static{

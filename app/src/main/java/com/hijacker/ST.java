@@ -60,7 +60,7 @@ class ST extends Device{
     static final ArrayList<ST> marked = new ArrayList<>();
     static String paired, not_connected;
     static int connected=0;     //Stations that are connected to an AP
-    int id;
+    final int id;
     private int frames, lost, total_frames=0, total_lost=0;
     AP connectedTo = null;
     String bssid, probes;
@@ -95,12 +95,7 @@ class ST extends Device{
                 if(connectedTo==null){
                     //Now not connected
                     connected--;
-                    runInHandler(new Runnable(){
-                        @Override
-                        public void run(){
-                            Tile.onCountsChanged();
-                        }
-                    });
+                    runInHandler(() -> Tile.onCountsChanged());
                 }else{
                     connectedTo.addClient(this);
                 }
@@ -112,12 +107,7 @@ class ST extends Device{
                 //Now connected to known AP
                 connected++;
                 connectedTo.addClient(this);
-                runInHandler(new Runnable(){
-                    @Override
-                    public void run(){
-                        Tile.onCountsChanged();
-                    }
-                });
+                runInHandler(() -> Tile.onCountsChanged());
             }
         }
         if(frames!=this.frames || lost!=this.lost || this.lastseen==0){
@@ -151,14 +141,11 @@ class ST extends Device{
             lowerLeft = paired + connectedTo.mac + " (" + connectedTo.getESSID() + ")";
         }else lowerLeft = not_connected;
         lowerRight = "PWR: " + this.pwr + " | Frames: " + this.getFrames();
-        runInHandler(new Runnable(){
-            @Override
-            public void run(){
-                if(tile!=null) tile.update();
-                else tile = new Tile(AP.APs.size() + id, ST.this);
+        runInHandler(() -> {
+            if(tile!=null) tile.update();
+            else tile = new Tile(AP.APs.size() + id, ST.this);
 
-                if(toSort) Tile.sort();
-            }
+            if(toSort) Tile.sort();
         });
     }
     public int getFrames(){ return total_frames + frames; }
@@ -232,94 +219,89 @@ class ST extends Device{
             popup.getMenu().add(0, 3, 5, "Copy disconnect command");
         }
 
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(android.view.MenuItem item) {
-                if(debug) Log.d("HIJACKER/MyListFragment", "Clicked " + item.getItemId() + " for st");
-                switch(item.getItemId()) {
-                    case 0:
-                        //Info
-                        ST.this.showInfo(activity.getFragmentManager());
-                        break;
-                    case 1:
-                        //copy to clipboard
-                        copy(ST.this.mac, v);
-                        break;
-                    case 2:
-                        //Disconnect this
-                        ST.this.disconnect();
-                        break;
-                    case 3:
-                        //copy disconnect command to clipboard
-                        String str = prefix + " " + aireplay_dir + " --ignore-negative-one --deauth 0 -a " + ST.this.bssid + " -c " + ST.this.mac + " " + iface;
-                        copy(str, v);
-                        break;
-                    case 4:
-                        //mark or unmark
-                        if(ST.this.isMarked){
-                            ST.this.unmark();
-                        }else{
-                            ST.this.mark();
-                        }
-                        break;
-                    case 5:
-                        //Set alias
-                        final EditTextDialog dialog = new EditTextDialog();
-                        dialog.setTitle(activity.getString(R.string.set_alias));
-                        dialog.setAllowEmpty(true);
-                        dialog.setDefaultText(ST.this.alias);
-                        dialog.setRunnable(new Runnable(){
-                            @Override
-                            public void run(){
-                                if(dialog.result.equals("")) dialog.result = null;
-                                try{
-                                    if(ST.this.alias==null ^ dialog.result==null){
-                                        //Need to remove previous alias
-                                        File temp_aliases = new File(data_path + "/temp_aliases");
-                                        if(temp_aliases.exists()) temp_aliases.delete();
-                                        temp_aliases.createNewFile();
-                                        PrintWriter temp_in = new PrintWriter(new FileWriter(temp_aliases));
+        popup.setOnMenuItemClickListener(item -> {
+            if(debug) Log.d("HIJACKER/MyListFragment", "Clicked " + item.getItemId() + " for st");
+            switch(item.getItemId()) {
+                case 0:
+                    //Info
+                    ST.this.showInfo(activity.getFragmentManager());
+                    break;
+                case 1:
+                    //copy to clipboard
+                    copy(ST.this.mac, v);
+                    break;
+                case 2:
+                    //Disconnect this
+                    ST.this.disconnect();
+                    break;
+                case 3:
+                    //copy disconnect command to clipboard
+                    String str = prefix + " " + aireplay_dir + " --ignore-negative-one --deauth 0 -a " + ST.this.bssid + " -c " + ST.this.mac + " " + iface;
+                    copy(str, v);
+                    break;
+                case 4:
+                    //mark or unmark
+                    if(ST.this.isMarked){
+                        ST.this.unmark();
+                    }else{
+                        ST.this.mark();
+                    }
+                    break;
+                case 5:
+                    //Set alias
+                    final EditTextDialog dialog = new EditTextDialog();
+                    dialog.setTitle(activity.getString(R.string.set_alias));
+                    dialog.setAllowEmpty();
+                    dialog.setDefaultText(ST.this.alias);
+                    dialog.setRunnable(() -> {
+                        if (dialog.result.equals("")) dialog.result = null;
+                        try {
+                            if (ST.this.alias == null ^ dialog.result == null) {
+                                //Need to remove previous alias
+                                File temp_aliases = new File(data_path + "/temp_aliases");
+                                if (temp_aliases.exists()) temp_aliases.delete();
+                                temp_aliases.createNewFile();
+                                PrintWriter temp_in = new PrintWriter(new FileWriter(temp_aliases));
 
-                                        BufferedReader aliases_out = new BufferedReader(new FileReader(aliases_file));
+                                BufferedReader aliases_out = new BufferedReader(new FileReader(aliases_file));
 
-                                        //Copy current aliases to temp file, except the one we are changing
-                                        String buffer = aliases_out.readLine();
-                                        while(buffer!=null){
-                                            //Line format: 00:11:22:33:44:55 Alias
-                                            if(buffer.charAt(17)==' ' && buffer.length()>18){
-                                                String mac = buffer.substring(0, 17);
-                                                String alias = buffer.substring(18);
-                                                if(!mac.equals(ST.this.mac)){
-                                                    temp_in.println(mac + ' ' + alias);
-                                                }
-                                            }else{
-                                                Log.e("HIJACKER/setup", "Aliases file format error: " + buffer);
-                                            }
-                                            buffer = aliases_out.readLine();
+                                //Copy current aliases to temp file, except the one we are changing
+                                String buffer = aliases_out.readLine();
+                                while (buffer != null) {
+                                    //Line format: 00:11:22:33:44:55 Alias
+                                    if (buffer.charAt(17) == ' ' && buffer.length() > 18) {
+                                        String mac = buffer.substring(0, 17);
+                                        String alias = buffer.substring(18);
+                                        if (!mac.equals(ST.this.mac)) {
+                                            temp_in.println(mac + ' ' + alias);
                                         }
-                                        temp_in.flush();
-                                        temp_in.close();
-                                        aliases_out.close();
-
-                                        aliases_file.delete();
-                                        temp_aliases.renameTo(aliases_file);
-                                        aliases_in = new FileWriter(aliases_file, true);
+                                    } else {
+                                        Log.e("HIJACKER/setup", "Aliases file format error: " + buffer);
                                     }
-                                    if(dialog.result!=null){
-                                        aliases_in.write(ST.this.mac + ' ' + dialog.result + '\n');
-                                        aliases_in.flush();
-                                    }
-                                }catch(IOException e){
-                                    Log.e("HIJACKER/MyListFrgm", e.toString());
+                                    buffer = aliases_out.readLine();
                                 }
-                                aliases.put(ST.this.mac, dialog.result);
-                                ST.this.alias = dialog.result;
-                                ST.this.update();
+                                temp_in.flush();
+                                temp_in.close();
+                                aliases_out.close();
+
+                                aliases_file.delete();
+                                temp_aliases.renameTo(aliases_file);
+                                aliases_in = new FileWriter(aliases_file, true);
                             }
-                        });
-                        dialog.show(activity.getFragmentManager(), "EditTextDialog");
-                }
-                return true;
+                            if (dialog.result != null) {
+                                aliases_in.write(ST.this.mac + ' ' + dialog.result + '\n');
+                                aliases_in.flush();
+                            }
+                        } catch (IOException e) {
+                            Log.e("HIJACKER/MyListFrgm", e.toString());
+                        }
+                        aliases.put(ST.this.mac, dialog.result);
+                        ST.this.alias = dialog.result;
+                        ST.this.update();
+                    });
+                    dialog.show(activity.getFragmentManager(), "EditTextDialog");
             }
+            return true;
         });
         return popup;
     }

@@ -1,17 +1,24 @@
 {
   "buildFiles": [
-    "/root/Android/Sdk/ndk/21.1.6210238/build/cmake/android.toolchain.cmake",
-    "/root/Android/Sdk/ndk/21.1.6210238/build/cmake/platforms.cmake",
     "/root/Hijacker/app/CMakeLists.txt"
   ],
-  "cleanCommands": [
-    "/root/Android/Sdk/cmake/3.10.2.4988404/bin/ninja -C \"/root/Hijacker/app/.cxx/cmake/debug/arm64-v8a\" clean"
+  "cleanCommandsComponents": [
+    [
+      "/root/Android/Sdk/cmake/3.18.1/bin/ninja",
+      "-C",
+      "/root/Hijacker/app/.cxx/cmake/debug/arm64-v8a",
+      "clean"
+    ]
   ],
-  "buildTargetsCommand": "/root/Android/Sdk/cmake/3.10.2.4988404/bin/ninja  -C \"/root/Hijacker/app/.cxx/cmake/debug/arm64-v8a\" {LIST_OF_TARGETS_TO_BUILD}",
+  "buildTargetsCommandComponents": [
+    "/root/Android/Sdk/cmake/3.18.1/bin/ninja",
+    "-C",
+    "/root/Hijacker/app/.cxx/cmake/debug/arm64-v8a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
   "libraries": {
-    "native-lib-Debug-arm64-v8a": {
+    "native-lib::@6890427a1f51a3e7e1df": {
       "artifactName": "native-lib",
-      "buildCommand": "/root/Android/Sdk/cmake/3.10.2.4988404/bin/ninja -C \"/root/Hijacker/app/.cxx/cmake/debug/arm64-v8a\" native-lib",
       "abi": "arm64-v8a",
       "output": "/root/Hijacker/app/build/intermediates/cmake/debug/obj/arm64-v8a/libnative-lib.so",
       "runtimeFiles": []

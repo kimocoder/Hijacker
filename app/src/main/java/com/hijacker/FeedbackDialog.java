@@ -58,35 +58,26 @@ public class FeedbackDialog extends DialogFragment{
         progress = dialogView.findViewById(R.id.progress);
 
         report = null;
-        include_report.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked){
-                if(isChecked && report==null){
-                    new ReportTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                }
+        include_report.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if(isChecked && report==null){
+                new ReportTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
         });
 
         builder.setView(dialogView);
         builder.setTitle(getString(R.string.feedback));
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {}
-        });
-        builder.setPositiveButton(R.string.send_email, new DialogInterface.OnClickListener(){
-            @Override
-            public void onClick(DialogInterface dialog, int which){
-                Intent intent = new Intent (Intent.ACTION_SEND);
-                intent.setType("plain/text");
-                intent.putExtra(Intent.EXTRA_EMAIL, new String[] {"kiriakopoulos44@gmail.com"});
-                intent.putExtra(Intent.EXTRA_SUBJECT, "Hijacker feedback");
-                intent.putExtra(Intent.EXTRA_TEXT, feedbackView.getText().toString());
-                if(report!=null){
-                    Uri attachment = FileProvider.getUriForFile(FeedbackDialog.this.getActivity().getApplicationContext(), BuildConfig.APPLICATION_ID + ".provider", report);
-                    intent.putExtra(Intent.EXTRA_STREAM, attachment);
-                }
-                startActivity(intent);
+        builder.setNegativeButton(R.string.cancel, (dialog, which) -> {});
+        builder.setPositiveButton(R.string.send_email, (dialog, which) -> {
+            Intent intent = new Intent (Intent.ACTION_SEND);
+            intent.setType("plain/text");
+            intent.putExtra(Intent.EXTRA_EMAIL, new String[] {"kiriakopoulos44@gmail.com"});
+            intent.putExtra(Intent.EXTRA_SUBJECT, "Hijacker feedback");
+            intent.putExtra(Intent.EXTRA_TEXT, feedbackView.getText().toString());
+            if(report!=null){
+                Uri attachment = FileProvider.getUriForFile(FeedbackDialog.this.getActivity().getApplicationContext(), BuildConfig.APPLICATION_ID + ".provider", report);
+                intent.putExtra(Intent.EXTRA_STREAM, attachment);
             }
+            startActivity(intent);
         });
         return builder.create();
     }

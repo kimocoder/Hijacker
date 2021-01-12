@@ -5,7 +5,8 @@ import android.os.AsyncTask;
 import androidx.annotation.NonNull;
 
 class DialogRefreshTask extends AsyncTask<Void, Void, Boolean>{
-    @SuppressLint("StaticFieldLeak")        // This object will exist as long as the device dialog exists
+    @SuppressLint("StaticFieldLeak")
+    final        // This object will exist as long as the device dialog exists
     DeviceDialog deviceDialog;
     DialogRefreshTask(@NonNull DeviceDialog deviceDialog){
         this.deviceDialog = deviceDialog;
