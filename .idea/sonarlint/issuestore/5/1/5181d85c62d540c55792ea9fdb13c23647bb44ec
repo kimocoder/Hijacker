@@ -1,0 +1,41 @@
+
+K
+java:S1874 "6Remove this use of "DialogFragment"; it is deprecated.(ûš¢:
+e
+java:S1874""JDon't override a deprecated method or explicitly mark it as "@Deprecated".(à“æ…øÿÿÿÿ
+K
+java:S1874#"5Remove this use of "setCancelable"; it is deprecated.(Ü‘Ìç
+I
+java:S1874$"3Remove this use of "getActivity"; it is deprecated.( ô•À
+G
+java:S1602(",Remove useless curly braces around statement(ÍÐçáúÿÿÿÿ
+`
+java:S18740"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(‰¦ì·
+M
+java:S18740"7Remove this use of "FragmentManager"; it is deprecated.(‰¦ì·
+B
+java:S18741",Remove this use of "show"; it is deprecated.(Ôš„ò
+e
+java:S18744"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(µ‚µõýÿÿÿÿ
+E
+java:S18745"/Remove this use of "onStart"; it is deprecated.(ï†æŽ
+L
+java:S18747"1Remove this use of "getDialog"; it is deprecated.(÷ï¼ôüÿÿÿÿ
+j
+java:S3252:"OUse static access with "android.content.DialogInterface" for "BUTTON_POSITIVE".(ÆÄ†Œùÿÿÿÿ
+G
+java:S1602>",Remove useless curly braces around statement(àò»ªøÿÿÿÿ
+U
+java:S1874@":Remove this use of "getFragmentManager"; it is deprecated.(Œå»‘ÿÿÿÿÿ
+`
+java:S1874E"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(úÑ¡î
+G
+java:S1874F"1Remove this use of "onDismiss"; it is deprecated.(É†–§
+K
+java:S2446I"0"notify" may not wake up the appropriate thread.(óÄ£¶øÿÿÿÿ
+h	java:S100M"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(øÇØûúÿÿÿÿ
+\
+java:S2142R"FEither re-interrupt this method or rethrow the "InterruptedException".(´í­Œ
+O
+java:S2274P":Remove this call to "wait" or move it into a "while" loop.(ç£ŠM
+>	java:S108R")Either remove or fill this block of code.(´í­Œ

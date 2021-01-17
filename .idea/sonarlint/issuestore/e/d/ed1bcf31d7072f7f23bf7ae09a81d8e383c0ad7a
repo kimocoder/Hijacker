@@ -1,0 +1,218 @@
+
+F
+java:S1066•"/Merge this if statement with the enclosing one.(¨±¸Ã
+l
+java:S3008Y"WRename this field "console_text" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(è¸‹
+i
+java:S3008Y"TRename this field "pin_delay" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(è¸‹
+l
+java:S3008Y"WRename this field "locked_delay" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(è¸‹
+j
+java:S3008Y"URename this field "custom_mac" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(è¸‹
+x
+java:S3008Z"]Rename this field "pixie_dust_enabled" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Çâü‡şÿÿÿÿ
+p
+java:S3008Z"URename this field "pixie_dust" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Çâü‡şÿÿÿÿ
+s
+java:S3008Z"XRename this field "ignore_locked" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Çâü‡şÿÿÿÿ
+n
+java:S3008Z"SRename this field "eap_fail" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Çâü‡şÿÿÿÿ
+n
+java:S3008Z"SRename this field "small_dh" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Çâü‡şÿÿÿÿ
+m
+java:S3008Z"RRename this field "no_nack" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Çâü‡şÿÿÿÿ
+I
+java:S1659N".Declare "optionsContainer" on a separate line.(àğÕ¹ıÿÿÿÿ
+A
+java:S1659O"+Declare "select_button" on a separate line.(Îø¿Ó
+C
+java:S1659Q"-Declare "lockedDelayView" on a separate line.(™õ‡ù
+J
+java:S1659R"/Declare "ignored_locked_cb" on a separate line.(éåÃËüÿÿÿÿ
+D
+java:S1659R")Declare "eap_fail_cb" on a separate line.(éåÃËüÿÿÿÿ
+D
+java:S1659R")Declare "small_dh_cb" on a separate line.(éåÃËüÿÿÿÿ
+C
+java:S1659R"(Declare "no_nack_cb" on a separate line.(éåÃËüÿÿÿÿ
+<
+java:S1659Y"'Declare "pin_delay" on a separate line.(è¸‹
+?
+java:S1659Y"*Declare "locked_delay" on a separate line.(è¸‹
+=
+java:S1659Y"(Declare "custom_mac" on a separate line.(è¸‹
+C
+java:S1659Z"(Declare "pixie_dust" on a separate line.(Çâü‡şÿÿÿÿ
+F
+java:S1659Z"+Declare "ignore_locked" on a separate line.(Çâü‡şÿÿÿÿ
+A
+java:S1659Z"&Declare "eap_fail" on a separate line.(Çâü‡şÿÿÿÿ
+A
+java:S1659Z"&Declare "small_dh" on a separate line.(Çâü‡şÿÿÿÿ
+@
+java:S1659Z"%Declare "no_nack" on a separate line.(Çâü‡şÿÿÿÿ
+l	java:S116O"WRename this field "start_button" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Îø¿Ó
+m	java:S116O"XRename this field "select_button" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Îø¿Ó
+r	java:S116R"XRename this field "pixie_dust_cb" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(éåÃËüÿÿÿÿ
+v	java:S116R"\Rename this field "ignored_locked_cb" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(éåÃËüÿÿÿÿ
+p	java:S116R"VRename this field "eap_fail_cb" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(éåÃËüÿÿÿÿ
+p	java:S116R"VRename this field "small_dh_cb" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(éåÃËüÿÿÿÿ
+o	java:S116R"URename this field "no_nack_cb" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(éåÃËüÿÿÿÿ
+F
+java:S1874K"0Remove this use of "Fragment"; it is deprecated.(ÍÎáÆ
+`
+java:S1874]"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(«ÃÀ÷
+h
+java:S3776]"RRefactor this method to reduce its Cognitive Complexity from 26 to the 15 allowed.(«ÃÀ÷
+O
+java:S1874_"9Remove this use of "setRetainInstance"; it is deprecated.(ø“®ô
+L
+java:S2696v"6Make the enclosing method "static" or remove this set.(‰²³‰
+Q
+java:S2696{"6Make the enclosing method "static" or remove this set.(¿ŠŠÖıÿÿÿÿ
+I
+java:S1874|"3Remove this use of "getActivity"; it is deprecated.(Šá§
+G
+java:S1874|"1Remove this use of "getString"; it is deprecated.(Šá§
+N
+java:S1874}"3Remove this use of "getActivity"; it is deprecated.(¨õ€êÿÿÿÿÿ
+L
+java:S1874}"1Remove this use of "getString"; it is deprecated.(¨õ€êÿÿÿÿÿ
+N
+java:S1874~"3Remove this use of "getActivity"; it is deprecated.(ã‹å¬ıÿÿÿÿ
+L
+java:S1874~"1Remove this use of "getString"; it is deprecated.(ã‹å¬ıÿÿÿÿ
+M
+java:S2696"6Make the enclosing method "static" or remove this set.(–‡˜Ê
+O
+java:S1874…"3Remove this use of "getActivity"; it is deprecated.(ÃÏåƒÿÿÿÿÿ
+M
+java:S2696”"6Make the enclosing method "static" or remove this set.(ˆ¯Áˆ
+R
+java:S2696—"6Make the enclosing method "static" or remove this set.(âà„ˆüÿÿÿÿ
+H
+java:S1874"1Remove this use of "getString"; it is deprecated.(››üÈ
+M
+java:S1874"1Remove this use of "getString"; it is deprecated.(±‰…ºıÿÿÿÿ
+M
+java:S1874«"1Remove this use of "getStatus"; it is deprecated.(ñÊ·Äÿÿÿÿÿ
+M
+java:S1874«"1Remove this use of "AsyncTask"; it is deprecated.(ñÊ·Äÿÿÿÿÿ
+J
+java:S1874«".Remove this use of "Status"; it is deprecated.(ñÊ·Äÿÿÿÿÿ
+K
+java:S1874«"/Remove this use of "RUNNING"; it is deprecated.(ñÊ·Äÿÿÿÿÿ
+J
+java:S1874¯".Remove this use of "cancel"; it is deprecated.(û÷Øúùÿÿÿÿ
+H
+java:S1874º"1Remove this use of "getString"; it is deprecated.(…óÄ´
+~
+java:S3252º"gUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_LONG".(…óÄ´
+H
+java:S1874½"1Remove this use of "getString"; it is deprecated.(”üöº
+M
+java:S1874Â"1Remove this use of "getString"; it is deprecated.(€Ş ¤şÿÿÿÿ
+R
+java:S2696Ç"6Make the enclosing method "static" or remove this set.(‡ç¥±ùÿÿÿÿ
+P
+java:S1874È"9Remove this use of "executeOnExecutor"; it is deprecated.(¯«”Ü
+H
+java:S1874È"1Remove this use of "AsyncTask"; it is deprecated.(¯«”Ü
+S
+java:S1874È"<Remove this use of "THREAD_POOL_EXECUTOR"; it is deprecated.(¯«”Ü
+M
+java:S1874Ñ"1Remove this use of "getStatus"; it is deprecated.(–ƒ¯¸øÿÿÿÿ
+M
+java:S1874Ñ"1Remove this use of "AsyncTask"; it is deprecated.(–ƒ¯¸øÿÿÿÿ
+J
+java:S1874Ñ".Remove this use of "Status"; it is deprecated.(–ƒ¯¸øÿÿÿÿ
+K
+java:S1874Ñ"/Remove this use of "RUNNING"; it is deprecated.(–ƒ¯¸øÿÿÿÿ
+J
+java:S1874×".Remove this use of "cancel"; it is deprecated.(û÷Øúùÿÿÿÿ
+a
+java:S1874Û"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(öÿÕÅ
+L
+java:S1874Ü"0Remove this use of "onResume"; it is deprecated.(çóà±úÿÿÿÿ
+O
+java:S1874Ş"3Remove this use of "getActivity"; it is deprecated.(»²¤¢üÿÿÿÿ
+a
+java:S1874å"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(ßû¢½
+K
+java:S1874æ"/Remove this use of "onPause"; it is deprecated.(´¬á®ÿÿÿÿÿ
+R
+java:S2696é"6Make the enclosing method "static" or remove this set.(°é©Âıÿÿÿÿ
+f
+java:S1874ì"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(µ‚µõıÿÿÿÿ
+F
+java:S1874í"/Remove this use of "onStart"; it is deprecated.(ï†æ
+M
+java:S2696û"6Make the enclosing method "static" or remove this set.(Ä˜½€
+H
+java:S1874"1Remove this use of "getStatus"; it is deprecated.(¶º–
+H
+java:S1874"1Remove this use of "AsyncTask"; it is deprecated.(¶º–
+E
+java:S1874".Remove this use of "Status"; it is deprecated.(¶º–
+F
+java:S1874"/Remove this use of "RUNNING"; it is deprecated.(¶º–
+f
+java:S1874“"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(º£”úÿÿÿÿ
+M
+java:S2696›"6Make the enclosing method "static" or remove this set.(¦„‚¶
+R
+java:S2696œ"6Make the enclosing method "static" or remove this set.(Üá÷ÿıÿÿÿÿ
+R
+java:S2696"6Make the enclosing method "static" or remove this set.(í¶ù´üÿÿÿÿ
+M
+java:S2696"6Make the enclosing method "static" or remove this set.(¡‡…ë
+L
+java:S2696Ÿ"6Make the enclosing method "static" or remove this set.(å½ùt
+L
+java:S2696 "6Make the enclosing method "static" or remove this set.(Ê€ì
+
+R
+java:S2696¡"6Make the enclosing method "static" or remove this set.(Œ¡´ùÿÿÿÿ
+M
+java:S2696¢"6Make the enclosing method "static" or remove this set.(•Î÷
+J
+java:S1874¤".Remove this use of "onStop"; it is deprecated.(å­Şıÿÿÿÿ
+d	java:S100¦"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(õ©ñó
+@
+java:S1659Æ")Declare "lockedDelay" on a separate line.(å§´ã
+<
+java:S1659Ç"%Declare "eapFail" on a separate line.(…¤øË
+<
+java:S1659Ç"%Declare "smallDH" on a separate line.(…¤øË
+>
+java:S1659Ç"'Declare "pixieDust" on a separate line.(…¤øË
+;
+java:S1659Ç"$Declare "noNack" on a separate line.(…¤øË
+H
+java:S1874Å"1Remove this use of "AsyncTask"; it is deprecated.(Œ©Ï
+a
+java:S1874Ê"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(ËĞƒ
+S
+java:S1874ò"7Remove this use of "publishProgress"; it is deprecated.(ÍåøÇøÿÿÿÿ
+M
+java:S1874ò"1Remove this use of "getString"; it is deprecated.(ÍåøÇøÿÿÿÿ
+J
+java:S1874ø"3Remove this use of "getActivity"; it is deprecated.(ÄÔåğ
+S
+java:S1874ù"7Remove this use of "publishProgress"; it is deprecated.(·Ùéõúÿÿÿÿ
+S
+java:S1874ƒ"7Remove this use of "publishProgress"; it is deprecated.(·Ùéõúÿÿÿÿ
+J
+java:S1874‹"3Remove this use of "isCancelled"; it is deprecated.(½ùÚ‚
+S
+java:S1874Œ"7Remove this use of "publishProgress"; it is deprecated.(œ°ÖÎøÿÿÿÿ
+S
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(˜Ï†ıÿÿÿÿ
+a
+java:S1874–"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(Ÿâí
+R
+java:S2696œ"6Make the enclosing method "static" or remove this set.(•Ø¯·ıÿÿÿÿ
+a
+java:S1874 "JDon't override a deprecated method or explicitly mark it as "@Deprecated".(–¦¶Ğ
+a
+java:S1874¤"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(¨‚è

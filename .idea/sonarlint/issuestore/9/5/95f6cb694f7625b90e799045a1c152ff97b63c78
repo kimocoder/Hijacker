@@ -1,0 +1,27 @@
+
+e
+java:S1874^"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(Ã«•·ÿÿÿÿÿ
+K
+java:S1874l".Remove this use of "Status"; it is deprecated.(–œ’ñ8ˆÊØğ.
+N
+java:S1874l"1Remove this use of "getStatus"; it is deprecated.(–œ’ñ8ˆÊØğ.
+L
+java:S1874l"/Remove this use of "RUNNING"; it is deprecated.(–œ’ñ8ˆÊØğ.
+`
+java:S1155;">Use isEmpty() to check whether the collection is empty or not.(¬Ø•ıøÿÿÿÿ8ÑˆÅİğ.
+[
+java:S1155?">Use isEmpty() to check whether the collection is empty or not.(©ş…Œ8ÑˆÅİğ.
+J
+java:S1659+"(Declare "PAUSE_TIME" on a separate line.(›ãå«øÿÿÿÿ8ÑˆÅİğ.
+M
+java:S1874*"1Remove this use of "AsyncTask"; it is deprecated.(”éÖ%8ÑˆÅİğ.
+O
+java:S18748"3Remove this use of "isCancelled"; it is deprecated.(¹«’8ÑˆÅİğ.
+Y
+java:S1874="7Remove this use of "publishProgress"; it is deprecated.(÷õºˆıÿÿÿÿ8ÑˆÅİğ.
+Y
+java:S1874D"7Remove this use of "publishProgress"; it is deprecated.(ˆÚ¼ÿÿÿÿÿ8ÑˆÅİğ.
+c
+java:S2142W"FEither re-interrupt this method or rethrow the "InterruptedException".(ä ¹€8ÑˆÅİğ.
+P
+java:S1874K"3Remove this use of "isCancelled"; it is deprecated.(íÆË8ÑˆÅİğ.

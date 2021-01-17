@@ -1,0 +1,33 @@
+
+=
+java:S1659!""Declare "hint" on a separate line.(™Æúºûÿÿÿÿ
+D
+java:S1659!")Declare "defaultText" on a separate line.(™Æúºûÿÿÿÿ
+?
+java:S1659!"$Declare "result" on a separate line.(™Æúºûÿÿÿÿ
+Q
+java:S1874 "6Remove this use of "DialogFragment"; it is deprecated.(ùŽÐñøÿÿÿÿ
+e
+java:S1874'"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(à“æ…øÿÿÿÿ
+I
+java:S1874("3Remove this use of "getActivity"; it is deprecated.( ô•À
+H
+java:S1874)"3Remove this use of "getActivity"; it is deprecated.(ëö¹W
+`
+java:S1874>"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(‰¦ì·
+M
+java:S1874>"7Remove this use of "FragmentManager"; it is deprecated.(‰¦ì·
+B
+java:S1874?",Remove this use of "show"; it is deprecated.(Ôš„ò
+e
+java:S1874B"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(µ‚µõýÿÿÿÿ
+E
+java:S1874C"/Remove this use of "onStart"; it is deprecated.(ï†æŽ
+L
+java:S1874D"1Remove this use of "getDialog"; it is deprecated.(÷ï¼ôüÿÿÿÿ
+e
+java:S3252F"OUse static access with "android.content.DialogInterface" for "BUTTON_POSITIVE".(¦ûºÑ
+G
+java:S1874M"1Remove this use of "getString"; it is deprecated.(Û€˜Ê
+V
+java:S1874R"@Remove this use of "dismissAllowingStateLoss"; it is deprecated.(ÌÌÓÙ

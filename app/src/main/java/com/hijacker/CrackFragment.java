@@ -26,14 +26,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import com.google.android.material.snackbar.Snackbar;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
@@ -43,7 +41,6 @@ import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -110,7 +107,9 @@ public class CrackFragment extends Fragment{
             wepRG.getChildAt(i).setEnabled(false);
         }
 
-        if(task==null) task = new CrackTask(CrackTask.JOB_CRACK, null, null);
+        if(task==null) {
+            task = new CrackTask(CrackTask.JOB_CRACK, null, null);
+        }
 
         wepRB.setOnCheckedChangeListener((compoundButton, b) -> {
             for (int i = 0; i < wepRG.getChildCount(); i++) {

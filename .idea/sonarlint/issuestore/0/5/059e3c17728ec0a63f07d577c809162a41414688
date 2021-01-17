@@ -1,0 +1,34 @@
+
+@
+java:S5411c"*Use the primitive boolean expression here.(Û¹¯â
+s	java:S116/"YRename this field "include_report" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(âä¸Ïøÿÿÿÿ
+Q
+java:S1874+"6Remove this use of "DialogFragment"; it is deprecated.(‘¢Ê¢ûÿÿÿÿ
+e
+java:S18742"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(à“æ…øÿÿÿÿ
+I
+java:S18743"3Remove this use of "getActivity"; it is deprecated.( ô•À
+I
+java:S18744"3Remove this use of "getActivity"; it is deprecated.(Ï­”°
+O
+java:S1874="9Remove this use of "executeOnExecutor"; it is deprecated.(ƒŠŽÕ
+G
+java:S1874="1Remove this use of "AsyncTask"; it is deprecated.(ƒŠŽÕ
+R
+java:S1874="<Remove this use of "THREAD_POOL_EXECUTOR"; it is deprecated.(ƒŠŽÕ
+L
+java:S1874B"1Remove this use of "getString"; it is deprecated.(ù‰›ðûÿÿÿÿ
+`
+java:S1874S"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(‰¦ì·
+M
+java:S1874S"7Remove this use of "FragmentManager"; it is deprecated.(‰¦ì·
+B
+java:S1874T",Remove this use of "show"; it is deprecated.(Ôš„ò
+G
+java:S1874V"1Remove this use of "AsyncTask"; it is deprecated.(ÈÁÜ·
+`
+java:S1874X"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(ËÐƒ
+^
+java:S1874]"CRemove this use of "getExternalStorageDirectory"; it is deprecated.(šß¨•ýÿÿÿÿ
+`
+java:S1874a"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(–¦¶Ð

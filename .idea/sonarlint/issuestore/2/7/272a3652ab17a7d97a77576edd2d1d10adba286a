@@ -1,0 +1,58 @@
+
+f
+java:S13017"KReplace this "switch" statement by "if" statements to increase readability.(øå´¡ÿÿÿÿÿ
+F
+java:S1874'"0Remove this use of "Fragment"; it is deprecated.(ˆÒàÙ
+`
+java:S1874)"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(‚ğ„
+N
+java:S1874/"3Remove this use of "getActivity"; it is deprecated.(ÃÏåƒÿÿÿÿÿ
+L
+java:S18743"1Remove this use of "getString"; it is deprecated.(ƒßÙıÿÿÿÿ
+L
+java:S18744"1Remove this use of "getString"; it is deprecated.(½Àíìşÿÿÿÿ
+<	java:S1317""Add a default case to this switch.(øå´¡ÿÿÿÿÿ
+V
+java:S1874=";Remove this use of "FragmentTransaction"; it is deprecated.(¸Ø­ôÿÿÿÿÿ
+E
+java:S1874>"/Remove this use of "replace"; it is deprecated.(‡éñá
+K
+java:S1874?"5Remove this use of "setTransition"; it is deprecated.(í¼€Ù
+Q
+java:S1874?";Remove this use of "FragmentTransaction"; it is deprecated.(í¼€Ù
+S
+java:S1874?"=Remove this use of "TRANSIT_FRAGMENT_OPEN"; it is deprecated.(í¼€Ù
+Q
+java:S1874@"6Remove this use of "addToBackStack"; it is deprecated.(©ëà»øÿÿÿÿ
+Z
+java:S1874A"?Remove this use of "commitAllowingStateLoss"; it is deprecated.(‹–¨ùÿÿÿÿ
+L
+java:S1874F"1Remove this use of "getString"; it is deprecated.(Ñ×˜üÿÿÿÿ
+L
+java:S1874G"1Remove this use of "getString"; it is deprecated.(Ğ Âîüÿÿÿÿ
+L
+java:S1874H"1Remove this use of "getString"; it is deprecated.(óîÊÕøÿÿÿÿ
+G
+java:S1874M"1Remove this use of "getString"; it is deprecated.(„æ¹à
+P
+java:S1874N":Remove this use of "getFragmentManager"; it is deprecated.(˜‰ÖÛ
+V
+java:S1874Y";Remove this use of "FragmentTransaction"; it is deprecated.(¸Ø­ôÿÿÿÿÿ
+E
+java:S1874Z"/Remove this use of "replace"; it is deprecated.(ÌŞ·©
+K
+java:S1874["5Remove this use of "setTransition"; it is deprecated.(í¼€Ù
+Q
+java:S1874[";Remove this use of "FragmentTransaction"; it is deprecated.(í¼€Ù
+S
+java:S1874["=Remove this use of "TRANSIT_FRAGMENT_OPEN"; it is deprecated.(í¼€Ù
+Q
+java:S1874\"6Remove this use of "addToBackStack"; it is deprecated.(©ëà»øÿÿÿÿ
+Z
+java:S1874]"?Remove this use of "commitAllowingStateLoss"; it is deprecated.(‹–¨ùÿÿÿÿ
+`
+java:S1874c"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(öÿÕÅ
+K
+java:S1874d"0Remove this use of "onResume"; it is deprecated.(çóà±úÿÿÿÿ
+N
+java:S1874f"3Remove this use of "getActivity"; it is deprecated.(»²¤¢üÿÿÿÿ

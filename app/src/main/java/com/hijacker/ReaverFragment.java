@@ -25,7 +25,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import com.google.android.material.snackbar.Snackbar;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -268,7 +267,7 @@ public class ReaverFragment extends Fragment{
         }
 
         if(autostart){
-            optionsContainer.post(() -> attemptStart());
+            optionsContainer.post(this::attemptStart);
             autostart = false;
         }
     }

@@ -13,7 +13,8 @@
         android:layout_height="100dp"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        app:srcCompat="@drawable/ic_notification" />
+        app:srcCompat="@drawable/ic_notification"
+        android:contentDescription="TODO" />
 
     <TextView
         android:layout_width="match_parent"

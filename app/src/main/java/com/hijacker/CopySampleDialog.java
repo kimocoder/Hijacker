@@ -20,7 +20,6 @@ package com.hijacker;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import androidx.appcompat.app.AlertDialog;
 
@@ -60,7 +59,7 @@ public class CopySampleDialog extends DialogFragment {
                     copy(prefix + " " + mdk3bf_dir + " " + iface + " b -m", getView());
                     break;
                 case 4:
-                    copy(prefix + " " + reaver_dir + " -i " + iface + " -vv -b 00:11:22:33:44:55 --channel 6 -L -E -S", getView());
+                    copy(prefix + " " + reaver_dir + " -i " + iface + " -F -vv -b 00:11:22:33:44:55 --channel 6 -L -E -S", getView());
                     break;
                 case 5:
                     copy("chroot " + chroot_dir + " /bin/bash -c '" + get_chroot_env(getActivity()) + "reaver -i " + iface + " -vv -b 00:11:22:33:44:55 --channel 6 -L -E -S'", getView());

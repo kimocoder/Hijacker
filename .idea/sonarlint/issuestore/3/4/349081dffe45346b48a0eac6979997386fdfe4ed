@@ -1,0 +1,58 @@
+
+Q
+java:S1874"1Remove this use of "AsyncTask"; it is deprecated.(µΎ€ωÿÿÿÿ8‚ÿέπ.
+E
+java:S1659"*Declare "download_url" on a separate line.(κ©Β™8‚ÿέπ.
+L
+java:S1874"1Remove this use of "getString"; it is deprecated.(αω²σ8‚ÿέπ.
+T
+java:S1874"9Remove this use of "executeOnExecutor"; it is deprecated.(―«”ά8‚ÿέπ.
+W
+java:S1874"<Remove this use of "THREAD_POOL_EXECUTOR"; it is deprecated.(―«”ά8‚ÿέπ.
+N
+java:S1874"3Remove this use of "getActivity"; it is deprecated.(ζΐ§Ò8‚ÿέπ.
+^
+java:S1874"CRemove this use of "allowScanningByMediaScanner"; it is deprecated.(ƒ½‘8‚ÿέπ.
+L
+java:S1874"1Remove this use of "getString"; it is deprecated.(ρΊήΟ8‚ÿέπ.
+e
+java:S1874"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(–¦¶Π8‚ÿέπ.
+q	java:S116"WRename this field "download_url" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ςΥΊ8‚ÿέπ.
+Q
+java:S1874"6Remove this use of "DialogFragment"; it is deprecated.(ΜΙ΄ÿ8‚ÿέπ.
+N
+java:S1874"3Remove this use of "getActivity"; it is deprecated.(ώµΣ8‚ÿέπ.
+S
+java:S1874"3Remove this use of "getActivity"; it is deprecated.(χ‰ω†ύÿÿÿÿ8‚ÿέπ.
+j
+java:S1874"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(ΰ“ζ…ψÿÿÿÿ8‚ÿέπ.
+Q
+java:S1874"1Remove this use of "getString"; it is deprecated.(–™·Εόÿÿÿÿ8‚ÿέπ.
+N
+java:S1874"3Remove this use of "getActivity"; it is deprecated.( τ•ΐ8‚ÿέπ.
+S
+java:S1874"3Remove this use of "getActivity"; it is deprecated.(ζϋ†ÿÿÿÿÿ8‚ÿέπ.
+M
+java:S1874"3Remove this use of "getActivity"; it is deprecated.(Εςªf8‚ÿέπ.
+E
+java:S5411"*Use the primitive boolean expression here.(ΫΉ―β8‚ÿέπ.
+[
+java:S1874"@Remove this use of "dismissAllowingStateLoss"; it is deprecated.(ΜΜΣΩ8‚ÿέπ.
+N
+java:S1874"3Remove this use of "getActivity"; it is deprecated.(¦„Η†8‚ÿέπ.
+S
+java:S1874"3Remove this use of "getActivity"; it is deprecated.(«Άωÿÿÿÿ8‚ÿέπ.
+Q
+java:S1874"1Remove this use of "getString"; it is deprecated.(ζϋ†ÿÿÿÿÿ8‚ÿέπ.
+K
+java:S1874"1Remove this use of "getString"; it is deprecated.(Εςªf8‚ÿέπ.
+S
+java:S1874"3Remove this use of "getActivity"; it is deprecated.(–™·Εόÿÿÿÿ8‚ÿέπ.
+S
+java:S1874"3Remove this use of "getActivity"; it is deprecated.(¨–Μÿÿÿÿÿ8‚ÿέπ.
+L
+java:S1874"1Remove this use of "AsyncTask"; it is deprecated.(―«”ά8‚ÿέπ.
+S
+java:S1874"3Remove this use of "getActivity"; it is deprecated.(ΙΛ‰ÿÿÿÿÿ8‚ÿέπ.
+N
+java:S1874"3Remove this use of "getActivity"; it is deprecated.(ρΊήΟ8‚ÿέπ.

@@ -1,0 +1,96 @@
+
+U
+java:S3516†"9Refactor this method to not always return the same value.(áæĞ¨ùÿÿÿÿ
+d
+java:S2095¿"NUse try-with-resources or close this "FileOutputStream" in a "finally" clause.(½¤ñt
+`
+java:S2095¾"IUse try-with-resources or close this "InputStream" in a "finally" clause.(Ëà½‡
+K
+java:S1066“"/Merge this if statement with the enclosing one.(ğ·‡ëıÿÿÿÿ
+K
+java:S1066¸"/Merge this if statement with the enclosing one.(ëâÀûÿÿÿÿ
+A
+java:S1659@"+Declare "neutralButton" on a separate line.(íÈ½ï
+G
+java:S1659B",Declare "devChipsetView" on a separate line.(ÏéÓ³ıÿÿÿÿ
+n	java:S116D"TRename this field "backup_cb" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ùğ»‘ÿÿÿÿÿ
+Q
+java:S1874;"6Remove this use of "DialogFragment"; it is deprecated.(©ü¯„şÿÿÿÿ
+W
+java:S1075="ARefactor your code to get this URI from a customizable parameter.(Ô‡·Å
+e
+java:S1874J"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(à“æ…øÿÿÿÿ
+I
+java:S1874K"3Remove this use of "getActivity"; it is deprecated.( ô•À
+N
+java:S1874L"3Remove this use of "getActivity"; it is deprecated.(…•Íûÿÿÿÿ
+e
+java:S1874_"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(µ‚µõıÿÿÿÿ
+E
+java:S1874`"/Remove this use of "onStart"; it is deprecated.(ï†æ
+L
+java:S1874b"1Remove this use of "getDialog"; it is deprecated.(÷ï¼ôüÿÿÿÿ
+j
+java:S3252d"OUse static access with "android.content.DialogInterface" for "BUTTON_POSITIVE".(ıÓåùÿÿÿÿ
+i
+java:S3252h"NUse static access with "android.content.DialogInterface" for "BUTTON_NEUTRAL".(ƒ°¹šüÿÿÿÿ
+T
+java:S1874l"9Remove this use of "executeOnExecutor"; it is deprecated.(Ü€ï™üÿÿÿÿ
+L
+java:S1874l"1Remove this use of "AsyncTask"; it is deprecated.(Ü€ï™üÿÿÿÿ
+W
+java:S1874l"<Remove this use of "THREAD_POOL_EXECUTOR"; it is deprecated.(Ü€ï™üÿÿÿÿ
+e
+java:S1874p"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(î¾ü‡ùÿÿÿÿ
+G
+java:S1874q"1Remove this use of "onDismiss"; it is deprecated.(»áæ
+`
+java:S1874u"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(‰¦ì·
+M
+java:S1874u"7Remove this use of "FragmentManager"; it is deprecated.(‰¦ì·
+B
+java:S1874v",Remove this use of "show"; it is deprecated.(Ôš„ò
+~
+java:S3252¢"gUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_LONG".(à¬®˜
+~
+java:S3252À"gUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_LONG".(ö“
+ƒ
+java:S3252Ğ"gUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_LONG".(™Á¡‹şÿÿÿÿ
+~
+java:S3252Ó"gUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_LONG".(à¬®˜
+J
+java:S1874â"3Remove this use of "getActivity"; it is deprecated.(îÜø¡
+O
+java:S1874å"3Remove this use of "getActivity"; it is deprecated.(’Ûù–øÿÿÿÿ
+~
+java:S3252ƒ"gUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_LONG".(ğÚŸõ
+ƒ
+java:S3252‡"gUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_LONG".(ü¿şÿÿÿÿ
+O
+java:S1874™"3Remove this use of "getActivity"; it is deprecated.(û“şËüÿÿÿÿ
+W
+java:S1874"@Remove this use of "dismissAllowingStateLoss"; it is deprecated.(ÌÌÓÙ
+O
+java:S1874¡"3Remove this use of "getActivity"; it is deprecated.(ˆÃ«„şÿÿÿÿ
+R
+java:S1874¢"6Remove this use of "setWifiEnabled"; it is deprecated.(ˆğÎíıÿÿÿÿ
+O
+java:S1874µ"3Remove this use of "getActivity"; it is deprecated.(¢£”øúÿÿÿÿ
+R
+java:S1874¶"6Remove this use of "setWifiEnabled"; it is deprecated.(ÊìÍ”ıÿÿÿÿ
+W
+java:S1874·"@Remove this use of "dismissAllowingStateLoss"; it is deprecated.(ÌÌÓÙ
+K
+java:S1874¾"4Remove this use of "getResources"; it is deprecated.(Ëà½‡
+H
+java:S1874Ï"1Remove this use of "AsyncTask"; it is deprecated.(İÚ¹’
+a
+java:S1874Õ"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(ËĞƒ
+f
+java:S1874ò"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(’á›ûøÿÿÿÿ
+M
+java:S1874ü"1Remove this use of "getString"; it is deprecated.(œŸÍ…ùÿÿÿÿ
+G
+java:S1874‰"1Remove this use of "getString"; it is deprecated.(üı+
+J
+java:S1874Œ"3Remove this use of "getActivity"; it is deprecated.(áÎ—í

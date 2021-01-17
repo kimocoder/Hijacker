@@ -1,0 +1,42 @@
+
+c
+java:S2095"LUse try-with-resources or close this "BufferedReader" in a "finally" clause.(ƒŒï
+Q	java:S1107"<This class has 9 parents which is greater than 5 authorized.(”îÏ—
+Q
+java:S1141Ğ"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ
+A
+java:S5411 "*Use the primitive boolean expression here.(‡î·À
+?
+java:S1659:")Declare "progressBar" on a separate line.(¦À“
+m	java:S116@"SRename this field "shell_in" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ˆæµ£üÿÿÿÿ
+n	java:S116A"TRename this field "shell_out" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(À›Á€ÿÿÿÿÿ
+L
+java:S2696N"6Make the enclosing method "static" or remove this set.(‚‚²
+N
+java:S1874X"3Remove this use of "versionCode"; it is deprecated.(’­Çıÿÿÿÿ
+T
+java:S1874`"9Remove this use of "executeOnExecutor"; it is deprecated.(¿ßè©şÿÿÿÿ
+L
+java:S1874`"1Remove this use of "AsyncTask"; it is deprecated.(¿ßè©şÿÿÿÿ
+W
+java:S1874`"<Remove this use of "THREAD_POOL_EXECUTOR"; it is deprecated.(¿ßè©şÿÿÿÿ
+O
+java:S1874i"9Remove this use of "executeOnExecutor"; it is deprecated.(ƒŠÕ
+G
+java:S1874i"1Remove this use of "AsyncTask"; it is deprecated.(ƒŠÕ
+R
+java:S1874i"<Remove this use of "THREAD_POOL_EXECUTOR"; it is deprecated.(ƒŠÕ
+L
+java:S1874o"1Remove this use of "AsyncTask"; it is deprecated.(äŸú¸øÿÿÿÿ
+‚
+java:S3252{"gUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_LONG".(àèÁöşÿÿÿÿ
+H
+java:S1874ˆ"1Remove this use of "AsyncTask"; it is deprecated.(ÈÁÜ·
+_
+java:S1874Œ"CRemove this use of "getExternalStorageDirectory"; it is deprecated.(šß¨•ıÿÿÿÿ
+a
+java:S1874"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(–¦¶Ğ
+D
+java:S1172«"(Remove this unused method parameter "v".(Şİ€ƒÿÿÿÿÿ
+?
+java:S1172µ"(Remove this unused method parameter "v".(†ğ¿ˆ

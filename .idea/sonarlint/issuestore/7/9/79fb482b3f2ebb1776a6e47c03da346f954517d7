@@ -1,0 +1,10 @@
+
+G
+java:S1874"1Remove this use of "AsyncTask"; it is deprecated.(Ñ“×ˆ
+e
+java:S1874"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(¤õ“éøÿÿÿÿ
+c
+java:S2142"FEither re-interrupt this method or rethrow the "InterruptedException".(´í­Œ8ÑˆÅÝð.
+Y
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(ôÒÚŠúÿÿÿÿ8ÑˆÅÝð.
+E	java:S108")Either remove or fill this block of code.(´í­Œ8ÑˆÅÝð.

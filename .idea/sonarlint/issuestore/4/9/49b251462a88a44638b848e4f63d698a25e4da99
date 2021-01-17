@@ -1,0 +1,98 @@
+
+\	java:S107Z"BConstructor has 10 parameters, which is greater than 7 authorized.(‰ÅéŞúÿÿÿÿ
+Q	java:S107q"<Method has 9 parameters, which is greater than 7 authorized.(õ¤¢¥
+=
+java:S1659L""Declare "WPA2" on a separate line.(“Ôøÿÿÿÿÿ
+<
+java:S1659L"!Declare "WEP" on a separate line.(“Ôøÿÿÿÿÿ
+<
+java:S1659L"!Declare "OPN" on a separate line.(“Ôøÿÿÿÿÿ
+@
+java:S1659L"%Declare "UNKNOWN" on a separate line.(“Ôøÿÿÿÿÿ
+8
+java:S1659M""Declare "wpa2" on a separate line.(˜Îåù
+7
+java:S1659M"!Declare "wep" on a separate line.(˜Îåù
+7
+java:S1659M"!Declare "opn" on a separate line.(˜Îåù
+:
+java:S1659M"$Declare "hidden" on a separate line.(˜Îåù
+=
+java:S1659V""Declare "data" on a separate line.(è›¸§şÿÿÿÿ
+<
+java:S1659V"!Declare "ivs" on a separate line.(è›¸§şÿÿÿÿ
+F
+java:S1659V"+Declare "total_beacons" on a separate line.(è›¸§şÿÿÿÿ
+C
+java:S1659V"(Declare "total_data" on a separate line.(è›¸§şÿÿÿÿ
+B
+java:S1659V"'Declare "total_ivs" on a separate line.(è›¸§şÿÿÿÿ
+:
+java:S1659X"$Declare "cipher" on a separate line.(²·´
+8
+java:S1659X""Declare "auth" on a separate line.(²·´
+r	java:S116V"XRename this field "total_beacons" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(è›¸§şÿÿÿÿ
+o	java:S116V"URename this field "total_data" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(è›¸§şÿÿÿÿ
+n	java:S116V"TRename this field "total_ivs" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(è›¸§şÿÿÿÿ
+s
+java:S1845M"]Rename field "wpa" to prevent any misunderstanding/clash with field "WPA" defined on line 76.(˜Îåù
+u
+java:S1845M"_Rename field "wpa2" to prevent any misunderstanding/clash with field "WPA2" defined on line 76.(˜Îåù
+s
+java:S1845M"]Rename field "wep" to prevent any misunderstanding/clash with field "WEP" defined on line 76.(˜Îåù
+s
+java:S1845M"]Rename field "opn" to prevent any misunderstanding/clash with field "OPN" defined on line 76.(˜Îåù
+h
+java:S3776q"RRefactor this method to reduce its Cognitive Complexity from 29 to the 15 allowed.(õ¤¢¥
+<	java:S131u""Add a default case to this switch.(Ÿ´„ûÿÿÿÿ
+R
+java:S2696Š"6Make the enclosing method "static" or remove this set.(Óô‡ãÿÿÿÿÿ
+8	java:S131£""Add a default case to this switch.(¥óÏ
+R
+java:S2696¥"6Make the enclosing method "static" or remove this set.(úòéëùÿÿÿÿ
+R
+java:S2696©"6Make the enclosing method "static" or remove this set.(±ÂÏúÿÿÿÿ
+R
+java:S2696­"6Make the enclosing method "static" or remove this set.(¬ìñÊùÿÿÿÿ
+M
+java:S2696±"6Make the enclosing method "static" or remove this set.(­Õ÷¦
+M
+java:S1874ã"7Remove this use of "FragmentManager"; it is deprecated.(Øûö
+W
+java:S1874æ";Remove this use of "FragmentTransaction"; it is deprecated.(÷²®–ùÿÿÿÿ
+T
+java:S1874æ"8Remove this use of "beginTransaction"; it is deprecated.(÷²®–ùÿÿÿÿ
+F
+java:S1874ç"/Remove this use of "replace"; it is deprecated.(ÊÈğ©
+L
+java:S1874è"5Remove this use of "setTransition"; it is deprecated.(í¼€Ù
+R
+java:S1874è";Remove this use of "FragmentTransaction"; it is deprecated.(í¼€Ù
+T
+java:S1874è"=Remove this use of "TRANSIT_FRAGMENT_OPEN"; it is deprecated.(í¼€Ù
+R
+java:S1874é"6Remove this use of "addToBackStack"; it is deprecated.(©ëà»øÿÿÿÿ
+[
+java:S1874ê"?Remove this use of "commitAllowingStateLoss"; it is deprecated.(‹–¨ùÿÿÿÿ
+^
+java:S1874ë"BRemove this use of "executePendingTransactions"; it is deprecated.(›é÷Šÿÿÿÿÿ
+S
+java:S1874™"7Remove this use of "FragmentManager"; it is deprecated.(®†Æõıÿÿÿÿ
+n
+java:S3776Æ"RRefactor this method to reduce its Cognitive Complexity from 78 to the 15 allowed.(éıÁşÿÿÿÿ
+=	java:S131Ô""Add a default case to this switch.(øå´¡ÿÿÿÿÿ
+7	java:S131ü""Add a default case to this switch.(±ô¡\
+W
+java:S1874™";Remove this use of "FragmentTransaction"; it is deprecated.(¸Ø­ôÿÿÿÿÿ
+K
+java:S1874š"/Remove this use of "replace"; it is deprecated.(³’¦³şÿÿÿÿ
+L
+java:S1874›"5Remove this use of "setTransition"; it is deprecated.(í¼€Ù
+R
+java:S1874›";Remove this use of "FragmentTransaction"; it is deprecated.(í¼€Ù
+T
+java:S1874›"=Remove this use of "TRANSIT_FRAGMENT_OPEN"; it is deprecated.(í¼€Ù
+R
+java:S1874œ"6Remove this use of "addToBackStack"; it is deprecated.(©ëà»øÿÿÿÿ
+[
+java:S1874"?Remove this use of "commitAllowingStateLoss"; it is deprecated.(‹–¨ùÿÿÿÿ

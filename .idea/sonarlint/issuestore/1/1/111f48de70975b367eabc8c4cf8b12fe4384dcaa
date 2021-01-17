@@ -1,0 +1,21 @@
+
+h
+java:S2095‡"LUse try-with-resources or close this "BufferedReader" in a "finally" clause.(õéµ¨ûÿÿÿÿ
+c
+java:S2095k"HUse try-with-resources or close this "FileWriter" in a "finally" clause.(ĞŒı©øÿÿÿÿ
+:
+java:S1659*"%Declare "TYPE_ST" on a separate line.(Ç¨%
+K
+java:S16591"0Declare "requires_connected" on a separate line.(¸ıöüşÿÿÿÿ
+I
+java:S16591".Declare "has_process_name" on a separate line.(¸ıöüşÿÿÿÿ
+n	java:S116-"TRename this field "start_cmd" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Öñİøûÿÿÿÿ
+h	java:S116."SRename this field "stop_cmd" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÿäÊ›
+q	java:S116/"WRename this field "process_name" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(íĞİÎûÿÿÿÿ
+u	java:S1161"[Rename this field "requires_clients" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¸ıöüşÿÿÿÿ
+w	java:S1161"]Rename this field "requires_connected" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¸ıöüşÿÿÿÿ
+u	java:S1161"[Rename this field "has_process_name" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¸ıöüşÿÿÿÿ
+<
+java:S1075i"&Remove this hard-coded path-delimiter.(‘¦Ğÿ
+m
+java:S3776{"RRefactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed.(ÃÈ€ûùÿÿÿÿ

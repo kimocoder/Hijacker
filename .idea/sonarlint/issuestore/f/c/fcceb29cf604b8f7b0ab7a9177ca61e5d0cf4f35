@@ -1,0 +1,27 @@
+
+P
+java:S1874$":Remove this use of "PreferenceFragment"; it is deprecated.(—÷Ú
+`
+java:S1874'"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(ßìê¯
+K
+java:S1874("0Remove this use of "onCreate"; it is deprecated.(î±¨Ôøÿÿÿÿ
+]
+java:S1874)"BRemove this use of "addPreferencesFromResource"; it is deprecated.(¼†Öûÿÿÿÿ
+Q
+java:S1874+"6Remove this use of "findPreference"; it is deprecated.(¥µ‹ûşÿÿÿÿ
+_
+java:S1874+"DRemove this use of "setOnPreferenceClickListener"; it is deprecated.(¥µ‹ûşÿÿÿÿ
+Q
+java:S1874/"6Remove this use of "findPreference"; it is deprecated.(ëÚşÿÿÿÿ
+_
+java:S1874/"DRemove this use of "setOnPreferenceClickListener"; it is deprecated.(ëÚşÿÿÿÿ
+N
+java:S18749"3Remove this use of "getActivity"; it is deprecated.(ã·¹©ÿÿÿÿÿ
+`
+java:S1874Q"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(öÿÕÅ
+K
+java:S1874R"0Remove this use of "onResume"; it is deprecated.(çóà±úÿÿÿÿ
+N
+java:S1874T"3Remove this use of "getActivity"; it is deprecated.(»²¤¢üÿÿÿÿ
+E
+java:S1874U"/Remove this use of "getView"; it is deprecated.(¤–§Ã

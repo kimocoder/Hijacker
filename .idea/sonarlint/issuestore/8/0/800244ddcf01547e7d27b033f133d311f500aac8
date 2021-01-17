@@ -1,0 +1,128 @@
+
+g
+java:S1301Ô"KReplace this "switch" statement by "if" statements to increase readability.(ëáµˆþÿÿÿÿ
+F
+java:S1066”"/Merge this if statement with the enclosing one.(¨±¸Ã
+F
+java:S1066ç"/Merge this if statement with the enclosing one.(Ó‹¬»
+r
+java:S3008E"WRename this field "console_text" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ê‰—åûÿÿÿÿ
+=
+java:S1659<"'Declare "targetBtn" on a separate line.(ß²±´
+=
+java:S1659<"'Declare "actionBtn" on a separate line.(ß²±´
+K
+java:S18747"0Remove this use of "Fragment"; it is deprecated.(¥‰‘€ýÿÿÿÿ
+`
+java:S1874H"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(‚ð„
+O
+java:S1874I"9Remove this use of "setRetainInstance"; it is deprecated.(ø“®ô
+L
+java:S2696S"6Make the enclosing method "static" or remove this set.(•ìýÑ
+I
+java:S1874[".Remove this use of "cancel"; it is deprecated.(û÷Øúùÿÿÿÿ
+L
+java:S2696]"6Make the enclosing method "static" or remove this set.(¸î
+O
+java:S1874^"9Remove this use of "executeOnExecutor"; it is deprecated.(¯«”Ü
+G
+java:S1874^"1Remove this use of "AsyncTask"; it is deprecated.(¯«”Ü
+R
+java:S1874^"<Remove this use of "THREAD_POOL_EXECUTOR"; it is deprecated.(¯«”Ü
+`
+java:S1874e"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(öÿÕÅ
+K
+java:S1874f"0Remove this use of "onResume"; it is deprecated.(çóà±úÿÿÿÿ
+N
+java:S1874h"3Remove this use of "getActivity"; it is deprecated.(»²¤¢üÿÿÿÿ
+`
+java:S1874o"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(ßû¢½
+J
+java:S1874p"/Remove this use of "onPause"; it is deprecated.(´¬á®ÿÿÿÿÿ
+Q
+java:S2696s"6Make the enclosing method "static" or remove this set.(°é©Âýÿÿÿÿ
+e
+java:S1874v"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(µ‚µõýÿÿÿÿ
+E
+java:S1874w"/Remove this use of "onStart"; it is deprecated.(ï†æŽ
+H
+java:S1874…"1Remove this use of "getStatus"; it is deprecated.(¶º–
+H
+java:S1874…"1Remove this use of "AsyncTask"; it is deprecated.(¶º–
+E
+java:S1874…".Remove this use of "Status"; it is deprecated.(¶º–
+F
+java:S1874…"/Remove this use of "RUNNING"; it is deprecated.(¶º–
+f
+java:S1874’"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(º£”úÿÿÿÿ
+J
+java:S1874˜".Remove this use of "onStop"; it is deprecated.(å­Þýÿÿÿÿ
+M
+java:S1874œ"1Remove this use of "getStatus"; it is deprecated.(–ƒ¯¸øÿÿÿÿ
+M
+java:S1874œ"1Remove this use of "AsyncTask"; it is deprecated.(–ƒ¯¸øÿÿÿÿ
+J
+java:S1874œ".Remove this use of "Status"; it is deprecated.(–ƒ¯¸øÿÿÿÿ
+K
+java:S1874œ"/Remove this use of "RUNNING"; it is deprecated.(–ƒ¯¸øÿÿÿÿ
+J
+java:S1874 "3Remove this use of "getActivity"; it is deprecated.(ÞŽþ¸
+H
+java:S1874¨"1Remove this use of "getString"; it is deprecated.(ã“ïŽ
+W
+java:S1874­";Remove this use of "FragmentTransaction"; it is deprecated.(¸Ø­ôÿÿÿÿÿ
+K
+java:S1874®"/Remove this use of "replace"; it is deprecated.(²³ªìþÿÿÿÿ
+L
+java:S1874¯"5Remove this use of "setTransition"; it is deprecated.(í¼€Ù
+R
+java:S1874¯";Remove this use of "FragmentTransaction"; it is deprecated.(í¼€Ù
+T
+java:S1874¯"=Remove this use of "TRANSIT_FRAGMENT_OPEN"; it is deprecated.(í¼€Ù
+R
+java:S1874°"6Remove this use of "addToBackStack"; it is deprecated.(©ëà»øÿÿÿÿ
+[
+java:S1874±"?Remove this use of "commitAllowingStateLoss"; it is deprecated.(‹–¨ùÿÿÿÿ
+i
+java:S3776¹"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(¥ãÏ
+O
+java:S1874º"3Remove this use of "getActivity"; it is deprecated.(­´úèüÿÿÿÿ
+=	java:S131Ô""Add a default case to this switch.(ëáµˆþÿÿÿÿ
+R
+java:S2696é"6Make the enclosing method "static" or remove this set.(×Îýÿÿÿÿ
+M
+java:S1874ê"1Remove this use of "getString"; it is deprecated.(èÈàþÿÿÿÿ
+M
+java:S2696ð"6Make the enclosing method "static" or remove this set.(¦úšÇ
+R
+java:S2696ô"6Make the enclosing method "static" or remove this set.(Á…çêÿÿÿÿÿ
+M
+java:S1874ú"1Remove this use of "AsyncTask"; it is deprecated.(º„àûÿÿÿÿ
+a
+java:S1874ÿ"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(ËÐƒ
+S
+java:S1874ƒ"7Remove this use of "publishProgress"; it is deprecated.(ŒÞ®ëþÿÿÿÿ
+n
+java:S3776”"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(˜ÒŠ¹ÿÿÿÿÿ
+J
+java:S1874Ÿ"3Remove this use of "isCancelled"; it is deprecated.(ÓÇÑë
+S
+java:S1874 "7Remove this use of "publishProgress"; it is deprecated.(œ°ÖÎøÿÿÿÿ
+O
+java:S1874¨"3Remove this use of "isCancelled"; it is deprecated.(£©ù…úÿÿÿÿ
+N
+java:S1874«"7Remove this use of "publishProgress"; it is deprecated.(‰ÎØ´
+S
+java:S1874µ"7Remove this use of "publishProgress"; it is deprecated.(Å§žìýÿÿÿÿ
+S
+java:S1874¹"7Remove this use of "publishProgress"; it is deprecated.(Î‚Šƒÿÿÿÿÿ
+S
+java:S1874»"7Remove this use of "publishProgress"; it is deprecated.(˜Ï†ýÿÿÿÿ
+a
+java:S1874Ã"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(žŸâí
+R
+java:S2696É"6Make the enclosing method "static" or remove this set.(•Ø¯·ýÿÿÿÿ
+a
+java:S1874Í"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(–¦¶Ð
+a
+java:S1874Ñ"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(¨Ž‚è

@@ -1,0 +1,11 @@
+
+U
+java:S1155„">Use isEmpty() to check whether the collection is empty or not.(øİÜ¨
+h
+java:S3776U"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(àï–
+L
+java:S2696r"6Make the enclosing method "static" or remove this set.(Ì‚ˆÌ
+;
+java:S1659†"Declare "R" on a separate line.(å˜‘üÿÿÿÿ
+;
+java:S1659†"Declare "M" on a separate line.(å˜‘üÿÿÿÿ

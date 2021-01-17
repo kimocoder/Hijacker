@@ -17,6 +17,7 @@ package com.hijacker;
     along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
+import android.annotation.SuppressLint;
 import android.os.FileObserver;
 import android.util.Log;
 
@@ -27,7 +28,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import static com.hijacker.AP.getAPByMac;
 import static com.hijacker.MainActivity.BAND_2;
@@ -51,11 +51,12 @@ import static com.hijacker.MainActivity.refreshState;
 import static com.hijacker.MainActivity.runInHandler;
 import static com.hijacker.MainActivity.menu;
 import static com.hijacker.MainActivity.stopWPA;
+import static com.hijacker.R.string.*;
 import static com.hijacker.ST.getSTByMac;
 import static com.hijacker.Shell.getFreeShell;
 import static com.hijacker.Shell.runOne;
 
-class Airodump{
+public class Airodump{
     static final String TAG = "HIJACKER/Airodump";
     private static int channel = 0;
     private static boolean forWPA = false, forWEP = false, running = false;
@@ -78,7 +79,7 @@ class Airodump{
         }
         channel = ch;
     }
-    static void setMac(String new_mac){
+    public static void setMac(String new_mac){
         if(isRunning()){
             Log.e(TAG, "Can't change settings while airodump is running");
             throw new IllegalStateException("Airodump is still running");
@@ -116,9 +117,9 @@ class Airodump{
         channel = ap.ch;
     }
     static int getChannel(){ return channel; }
-    static String getMac(){ return mac; }
+    public static String getMac(){ return mac; }
     static String getCapFile(){
-        while(!capFileObserver.found_cap_file() && writingToFile()){}
+        capFileObserver.found_cap_file();
         return capFile;
     }
     static boolean writingToFile(){ return (forWEP || forWPA || always_cap) && isRunning(); }
@@ -136,7 +137,7 @@ class Airodump{
         setChannel(ch);
         start();
     }
-    static void start(){
+    public static void start(){
         // Construct the command
         String cmd = "su -c " + prefix + " " + airodump_dir + " --update 9999999 --write-interval 1 --band ";
 
@@ -184,7 +185,7 @@ class Airodump{
         runInHandler(() -> {
             if(menu!=null){
                 menu.getItem(1).setIcon(R.drawable.stop_drawable);
-                menu.getItem(1).setTitle(R.string.stop);
+                menu.getItem(1).setTitle(stop);
             }
             refreshState();
             notification();
@@ -197,7 +198,7 @@ class Airodump{
         runInHandler(() -> {
             if(menu!=null){
                 menu.getItem(1).setIcon(R.drawable.start_drawable);
-                menu.getItem(1).setTitle(R.string.start);
+                menu.getItem(1).setTitle(start);
             }
         });
         stopWPA();
@@ -226,84 +227,13 @@ class Airodump{
         if (temp == null) new ST(mac, bssid, pwr, lost, frames, probes);
         else temp.update(bssid, pwr, lost, frames, probes);
     }
-    static void analyzeAirodumpString(String buffer, int mode){
-        int i, j;
 
-        // Remove trailing spaces
-        while(buffer.endsWith(" "))
-            buffer = buffer.substring(0, buffer.length()-1);
-
-        if(buffer.length()<3) return;
-        if( buffer.charAt(3)==':' || buffer.charAt(3)=='o' ){
-            //logd("Found ':' or 'o' @ 3");
-            while(buffer.charAt(buffer.length()-1)=='\n'){
-                buffer = buffer.substring(0, buffer.length()-1);
-            }
-
-            //Clear spaces
-            for(i=123; i<buffer.length(); i++){
-                if(buffer.charAt(i)==' ' && buffer.charAt(i+1)==' '){
-                    for(j=i;j<buffer.length();j++){
-                        buffer = buffer.substring(0, 123) + buffer.substring(124);
-                    }
-                    i--;
-                }
-            }
-            if(buffer.charAt(22)==':'){
-                //logd("0         1         2         3         4         5         6");
-                //logd("0123456789012345678901234567890123456789012345678901234567890");
-                //logd(buffer);
-                //st
-                String st_mac, bssid, probes;
-                int pwr, lost, frames;
-
-                st_mac = buffer.substring(20, 37);
-
-                if(buffer.charAt(1)=='(') bssid = "na";
-                else bssid = buffer.substring(1, 18);
-
-                pwr = Integer.parseInt(buffer.substring(37, 43).replace(" ", ""));
-                lost = Integer.parseInt(buffer.substring(52, 58).replace(" ", ""));
-                frames = Integer.parseInt(buffer.substring(58, 67).replace(" ", ""));
-                if(buffer.length()>=69) probes = buffer.substring(69);
-                else probes = "";
-
-                addST(st_mac, bssid, probes, pwr, lost, frames);
-            }else{
-                //ap
-                String bssid, enc, cipher, auth, essid;
-                int pwr, beacons, data, ivs, ch;
-
-                bssid = buffer.substring(1, 17);
-
-                pwr = Integer.parseInt(buffer.substring(18, 23).replace(" ", ""));
-
-                //if mode is not 0 then airodump-ng is running for a specific channel
-                //so we need to bypass 4 characters after pwr to get the correct results because there is one extra column
-                int offset = mode==0 ? 0 : 4;
-                buffer = buffer.substring(offset);
-
-                beacons = Integer.parseInt(buffer.substring(23, 32).replace(" ", ""));
-                data = Integer.parseInt(buffer.substring(32, 41).replace(" ", ""));
-                ivs = Integer.parseInt(buffer.substring(41, 46).replace(" ", ""));
-                ch = Integer.parseInt(buffer.substring(48, 50).replace(" ", ""));
-                enc = buffer.substring(57, 61).replace(" ", "");
-                cipher = buffer.substring(62, 66);
-                auth = buffer.substring(69, 73).replace(" ", "");
-
-                if(buffer.charAt(74)!='<') essid = buffer.substring(74);
-                else essid = "<hidden>";
-
-                addAP(essid, bssid, enc, cipher, auth, pwr, beacons, data, ivs, ch);
-            }
-        }
-    }
 
     static class CapFileObserver extends FileObserver{
         static final String TAG = "HIJACKER/CapFileObs";
-        final String master_path;
+        public final String master_path;
         Shell shell = null;
-        boolean found_cap_file = false;
+        public boolean found_cap_file = false;
         public CapFileObserver(String path, int mask) {
             super(path, mask);
             master_path = path;
@@ -360,29 +290,28 @@ class Airodump{
                 shell = null;
             }
         }
-        boolean found_cap_file(){
-            return found_cap_file;
+        public void found_cap_file(){
         }
-        void readCsv(String csv_path, @NonNull Shell shell){
+        public void readCsv(String csv_path, @NonNull Shell shell){
             shell.clearOutput();
             shell.run(busybox + " cat " + csv_path + "; echo ENDOFCAT");
             BufferedReader out = shell.getShell_out();
             try {
 
                 int type = 0;           // 0 = AP, 1 = ST
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                while(true){
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                do {
                     String line = out.readLine();
                     Log.d(TAG, line);
-                    if(line.equals("ENDOFCAT"))
+                    if (line.equals("ENDOFCAT"))
                         break;
 
-                    if(line.equals(""))
+                    if (line.equals(""))
                         continue;
-                    if(line.startsWith("BSSID")) {
+                    if (line.startsWith("BSSID")) {
                         type = 0;
                         continue;
-                    }else if(line.startsWith("Station")) {
+                    } else if (line.startsWith("Station")) {
                         type = 1;
                         continue;
                     }
@@ -390,58 +319,56 @@ class Airodump{
                     line = line.replace(", ", ",");
                     String[] fields = line.split(",");
                     Log.i(TAG, line);
-                    if(type == 0){
+                    if (type == 0) {
                         // Parse AP
                         // BSSID, First time seen, Last time seen, channel, Speed, Privacy,Cipher,
                         // Authentication, Power, # beacons, # IVs (or data??), LAN IP, ID-length, ESSID, Key
 
                         String bssid = fields[0];
                         try {
-                            Date first_seen = sdf.parse(fields[1]);
-                            Date last_seen = sdf.parse(fields[2]);
-                        }catch(ParseException e){
+                            sdf.parse(fields[1]);
+                            sdf.parse(fields[2]);
+                        } catch (ParseException e) {
                             e.printStackTrace();
                             Log.e(TAG, e.toString());
                         }
                         int ch = Integer.parseInt(fields[3].replace(" ", ""));
-                        int speed = Integer.parseInt(fields[4].replace(" ", ""));
+                        Integer.parseInt(fields[4].replace(" ", ""));
                         String enc = fields[5];
                         String cipher = fields[6];
                         String auth = fields[7];
                         int pwr = Integer.parseInt(fields[8].replace(" ", ""));
                         int beacons = Integer.parseInt(fields[9].replace(" ", ""));
                         int data = Integer.parseInt(fields[10].replace(" ", ""));
-                        String lan_ip = fields[11].replace(" ", "");
+                        fields[11].replace(" ", "");
                         int id_length = Integer.parseInt(fields[12].replace(" ", ""));
                         String essid = id_length > 0 ? fields[13] : null;
 
-                        String key = fields.length>14 ? fields[14] : null;
-
                         addAP(essid, bssid, enc, cipher, auth, pwr, beacons, data, 0, ch);
-                    }else{
+                    } else {
                         // Parse ST
                         //Station MAC, First time seen, Last time seen, Power, # packets, BSSID, Probed ESSIDs
 
                         String mac = fields[0];
                         try {
-                            Date first_seen = sdf.parse(fields[1]);
-                            Date last_seen = sdf.parse(fields[2]);
-                        }catch(ParseException e){
+                            sdf.parse(fields[1]);
+                            sdf.parse(fields[2]);
+                        } catch (ParseException e) {
                             e.printStackTrace();
                             Log.e(TAG, e.toString());
                         }
                         int pwr = Integer.parseInt(fields[3].replace(" ", ""));
                         int packets = Integer.parseInt(fields[4].replace(" ", ""));
                         String bssid = fields[5];
-                        if(bssid.charAt(0)=='(') bssid = null;
+                        if (bssid.charAt(0) == '(') bssid = null;
 
                         StringBuilder probes = new StringBuilder();
-                        if(fields.length==7) {
+                        if (fields.length == 7) {
                             probes = new StringBuilder(fields[6]);
-                        }else if(fields.length>7){
+                        } else if (fields.length > 7) {
                             // Multiple probes are separated by comma, so concatenate them
                             probes = new StringBuilder();
-                            for(int i=6; i<fields.length; i++){
+                            for (int i = 6; i < fields.length; i++) {
                                 probes.append(fields[i]).append(", ");
                             }
                             probes = new StringBuilder(probes.substring(0, probes.length() - 2));
@@ -449,7 +376,7 @@ class Airodump{
 
                         addST(mac, bssid, probes.toString(), pwr, 0, packets);
                     }
-                }
+                } while (true);
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.e(TAG, e.toString());

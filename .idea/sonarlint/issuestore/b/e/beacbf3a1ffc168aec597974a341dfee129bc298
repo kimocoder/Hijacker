@@ -1,0 +1,21 @@
+
+O
+java:S1874"4Remove this use of "ListFragment"; it is deprecated.(µºÖ˜øÿÿÿÿ
+`
+java:S1874"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(«ÃÀ÷
+P
+java:S1161":Add the "@Override" annotation above this method signature(«ÃÀ÷
+Q
+java:S1874 "6Remove this use of "setListAdapter"; it is deprecated.(”íÖúÿÿÿÿ
+_
+java:S1874$"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(”ã
+L
+java:S1874%"7Remove this use of "onListItemClick"; it is deprecated.(µ˜ÊU
+N
+java:S1874&"3Remove this use of "getActivity"; it is deprecated.(ŸëŠìÿÿÿÿÿ
+`
+java:S1874)"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(öÿÕÅ
+K
+java:S1874*"0Remove this use of "onResume"; it is deprecated.(çóà±úÿÿÿÿ
+N
+java:S1874,"3Remove this use of "getActivity"; it is deprecated.(»²¤¢üÿÿÿÿ

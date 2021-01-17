@@ -95,7 +95,7 @@ class ST extends Device{
                 if(connectedTo==null){
                     //Now not connected
                     connected--;
-                    runInHandler(() -> Tile.onCountsChanged());
+                    runInHandler(Tile::onCountsChanged);
                 }else{
                     connectedTo.addClient(this);
                 }
@@ -107,7 +107,7 @@ class ST extends Device{
                 //Now connected to known AP
                 connected++;
                 connectedTo.addClient(this);
-                runInHandler(() -> Tile.onCountsChanged());
+                runInHandler(Tile::onCountsChanged);
             }
         }
         if(frames!=this.frames || lost!=this.lost || this.lastseen==0){

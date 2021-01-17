@@ -35,7 +35,8 @@
                 android:paddingEnd="5dp"
                 android:clickable="true"
                 android:onClick="onAPStats"
-                android:focusable="true" />
+                android:focusable="true"
+                android:contentDescription="TODO" />
 
             <TextView
                 android:text="0"
@@ -59,7 +60,8 @@
                 android:paddingEnd="5dp"
                 android:clickable="true"
                 android:onClick="onAPStats"
-                android:focusable="true" />
+                android:focusable="true"
+                android:contentDescription="TODO" />
 
             <TextView
                 android:text="0"

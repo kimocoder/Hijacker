@@ -1,0 +1,47 @@
+
+8
+java:S1659;""Declare "stCb" on a separate line.(ØŒèé
+:
+java:S1659;"$Declare "stNaCb" on a separate line.(ØŒèé
+9
+java:S1659;"#Declare "wpaCb" on a separate line.(ØŒèé
+9
+java:S1659;"#Declare "wepCb" on a separate line.(ØŒèé
+9
+java:S1659;"#Declare "opnCb" on a separate line.(ØŒèé
+A
+java:S1659;"+Declare "sortReverseCb" on a separate line.(ØŒèé
+j	java:S1166"URename this field "sort_texts" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(£Åä¿
+n	java:S116>"TRename this field "temp_sort" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÔÄÃşÿÿÿÿ
+Q
+java:S18745"6Remove this use of "DialogFragment"; it is deprecated.(è±âÎúÿÿÿÿ
+e
+java:S1874@"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(à“æ…øÿÿÿÿ
+I
+java:S1874A"3Remove this use of "getActivity"; it is deprecated.( ô•À
+I
+java:S1874B"3Remove this use of "getActivity"; it is deprecated.(İÒá 
+G
+java:S1874E"1Remove this use of "getString"; it is deprecated.(§îöş
+L
+java:S1874F"1Remove this use of "getString"; it is deprecated.(öÓ—€şÿÿÿÿ
+G
+java:S1874G"1Remove this use of "getString"; it is deprecated.(ÅØ¨¿
+L
+java:S1874H"1Remove this use of "getString"; it is deprecated.(ù‹×Âÿÿÿÿÿ
+G
+java:S1874I"1Remove this use of "getString"; it is deprecated.(¬×ö˜
+V
+java:S1874u"@Remove this use of "dismissAllowingStateLoss"; it is deprecated.(ÌÌÓÙ
+a
+java:S1874‡"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(‰¦ì·
+N
+java:S1874‡"7Remove this use of "FragmentManager"; it is deprecated.(‰¦ì·
+C
+java:S1874ˆ",Remove this use of "show"; it is deprecated.(Ôš„ò
+f
+java:S1874‹"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(µ‚µõıÿÿÿÿ
+F
+java:S1874Œ"/Remove this use of "onStart"; it is deprecated.(ï†æ
+I
+java:S1874´"3Remove this use of "getActivity"; it is deprecated.(ïÃ•7

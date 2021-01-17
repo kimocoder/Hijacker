@@ -130,7 +130,7 @@
         "sdkFolder": "/root/Android/Sdk",
         "isBuildOnlyTargetAbiEnabled": true,
         "isCmakeBuildCohabitationEnabled": false,
-        "isConfigurationFoldingEnabled": false,
+        "isConfigurationFoldingEnabled": true,
         "isPrefabEnabled": false
       }
     },
@@ -144,7 +144,7 @@
   },
   "prefabFolder": "/root/Hijacker/app/.cxx/cmake/release/prefab/armeabi-v7a",
   "isActiveAbi": true,
-  "fullConfigurationHash": "t673x1s1fc45t2n5v1n393s5tqo5o5y41395215c1x1w6z214f1a5xc4y",
+  "fullConfigurationHash": "6n1t451ea592w4g2w5c4ew3w1id2nt106f5gf3wm2p686o1e1x2v4y725v",
   "configurationArguments": [
     "-H/root/Hijacker/app",
     "-DCMAKE_SYSTEM_NAME\u003dAndroid",

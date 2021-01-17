@@ -20,11 +20,10 @@ package com.hijacker;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
-import android.view.KeyEvent;
+
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
@@ -121,7 +120,7 @@ public class FiltersDialog extends DialogFragment {
             return false;
         });
 
-        sortSelectBtn.setOnClickListener(v -> showSortingPopup(v));
+        sortSelectBtn.setOnClickListener(this::showSortingPopup);
 
         builder.setView(view);
         builder.setTitle(R.string.filters);

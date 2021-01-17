@@ -1,0 +1,34 @@
+
+l	java:S127n"XRefactor the code in order to not assign to this loop counter from within the loop body.(¨…ÄK
+C
+java:S1659'"(Declare "SELECT_DIR" on a separate line.(¦¹”èøÿÿÿÿ
+C
+java:S1659+"-Declare "newFolderButton" on a separate line.(¹¶Ð‘
+<
+java:S1659-"&Declare "onCancel" on a separate line.(¦É´Î
+:
+java:S1659."%Declare "current" on a separate line.(­ýŽ
+~
+java:S1845z"hRename method "onSelect" to prevent any misunderstanding/clash with field "onSelect" defined on line 45.(‚÷ºð
+Q
+java:S1874&"6Remove this use of "DialogFragment"; it is deprecated.(ÌÜÌþÿÿÿÿ
+e
+java:S18741"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(à“æ…øÿÿÿÿ
+I
+java:S18742"3Remove this use of "getActivity"; it is deprecated.( ô•À
+N
+java:S18743"3Remove this use of "getActivity"; it is deprecated.(£Ä”Ñûÿÿÿÿ
+F
+java:S1874<"1Remove this use of "getString"; it is deprecated.(á–½
+O
+java:S1874F":Remove this use of "getFragmentManager"; it is deprecated.(ßÀ›
+`
+java:S1874b"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(‰¦ì·
+M
+java:S1874b"7Remove this use of "FragmentManager"; it is deprecated.(‰¦ì·
+B
+java:S1874c",Remove this use of "show"; it is deprecated.(Ôš„ò
+L
+java:S2696j"6Make the enclosing method "static" or remove this set.(èèÐî
+[
+java:S1874"@Remove this use of "dismissAllowingStateLoss"; it is deprecated.(¼Õ®Þúÿÿÿÿ

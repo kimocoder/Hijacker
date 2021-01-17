@@ -80,7 +80,7 @@ public class MDKFragment extends Fragment{
 
         bf_switch.setOnCheckedChangeListener((compoundButton, b) -> onBfSwitch(b));
         ados_switch.setOnCheckedChangeListener((compoundButton, b) -> onDosSwitch(b));
-        select_button.setOnClickListener(view -> onSelectClick(view));
+        select_button.setOnClickListener(this::onSelectClick);
 
         return fragmentView;
     }

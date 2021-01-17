@@ -1,0 +1,107 @@
+
+X
+java:S1874o"6Remove this use of "findPreference"; it is deprecated.(¹² €ùÿÿÿÿ8¸„ÛÙğ.
+X
+java:S1874e"6Remove this use of "findPreference"; it is deprecated.(à©²øÿÿÿÿ8¸„ÛÙğ.
+S
+java:S1874]"6Remove this use of "findPreference"; it is deprecated.(ó¥”8¸„ÛÙğ.
+\
+java:S1874x":Remove this use of "getFragmentManager"; it is deprecated.(êŸÚ÷ÿÿÿÿÿ8¸„ÛÙğ.
+T
+java:S18743"2Remove this use of "Preference"; it is deprecated.(ÿ‡÷‚ÿÿÿÿÿ8¸„ÛÙğ.
+a
+java:S1874]"DRemove this use of "setOnPreferenceClickListener"; it is deprecated.(ó¥”8¸„ÛÙğ.
+N
+java:S1874A"1Remove this use of "getString"; it is deprecated.(ÕÂ»¼8¸„ÛÙğ.
+W
+java:S1874'":Remove this use of "PreferenceFragment"; it is deprecated.(şÁÍ‡8¸„ÛÙğ.
+N
+java:S1874C"1Remove this use of "getString"; it is deprecated.(¦–ö„8¸„ÛÙğ.
+S
+java:S1874i"6Remove this use of "findPreference"; it is deprecated.(êï¤8¸„ÛÙğ.
+S
+java:S1874B"1Remove this use of "getString"; it is deprecated.(¤²¬ûÿÿÿÿ8¸„ÛÙğ.
+S
+java:S18744"1Remove this use of "getString"; it is deprecated.(ø£“şÿÿÿÿ8¸„ÛÙğ.
+Q
+java:S1874£"3Remove this use of "getActivity"; it is deprecated.(›û¹Ú8¸„ÛÙğ.
+S
+java:S1874«"<Remove this use of "THREAD_POOL_EXECUTOR"; it is deprecated.(ÕÕîï
+O
+java:S18745"2Remove this use of "setEnabled"; it is deprecated.(ì‘Ãş8¸„ÛÙğ.
+f
+java:S1874o"DRemove this use of "setOnPreferenceClickListener"; it is deprecated.(¹² €ùÿÿÿÿ8¸„ÛÙğ.
+m
+java:S3008("WRename this field "allow_prefix" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Š•›ù
+_
+java:S1874±"<Remove this use of "getPreferenceManager"; it is deprecated.(„‘®½ıÿÿÿÿ8¸„ÛÙğ.
+Q
+java:S1874{"6Remove this use of "findPreference"; it is deprecated.(ñF8¸„ÛÙğ.
+P
+java:S1874„"2Remove this use of "setSummary"; it is deprecated.(ØÌ–ı8¸„ÛÙğ.
+R
+java:S1874l"5Remove this use of "startActivity"; it is deprecated.(©Éò·8¸„ÛÙğ.
+_
+java:S1874±"<Remove this use of "getSharedPreferences"; it is deprecated.(„‘®½ıÿÿÿÿ8¸„ÛÙğ.
+f
+java:S1874?"DRemove this use of "setOnPreferenceClickListener"; it is deprecated.(ƒÀˆìıÿÿÿÿ8¸„ÛÙğ.
+W
+java:S1874Z":Remove this use of "getFragmentManager"; it is deprecated.(­ àß8¸„ÛÙğ.
+N
+java:S1874Y"1Remove this use of "getString"; it is deprecated.(„æ¹à8¸„ÛÙğ.
+O
+java:S1874"3Remove this use of "getActivity"; it is deprecated.(á¡Ó+8¸„ÛÙğ.
+T
+java:S18744"2Remove this use of "setSummary"; it is deprecated.(ø£“şÿÿÿÿ8¸„ÛÙğ.
+f
+java:S1874;"DRemove this use of "setOnPreferenceClickListener"; it is deprecated.(ê±ç±üÿÿÿÿ8¸„ÛÙğ.
+f
+java:S1874a"DRemove this use of "setOnPreferenceClickListener"; it is deprecated.(³®ëÿÿÿÿÿ8¸„ÛÙğ.
+S
+java:S18749"6Remove this use of "findPreference"; it is deprecated.(ûºÚ†8¸„ÛÙğ.
+h
+java:S1874 "JDon't override a deprecated method or explicitly mark it as "@Deprecated".(öÿÕÅ8¸„ÛÙğ.
+R
+java:S1874."0Remove this use of "onCreate"; it is deprecated.(î±¨Ôøÿÿÿÿ8¸„ÛÙğ.
+X
+java:S1874;"6Remove this use of "findPreference"; it is deprecated.(ê±ç±üÿÿÿÿ8¸„ÛÙğ.
+T
+java:S18747"2Remove this use of "setEnabled"; it is deprecated.(Èú˜àşÿÿÿÿ8¸„ÛÙğ.
+O
+java:S18749"2Remove this use of "setEnabled"; it is deprecated.(ûºÚ†8¸„ÛÙğ.
+H
+java:S1874«"1Remove this use of "AsyncTask"; it is deprecated.(ÕÕîï
+g
+java:S1874-"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(ßìê¯8¸„ÛÙğ.
+h
+java:S1874´"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(ßû¢½8¸„ÛÙğ.
+`
+java:S1874{"ERemove this use of "setOnPreferenceChangeListener"; it is deprecated.(ñF8¸„ÛÙğ.
+Q
+java:S1874ª"3Remove this use of "getActivity"; it is deprecated.(¦ˆ€œ8¸„ÛÙğ.
+X
+java:S18743"6Remove this use of "findPreference"; it is deprecated.(ÿ‡÷‚ÿÿÿÿÿ8¸„ÛÙğ.
+Z
+java:S1874µ"<Remove this use of "getPreferenceManager"; it is deprecated.(æÚçê8¸„ÛÙğ.
+X
+java:S18747"6Remove this use of "findPreference"; it is deprecated.(Èú˜àşÿÿÿÿ8¸„ÛÙğ.
+f
+java:S1874e"DRemove this use of "setOnPreferenceClickListener"; it is deprecated.(à©²øÿÿÿÿ8¸„ÛÙğ.
+d
+java:S18740"BRemove this use of "addPreferencesFromResource"; it is deprecated.(Š ¼Çÿÿÿÿÿ8¸„ÛÙğ.
+\
+java:S1874f":Remove this use of "getFragmentManager"; it is deprecated.(İî—´øÿÿÿÿ8¸„ÛÙğ.
+Z
+java:S1874µ"<Remove this use of "getSharedPreferences"; it is deprecated.(æÚçê8¸„ÛÙğ.
+X
+java:S1874?"6Remove this use of "findPreference"; it is deprecated.(ƒÀˆìıÿÿÿÿ8¸„ÛÙğ.
+R
+java:S1874¶"/Remove this use of "onPause"; it is deprecated.(´¬á®ÿÿÿÿÿ8¸„ÛÙğ.
+a
+java:S1874i"DRemove this use of "setOnPreferenceClickListener"; it is deprecated.(êï¤8¸„ÛÙğ.
+T
+java:S1874„"6Remove this use of "findPreference"; it is deprecated.(ØÌ–ı8¸„ÛÙğ.
+S
+java:S1874¡"0Remove this use of "onResume"; it is deprecated.(çóà±úÿÿÿÿ8¸„ÛÙğ.
+X
+java:S1874a"6Remove this use of "findPreference"; it is deprecated.(³®ëÿÿÿÿÿ8¸„ÛÙğ.

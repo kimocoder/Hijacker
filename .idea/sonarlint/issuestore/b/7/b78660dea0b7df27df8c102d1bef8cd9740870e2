@@ -1,0 +1,32 @@
+
+s	java:S116"YRename this field "found_cap_file" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¨¤´Ñ8ÒìĞİğ.
+E
+java:S1659"%Declare "running" on a separate line.(ÅÿÖıÿÿÿÿ8ÒìĞİğ.
+U
+java:S1118":Add a private constructor to hide the implicit public one.(ÈË²ï8ÒìĞİğ.
+U
+java:S1141"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ8ÃÛİğ.
+U
+java:S1141"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ8ÃÛİğ.
+h	java:S100"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÂÉô˜8ÀêÕİğ.
+r
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 32 to the 15 allowed.(†¾±›úÿÿÿÿ8ÀêÕİğ.
+u
+java:S1104"ZMake found_cap_file a static final constant or non-public and provide accessors if needed.(¨¤´Ñ8®…ãİğ.
+p	java:S116"VRename this field "master_path" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‘ğ¶8ÒìĞİğ.
+O
+java:S1874"4Remove this use of "FileObserver"; it is deprecated.(Äú‹Ì8ÒìĞİğ.
+W	java:S107"=Method has 10 parameters, which is greater than 7 authorized.(éú°Â8ÒìĞİğ.
+m
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 18 to the 15 allowed.(Ä¬àÏ8ÒìĞİğ.
+x	java:S135"YReduce the total number of break and continue statements in this loop to use at most one.(ü§è½ùÿÿÿÿ8ÃÛİğ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(Ø•£½ûÿÿÿÿ8ÒìĞİğ.
+e
+java:S1874"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(ö¡†­8ÒìĞİğ.
+K
+java:S2201"+The return value of "replace" must be used.(õ‘ÕÉıÿÿÿÿ8æËæİğ.
+
+java:S1845"uRename method "found_cap_file" to prevent any misunderstanding/clash with field "found_cap_file" defined on line 236.(ÂÉô˜8®…ãİğ.
+D
+java:S1659"$Declare "forWEP" on a separate line.(ÅÿÖıÿÿÿÿ8ÒìĞİğ.

@@ -43,7 +43,8 @@
                 android:id="@+id/imageView1"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                app:srcCompat="@drawable/failed_drawable"/>
+                app:srcCompat="@drawable/failed_drawable"
+                android:contentDescription="TODO" />
         </LinearLayout>
 
         <LinearLayout
@@ -63,7 +64,8 @@
                 android:id="@+id/imageView2"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                app:srcCompat="@drawable/done_drawable"/>
+                app:srcCompat="@drawable/done_drawable"
+                android:contentDescription="TODO" />
         </LinearLayout>
 
         <LinearLayout
@@ -83,7 +85,8 @@
                 android:id="@+id/imageView3"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                app:srcCompat="@drawable/testing_drawable"/>
+                app:srcCompat="@drawable/testing_drawable"
+                android:contentDescription="TODO" />
         </LinearLayout>
 
         <LinearLayout
@@ -103,7 +106,8 @@
                 android:id="@+id/imageView4"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                app:srcCompat="@drawable/testing_drawable"/>
+                app:srcCompat="@drawable/testing_drawable"
+                android:contentDescription="TODO" />
         </LinearLayout>
 
         <LinearLayout
@@ -123,7 +127,8 @@
                 android:id="@+id/imageView5"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                app:srcCompat="@drawable/testing_drawable"/>
+                app:srcCompat="@drawable/testing_drawable"
+                android:contentDescription="TODO" />
         </LinearLayout>
 
         <TextView

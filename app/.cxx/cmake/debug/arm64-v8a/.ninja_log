@@ -2,3 +2,12 @@
 0	141	1610439280	CMakeFiles/native-lib.dir/src/main/cpp/native-lib.cpp.o	9a5b1fff137ea8bd
 141	193	1610439281	../../../../build/intermediates/cmake/debug/obj/arm64-v8a/libnative-lib.so	cce5cd4c55a6ed49
 0	17	1610443937	../../../../build/intermediates/cmake/debug/obj/arm64-v8a/libnative-lib.so	cce5cd4c55a6ed49
+0	58	1610801440	CMakeFiles/native-lib.dir/src/main/cpp/native-lib.cpp.o	9a5b1fff137ea8bd
+58	66	1610801440	../../../../build/intermediates/cmake/debug/obj/arm64-v8a/libnative-lib.so	cce5cd4c55a6ed49
+0	61	1610803163	CMakeFiles/native-lib.dir/src/main/cpp/native-lib.cpp.o	9a5b1fff137ea8bd
+61	69	1610803163	../../../../build/intermediates/cmake/debug/obj/arm64-v8a/libnative-lib.so	cce5cd4c55a6ed49
+0	2	0	clean	c10a100a67edae2d
+0	2	0	clean	c10a100a67edae2d
+0	61	1610809502	CMakeFiles/native-lib.dir/src/main/cpp/native-lib.cpp.o	9a5b1fff137ea8bd
+61	70	1610809502	../../../../build/intermediates/cmake/debug/obj/arm64-v8a/libnative-lib.so	cce5cd4c55a6ed49
+0	9	1610809513	../../../../build/intermediates/cmake/debug/obj/arm64-v8a/libnative-lib.so	cce5cd4c55a6ed49

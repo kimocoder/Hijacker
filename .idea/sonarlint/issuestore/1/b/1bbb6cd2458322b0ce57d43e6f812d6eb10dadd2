@@ -1,0 +1,178 @@
+
+n
+java:S1301µ"KReplace this "switch" statement by "if" statements to increase readability.(³´æüÿÿÿÿÿ8ĞˆÅİğ.
+n
+java:S1301ä"KReplace this "switch" statement by "if" statements to increase readability.(³´æüÿÿÿÿÿ8ĞˆÅİğ.
+i
+java:S1301²"KReplace this "switch" statement by "if" statements to increase readability.(µ²µª8ĞˆÅİğ.
+M
+java:S1066ü"/Merge this if statement with the enclosing one.(ïŸÅÓ8ĞˆÅİğ.
+M
+java:S1066Å"/Merge this if statement with the enclosing one.(ÓıÚ8ĞˆÅİğ.
+H
+java:S5411ä"*Use the primitive boolean expression here.(‡î·À8ĞˆÅİğ.
+y
+java:S3008L"WRename this field "console_text" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(´ì¿—øÿÿÿÿ8ĞˆÅİğ.
+y
+java:S3008L"WRename this field "capfile_text" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(´ì¿—øÿÿÿÿ8ĞˆÅİğ.
+z
+java:S3008L"XRename this field "wordlist_text" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(´ì¿—øÿÿÿÿ8ĞˆÅİğ.
+>
+java:S1659="!Declare "WEP" on a separate line.(²øæŒ8ĞˆÅİğ.
+P
+java:S1659@".Declare "optionsContainer" on a separate line.(àğÕ¹ıÿÿÿÿ8ĞˆÅİğ.
+G
+java:S1659A"*Declare "speedTestBtn" on a separate line.(¯‡¹8ĞˆÅİğ.
+C
+java:S1659A"&Declare "capFeBtn" on a separate line.(¯‡¹8ĞˆÅİğ.
+H
+java:S1659A"+Declare "wordlistFeBtn" on a separate line.(¯‡¹8ĞˆÅİğ.
+L
+java:S1659D"*Declare "wordlistView" on a separate line.(¬Äùšüÿÿÿÿ8ĞˆÅİğ.
+J
+java:S1659E"(Declare "securityRG" on a separate line.(ˆ›™µúÿÿÿÿ8ĞˆÅİğ.
+@
+java:S1659F"#Declare "wpaRB" on a separate line.(¨™Ğÿ8ĞˆÅİğ.
+R
+java:S1659J"0Declare "normalTestBtnWidth" on a separate line.(Û€û™ıÿÿÿÿ8ĞˆÅİğ.
+L
+java:S1659L"*Declare "capfile_text" on a separate line.(´ì¿—øÿÿÿÿ8ĞˆÅİğ.
+M
+java:S1659L"+Declare "wordlist_text" on a separate line.(´ì¿—øÿÿÿÿ8ĞˆÅİğ.
+J
+java:S1659M"(Declare "wepChecked" on a separate line.(¤šüïúÿÿÿÿ8ĞˆÅİğ.
+R
+java:S1874<"0Remove this use of "Fragment"; it is deprecated.(ª±’ÿÿÿÿÿ8ĞˆÅİğ.
+g
+java:S1874O"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(‚ğ„8ĞˆÅİğ.
+o
+java:S3776O"RRefactor this method to reduce its Cognitive Complexity from 35 to the 15 allowed.(‚ğ„8ĞˆÅİğ.
+X
+java:S2696o"6Make the enclosing method "static" or remove this set.(˜’ÓŸşÿÿÿÿ8ĞˆÅİğ.
+P
+java:S1874}".Remove this use of "cancel"; it is deprecated.(û÷Øúùÿÿÿÿ8ĞˆÅİğ.
+]
+java:S1874‰":Remove this use of "getFragmentManager"; it is deprecated.(êŸÚ÷ÿÿÿÿÿ8ĞˆÅİğ.
+]
+java:S1874“":Remove this use of "getFragmentManager"; it is deprecated.(êŸÚ÷ÿÿÿÿÿ8ĞˆÅİğ.
+]
+java:S1874•":Remove this use of "getFragmentManager"; it is deprecated.(—Ìèïÿÿÿÿÿ8ĞˆÅİğ.
+h
+java:S1874Ä"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(öÿÕÅ8ĞˆÅİğ.
+S
+java:S1874Å"0Remove this use of "onResume"; it is deprecated.(çóà±úÿÿÿÿ8ĞˆÅİğ.
+V
+java:S1874Ç"3Remove this use of "getActivity"; it is deprecated.(»²¤¢üÿÿÿÿ8ĞˆÅİğ.
+h
+java:S1874Î"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(ßû¢½8ĞˆÅİğ.
+R
+java:S1874Ï"/Remove this use of "onPause"; it is deprecated.(´¬á®ÿÿÿÿÿ8ĞˆÅİğ.
+Y
+java:S2696Ò"6Make the enclosing method "static" or remove this set.(°é©Âıÿÿÿÿ8ĞˆÅİğ.
+m
+java:S1874Õ"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(µ‚µõıÿÿÿÿ8ĞˆÅİğ.
+M
+java:S1874Ö"/Remove this use of "onStart"; it is deprecated.(ï†æ8ĞˆÅİğ.
+O
+java:S1874â"1Remove this use of "getString"; it is deprecated.(ú§ª8ĞˆÅİğ.
+O
+java:S1874â"1Remove this use of "getString"; it is deprecated.(ú§ª8ĞˆÅİğ.
+O
+java:S1874å"1Remove this use of "getStatus"; it is deprecated.(¶º–8ĞˆÅİğ.
+O
+java:S1874å"1Remove this use of "AsyncTask"; it is deprecated.(¶º–8ĞˆÅİğ.
+L
+java:S1874å".Remove this use of "Status"; it is deprecated.(¶º–8ĞˆÅİğ.
+M
+java:S1874å"/Remove this use of "RUNNING"; it is deprecated.(¶º–8ĞˆÅİğ.
+m
+java:S1874ú"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(º£”úÿÿÿÿ8ĞˆÅİğ.
+T
+java:S2696‚"6Make the enclosing method "static" or remove this set.(õè¾Ñ8ĞˆÅİğ.
+Y
+java:S2696ƒ"6Make the enclosing method "static" or remove this set.(ñ‘‰ğúÿÿÿÿ8ĞˆÅİğ.
+Y
+java:S2696„"6Make the enclosing method "static" or remove this set.(ÛÀ­øÿÿÿÿ8ĞˆÅİğ.
+S
+java:S2696…"6Make the enclosing method "static" or remove this set.( ¬±=8ĞˆÅİğ.
+Q
+java:S1874‡".Remove this use of "onStop"; it is deprecated.(å­Şıÿÿÿÿ8ĞˆÅİğ.
+T
+java:S1874‹"1Remove this use of "getStatus"; it is deprecated.(–ƒ¯¸øÿÿÿÿ8ĞˆÅİğ.
+T
+java:S1874‹"1Remove this use of "AsyncTask"; it is deprecated.(–ƒ¯¸øÿÿÿÿ8ĞˆÅİğ.
+Q
+java:S1874‹".Remove this use of "Status"; it is deprecated.(–ƒ¯¸øÿÿÿÿ8ĞˆÅİğ.
+R
+java:S1874‹"/Remove this use of "RUNNING"; it is deprecated.(–ƒ¯¸øÿÿÿÿ8ĞˆÅİğ.
+Q
+java:S1874‘".Remove this use of "cancel"; it is deprecated.(û÷Øúùÿÿÿÿ8ĞˆÅİğ.
+N
+java:S1874›"1Remove this use of "getString"; it is deprecated.(ÑÄÂO8ĞˆÅİğ.
+T
+java:S1874¡"1Remove this use of "getString"; it is deprecated.(œâİõşÿÿÿÿ8ĞˆÅİğ.
+T
+java:S1874¨"1Remove this use of "getString"; it is deprecated.(øÿ›øşÿÿÿÿ8ĞˆÅİğ.
+T
+java:S1874¯"1Remove this use of "getString"; it is deprecated.(ò¥ªüÿÿÿÿ8ĞˆÅİğ.
+D	java:S131µ""Add a default case to this switch.(³´æüÿÿÿÿÿ8ĞˆÅİğ.
+T
+java:S1874¸"1Remove this use of "getString"; it is deprecated.(ßÒ›ùÿÿÿÿ8ĞˆÅİğ.
+‹
+java:S3252¸"hUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_SHORT".(ßÒ›ùÿÿÿÿ8ĞˆÅİğ.
+T
+java:S1874½"1Remove this use of "getString"; it is deprecated.(³ñ”íûÿÿÿÿ8ĞˆÅİğ.
+‹
+java:S3252½"hUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_SHORT".(³ñ”íûÿÿÿÿ8ĞˆÅİğ.
+Y
+java:S2696Â"6Make the enclosing method "static" or remove this set.(ğ’µšøÿÿÿÿ8ĞˆÅİğ.
+W
+java:S1874Ã"9Remove this use of "executeOnExecutor"; it is deprecated.(¯«”Ü8ĞˆÅİğ.
+O
+java:S1874Ã"1Remove this use of "AsyncTask"; it is deprecated.(¯«”Ü8ĞˆÅİğ.
+Z
+java:S1874Ã"<Remove this use of "THREAD_POOL_EXECUTOR"; it is deprecated.(¯«”Ü8ĞˆÅİğ.
+T
+java:S2696È"6Make the enclosing method "static" or remove this set.(İ‰û—8ĞˆÅİğ.
+W
+java:S1874É"9Remove this use of "executeOnExecutor"; it is deprecated.(¯«”Ü8ĞˆÅİğ.
+O
+java:S1874É"1Remove this use of "AsyncTask"; it is deprecated.(¯«”Ü8ĞˆÅİğ.
+Z
+java:S1874É"<Remove this use of "THREAD_POOL_EXECUTOR"; it is deprecated.(¯«”Ü8ĞˆÅİğ.
+D
+java:S1659Ì"&Declare "JOB_TEST" on a separate line.(éº“Ê8ĞˆÅİğ.
+?
+java:S1659Ï"!Declare "key" on a separate line.(êÍ­8ĞˆÅİğ.
+T
+java:S1874Ë"1Remove this use of "AsyncTask"; it is deprecated.(Ö¥À÷øÿÿÿÿ8ĞˆÅİğ.
+h
+java:S1874Û"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(ËĞƒ8ĞˆÅİğ.
+Z
+java:S1874ß"7Remove this use of "publishProgress"; it is deprecated.(±ëÉñÿÿÿÿÿ8ĞˆÅİğ.
+D	java:S131ä""Add a default case to this switch.(³´æüÿÿÿÿÿ8ĞˆÅİğ.
+D	java:S131ô""Add a default case to this switch.(ìêÅœûÿÿÿÿ8ĞˆÅİğ.
+Q
+java:S1874".Remove this use of "cancel"; it is deprecated.(‹Ÿ«œÿÿÿÿÿ8ĞˆÅİğ.
+Q
+java:S1874­"3Remove this use of "isCancelled"; it is deprecated.(àÄÛù8ĞˆÅİğ.
+?	java:S131²""Add a default case to this switch.(µ²µª8ĞˆÅİğ.
+V
+java:S1874´"3Remove this use of "isCancelled"; it is deprecated.(·Ó™Óûÿÿÿÿ8ĞˆÅİğ.
+o
+java:S2677´"LUse or store the value returned from "readLine" instead of throwing it away.(·Ó™Óûÿÿÿÿ8ĞˆÅİğ.
+V
+java:S1874¹"3Remove this use of "isCancelled"; it is deprecated.(…òìùÿÿÿÿ8ĞˆÅİğ.
+Z
+java:S1874º"7Remove this use of "publishProgress"; it is deprecated.(ˆğóÙùÿÿÿÿ8ĞˆÅİğ.
+E	java:S108Ë")Either remove or fill this block of code.(”ã‰G8ĞˆÅİğ.
+m
+java:S1874Ö"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(Ã«•·ÿÿÿÿÿ8ĞˆÅİğ.
+T
+java:S2696Ü"6Make the enclosing method "static" or remove this set.(¨ÜÆº8ĞˆÅİğ.
+h
+java:S1874à"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(–¦¶Ğ8ĞˆÅİğ.
+Y
+java:S2696ñ"6Make the enclosing method "static" or remove this set.(•¼§ãûÿÿÿÿ8ĞˆÅİğ.
+h
+java:S1874õ"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(¨‚è8ĞˆÅİğ.

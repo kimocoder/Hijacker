@@ -21,7 +21,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -31,7 +30,6 @@ import androidx.core.content.FileProvider;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 

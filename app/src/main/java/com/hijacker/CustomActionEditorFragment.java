@@ -25,20 +25,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import java.io.File;
 
+import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
 import static com.hijacker.CustomAction.TYPE_AP;
 import static com.hijacker.CustomAction.TYPE_ST;
 import static com.hijacker.CustomAction.cmds;
 import static com.hijacker.CustomAction.save;
 import static com.hijacker.MainActivity.FRAGMENT_CUSTOM;
 import static com.hijacker.MainActivity.actions_path;
-import static com.hijacker.MainActivity.currentFragment;
 import static com.hijacker.MainActivity.mFragmentManager;
 
 public class CustomActionEditorFragment extends Fragment{
@@ -118,7 +117,7 @@ public class CustomActionEditorFragment extends Fragment{
                     action.setRequiresConnected(requirement_cb.isChecked());
                 }
                 save();
-                Snackbar.make(fragmentView, getString(R.string.saved) + " " + action.getTitle(), Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(fragmentView, getString(R.string.saved) + " " + action.getTitle(), LENGTH_SHORT).show();
                 mFragmentManager.popBackStackImmediate();
             }else{
                 boolean found = false;
@@ -143,7 +142,7 @@ public class CustomActionEditorFragment extends Fragment{
                         action.setRequiresConnected(requirement_cb.isChecked());
                     }
                     save();
-                    Snackbar.make(fragmentView, getString(R.string.saved) + " " + action.getTitle(), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(fragmentView, getString(R.string.saved) + " " + action.getTitle(), LENGTH_SHORT).show();
                     mFragmentManager.popBackStackImmediate();
                 }
             }
@@ -154,7 +153,7 @@ public class CustomActionEditorFragment extends Fragment{
     @Override
     public void onResume(){
         super.onResume();
-        currentFragment = FRAGMENT_CUSTOM;
+        MainActivity.currentFragment = FRAGMENT_CUSTOM;
         if(action!=null){
             titleView.setText(action.getTitle());
             startCmdView.setText(action.getStartCmd());

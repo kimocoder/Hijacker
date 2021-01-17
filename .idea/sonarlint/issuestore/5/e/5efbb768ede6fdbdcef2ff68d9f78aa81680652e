@@ -1,0 +1,27 @@
+
+n
+java:S3008="XRename this field "not_connected" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ý«»“
+A
+java:S1659="+Declare "not_connected" on a separate line.(ý«»“
+=
+java:S1659@""Declare "lost" on a separate line.(Š§ß÷ýÿÿÿÿ
+E
+java:S1659@"*Declare "total_frames" on a separate line.(Š§ß÷ýÿÿÿÿ
+C
+java:S1659@"(Declare "total_lost" on a separate line.(Š§ß÷ýÿÿÿÿ
+9
+java:S1659B"$Declare "probes" on a separate line.(­À»w
+q	java:S116@"WRename this field "total_frames" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Š§ß÷ýÿÿÿÿ
+o	java:S116@"URename this field "total_lost" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Š§ß÷ýÿÿÿÿ
+h
+java:S3776Y"RRefactor this method to reduce its Cognitive Complexity from 28 to the 15 allowed.(øŠýà
+L
+java:S2696a"6Make the enclosing method "static" or remove this set.(¼Ë÷Å
+K
+java:S2696l"6Make the enclosing method "static" or remove this set.(‘ì¦b
+<	java:S131u""Add a default case to this switch.(Ÿ´„ûÿÿÿÿ
+S
+java:S1874µ"7Remove this use of "FragmentManager"; it is deprecated.(®†Æõýÿÿÿÿ
+n
+java:S3776Ñ"RRefactor this method to reduce its Cognitive Complexity from 51 to the 15 allowed.(éýÁþÿÿÿÿ
+=	java:S131à""Add a default case to this switch.(øå´¡ÿÿÿÿÿ

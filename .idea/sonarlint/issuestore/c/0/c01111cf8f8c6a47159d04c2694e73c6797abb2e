@@ -1,0 +1,14 @@
+
+L
+java:S1874'"6Remove this use of "DialogFragment"; it is deprecated.(³¯›©
+e
+java:S1874)"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(à“æ…øÿÿÿÿ
+I
+java:S1874*"3Remove this use of "getActivity"; it is deprecated.( ô•À
+<	java:S1310""Add a default case to this switch.(öÛ«°þÿÿÿÿ
+`
+java:S1874I"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(‰¦ì·
+M
+java:S1874I"7Remove this use of "FragmentManager"; it is deprecated.(‰¦ì·
+B
+java:S1874J",Remove this use of "show"; it is deprecated.(Ôš„ò

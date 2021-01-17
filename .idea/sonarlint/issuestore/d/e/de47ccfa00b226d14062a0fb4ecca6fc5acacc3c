@@ -1,0 +1,19 @@
+
+[
+java:S1124"EReorder the modifiers to comply with the Java Language Specification.(õ¡ËÖ
+L
+java:S1874"6Remove this use of "DialogFragment"; it is deprecated.(õ¡ËÖ
+`
+java:S1874"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(‰¦ì·
+M
+java:S1874"7Remove this use of "FragmentManager"; it is deprecated.(‰¦ì·
+B
+java:S1874",Remove this use of "show"; it is deprecated.(Ôš„ò
+`
+java:S1874""JDon't override a deprecated method or explicitly mark it as "@Deprecated".(öÿÕÅ
+K
+java:S1874#"0Remove this use of "onResume"; it is deprecated.(çóà±úÿÿÿÿ
+L
+java:S1874$"1Remove this use of "AsyncTask"; it is deprecated.(³¬Í¬ýÿÿÿÿ
+W
+java:S1874$"<Remove this use of "THREAD_POOL_EXECUTOR"; it is deprecated.(³¬Í¬ýÿÿÿÿ

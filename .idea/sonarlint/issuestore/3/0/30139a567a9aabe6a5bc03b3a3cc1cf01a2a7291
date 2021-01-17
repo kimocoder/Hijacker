@@ -1,0 +1,45 @@
+
+=
+java:S1659 "(Declare "wpa2_count" on a separate line.(Úğ‡
+<
+java:S1659 "'Declare "wep_count" on a separate line.(Úğ‡
+<
+java:S1659 "'Declare "opn_count" on a separate line.(Úğ‡
+?
+java:S1659 "*Declare "hidden_count" on a separate line.(Úğ‡
+B
+java:S1659 "-Declare "connected_count" on a separate line.(Úğ‡
+h	java:S116 "TRename this field "wpa_count" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Úğ‡
+i	java:S116 "URename this field "wpa2_count" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Úğ‡
+h	java:S116 "TRename this field "wep_count" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Úğ‡
+h	java:S116 "TRename this field "opn_count" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Úğ‡
+k	java:S116 "WRename this field "hidden_count" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Úğ‡
+n	java:S116 "ZRename this field "connected_count" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Úğ‡
+Q
+java:S1874"6Remove this use of "DialogFragment"; it is deprecated.(ğ‚÷üÿÿÿÿ
+e
+java:S1874#"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(à“æ…øÿÿÿÿ
+I
+java:S1874$"3Remove this use of "getActivity"; it is deprecated.( ô•À
+I
+java:S1874%"3Remove this use of "getActivity"; it is deprecated.(ÿƒÏ
+L
+java:S26960"6Make the enclosing method "static" or remove this set.(Àäá¡
+`
+java:S1874B"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(‰¦ì·
+M
+java:S1874B"7Remove this use of "FragmentManager"; it is deprecated.(‰¦ì·
+B
+java:S1874C",Remove this use of "show"; it is deprecated.(Ôš„ò
+`
+java:S1874F"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(öÿÕÅ
+K
+java:S1874G"0Remove this use of "onResume"; it is deprecated.(çóà±úÿÿÿÿ
+Q
+java:S2696H"6Make the enclosing method "static" or remove this set.(ÓœûØúÿÿÿÿ
+`
+java:S1874K"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(ßû¢½
+J
+java:S1874L"/Remove this use of "onPause"; it is deprecated.(´¬á®ÿÿÿÿÿ
+L
+java:S2696M"6Make the enclosing method "static" or remove this set.(Öêˆß

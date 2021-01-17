@@ -15,7 +15,8 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_margin="30dp"
-        android:focusable="true" />
+        android:focusable="true"
+        android:contentDescription="TODO" />
 
     <ListView
         android:layout_width="match_parent"

@@ -1,0 +1,27 @@
+
+L
+java:S1874"6Remove this use of "DialogFragment"; it is deprecated.(ÙãùŒ
+e
+java:S1874#"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(à“æ…øÿÿÿÿ
+F
+java:S1874$"1Remove this use of "getString"; it is deprecated.(æ‚Î
+I
+java:S1874&"3Remove this use of "getActivity"; it is deprecated.( ô•À
+h	java:S1004"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(øÇØûúÿÿÿÿ
+\
+java:S21429"FEither re-interrupt this method or rethrow the "InterruptedException".(´í­Œ
+P
+java:S22747":Remove this call to "wait" or move it into a "while" loop.(žŠäž
+>	java:S1089")Either remove or fill this block of code.(´í­Œ
+`
+java:S1874<"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(‰¦ì·
+M
+java:S1874<"7Remove this use of "FragmentManager"; it is deprecated.(‰¦ì·
+B
+java:S1874=",Remove this use of "show"; it is deprecated.(Ôš„ò
+`
+java:S1874E"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(úÑ¡î
+G
+java:S1874F"1Remove this use of "onDismiss"; it is deprecated.(É†–§
+K
+java:S2446I"0"notify" may not wake up the appropriate thread.(óÄ£¶øÿÿÿÿ

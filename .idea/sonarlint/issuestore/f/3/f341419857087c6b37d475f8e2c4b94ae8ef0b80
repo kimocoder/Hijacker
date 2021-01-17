@@ -1,0 +1,751 @@
+
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(ΞÒ½8‚ÿέπ.
+C
+java:S1659"(Declare "show_na_st" on a separate line.(ά…“―8‚ÿέπ.
+p
+java:S3008"URename this field "always_cap" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(–θ8‚ÿέπ.
+M
+java:S1659"-Declare "currentFragment" on a separate line.(―ίρηϋÿÿÿÿ8‚ÿέπ.
+U
+java:S2274":Remove this call to "wait" or move it into a "while" loop.(γίψ±8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(©Έ”ψÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(ζ΄”ώÿÿÿÿ8‚ÿέπ.
+J
+java:S2093"*Change this "try" to a try-with-resources.(΅»Άόωÿÿÿÿ8‚ÿέπ.
+S
+java:S1874"3Remove this use of "NetworkInfo"; it is deprecated.(«½Πλψÿÿÿÿ8‚ÿέπ.
+<
+java:S1659"!Declare "opn" on a separate line.(ά…“―8‚ÿέπ.
+s
+java:S3008"XRename this field "target_deauth" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(–θ8‚ÿέπ.
+R
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(ΚΡυψ8‚ÿέπ.
+K
+java:S1659"0Declare "CHROOT_DIR_MISSING" on a separate line.(•–™‘8‚ÿέπ.
+J
+java:S1659"*Declare "cap_tmp_path" on a separate line.(΅¤ν›ÿÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(”ίυΞψÿÿÿÿ8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(“¨Θ8‚ÿέπ.
+Z
+java:S1874":Remove this use of "getFragmentManager"; it is deprecated.(ΆΘφϊψÿÿÿÿ8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(ΦϋΑ8‚ÿέπ.
+I
+java:S1659")Declare "deviceModel" on a separate line.(†‰†υÿÿÿÿÿ8‚ÿέπ.
+A
+java:S1659"'Declare "BAND_BOTH" on a separate line.(¥’ι8‚ÿέπ.
+R
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(αζθτ8‚ÿέπ.
+M
+java:S1874"-Remove this use of "State"; it is deprecated.(«½Πλψÿÿÿÿ8‚ÿέπ.
+W
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(η½ε‹ÿÿÿÿÿ8‚ÿέπ.
+W
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(Ζƒ½µωÿÿÿÿ8‚ÿέπ.
+G
+java:S1659"-Declare "FRAGMENT_CUSTOM" on a separate line.(’ϋ^8‚ÿέπ.
+[
+java:S1874";Remove this use of "FragmentTransaction"; it is deprecated.(ΈΨ­τÿÿÿÿÿ8‚ÿέπ.
+W
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(ΠΣψÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(Ή¨ηόÿÿÿÿ8‚ÿέπ.
+H
+java:S1659"(Declare "mdk3bf_dir" on a separate line.( ρ‚έÿÿÿÿÿ8‚ÿέπ.
+J
+java:S1659"*Declare "show_details" on a separate line.(ΰκέ¨ϊÿÿÿÿ8‚ÿέπ.
+J
+java:S1874"/Remove this use of "replace"; it is deprecated.(ΑΰΎ8‚ÿέπ.
+w
+java:S3008"\Rename this field "update_on_startup" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(–θ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(°…²ώÿÿÿÿ8‚ÿέπ.
+h	java:S100"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(χ‹έ8‚ÿέπ.
+^
+java:S1874">Remove this use of "getBackStackEntryCount"; it is deprecated.(δƒΣιϋÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(ϊ•΅Σώÿÿÿÿ8‚ÿέπ.
+\
+java:S1874"BRemove this use of "executePendingTransactions"; it is deprecated.(‹A8‚ÿέπ.
+<
+java:S1659"!Declare "wpa" on a separate line.(ά…“―8‚ÿέπ.
+s
+java:S3008"SRename this field "st_count" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ΡίΫΫόÿÿÿÿ8‚ÿέπ.
+\
+java:S2259"BA "NullPointerException" could be thrown; "path" is nullable here.(΅±8‚ÿέπ.
+€
+java:S3008"`Rename this field "custom_action_adapter" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(–εΆνψÿÿÿÿ8‚ÿέπ.
+E
+java:S1659"*Declare "cont_on_fail" on a separate line.(–θ8‚ÿέπ.
+C	java:S108")Either remove or fill this block of code.(‡ξ·ΐ8‚ÿέπ.
+_
+java:S1874"?Remove this use of "commitAllowingStateLoss"; it is deprecated.(‹–¨ωÿÿÿÿ8‚ÿέπ.
+{
+java:S3008"`Rename this field "file_explorer_adapter" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ψΈρ 8‚ÿέπ.
+P
+java:S2696"6Make the enclosing method "static" or remove this set.(Υα­`8‚ÿέπ.
+q
+java:S3008"VRename this field "last_action" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(†ΫΝÿ8‚ÿέπ.
+C	java:S108")Either remove or fill this block of code.(΄ν­8‚ÿέπ.
+P
+java:S1874"5Remove this use of "setTransition"; it is deprecated.(νΌ€Ω8‚ÿέπ.
+L
+java:S1874"1Remove this use of "AsyncTask"; it is deprecated.(έ―Υ£8‚ÿέπ.
+N
+java:S1659".Declare "reaver_sess_path" on a separate line.(΅¤ν›ÿÿÿÿÿ8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(“©†ς8‚ÿέπ.
+r
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 36 to the 15 allowed.(ΙΕε£ϋÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(”χΊ™ωÿÿÿÿ8‚ÿέπ.
+H
+java:S1659"(Declare "background" on a separate line.(Υ½²ώÿÿÿÿ8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(•άρϊ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(»έδώϊÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(ϋ¬—όÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(³†Έ΄ϋÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(όΤªΌϋÿÿÿÿ8‚ÿέπ.
+J
+java:S1659"/Declare "update_on_startup" on a separate line.(–θ8‚ÿέπ.
+S
+java:S1874"3Remove this use of "NetworkInfo"; it is deprecated.(«½Πλψÿÿÿÿ8‚ÿέπ.
+H
+java:S1659"(Declare "reaver_dir" on a separate line.( ρ‚έÿÿÿÿÿ8‚ÿέπ.
+I
+java:S1874"/Remove this use of "replace"; it is deprecated.(€”‘_8‚ÿέπ.
+{
+java:S3008"[Rename this field "firm_backup_file" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(΅¤ν›ÿÿÿÿÿ8‚ÿέπ.
+D
+java:S1659"$Declare "buffer" on a separate line.(ξ›®ªϊÿÿÿÿ8‚ÿέπ.
+C
+java:S1659"#Declare "debug" on a separate line.(ΰκέ¨ϊÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(τΜθόÿÿÿÿ8‚ÿέπ.
+_	java:S112"FDefine and throw a dedicated exception instead of using a generic one.(‰Ζαe8‚ÿέπ.
+P
+java:S1874"5Remove this use of "setTransition"; it is deprecated.(νΌ€Ω8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(Ή“ªσ8‚ÿέπ.
+F
+java:S1168"+Return an empty collection instead of null.( «Τ8‚ÿέπ.
+m
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 24 to the 15 allowed.(®ϊ©β8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(Τ·λψÿÿÿÿ8‚ÿέπ.
+c
+java:S2095"HUse try-with-resources or close this "FileWriter" in a "finally" clause.(Ώοκ’8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(Ò Φ8‚ÿέπ.
+P
+java:S2696"6Make the enclosing method "static" or remove this set.(ƒπυo8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(¶»¤Ύ8‚ÿέπ.
+G
+java:S1659"-Declare "disable_monMode" on a separate line.(Γ‡ώd8‚ÿέπ.
+v
+java:S3008"\Rename this field "custom_chroot_cmd" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Γ‡ώd8‚ÿέπ.
+\	java:S899"=Do something with the "boolean" value returned by "renameTo".(¨έ―Ωώÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(±Ϋωÿÿÿÿ8‚ÿέπ.
+G
+java:S1659",Declare "FRAGMENT_CRACK" on a separate line.(κΟƒ8‚ÿέπ.
+O
+java:S1874"/Remove this use of "replace"; it is deprecated.(£‹έψÿÿÿÿ8‚ÿέπ.
+W
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(Ηªώÿÿÿÿ8‚ÿέπ.
+F
+java:S1659"&Declare "cap_path" on a separate line.(΅¤ν›ÿÿÿÿÿ8‚ÿέπ.
+E
+java:S5411"*Use the primitive boolean expression here.(‡ξ·ΐ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(†ΝΥÿÿÿÿÿ8‚ÿέπ.
+Q
+java:S1659"1Declare "SORT_BEACONS_FRAMES" on a separate line.(»φγυϊÿÿÿÿ8‚ÿέπ.
+i
+java:S4042"NUse "java.nio.file.Files#delete" here for better messages on error conditions.(Ρ½Γχ8‚ÿέπ.
+u
+java:S3008"URename this field "chroot_dir" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.( ρ‚έÿÿÿÿÿ8‚ÿέπ.
+q
+java:S3008"WRename this field "wpa_runnable" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ς£±F8‚ÿέπ.
+V
+java:S1874";Remove this use of "FragmentTransaction"; it is deprecated.(νΌ€Ω8‚ÿέπ.
+<
+java:S1659"!Declare "wep" on a separate line.(ά…“―8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(Πΰί8‚ÿέπ.
+P
+java:S2696"6Make the enclosing method "static" or remove this set.(βΝ8‚ÿέπ.
+h
+java:S4042"NUse "java.nio.file.Files#delete" here for better messages on error conditions.(μ‡Z8‚ÿέπ.
+X
+java:S1874"=Remove this use of "TRANSIT_FRAGMENT_OPEN"; it is deprecated.(νΌ€Ω8‚ÿέπ.
+P
+java:S2696"6Make the enclosing method "static" or remove this set.(Ξ³¨]8‚ÿέπ.
+a
+java:S2142"FEither re-interrupt this method or rethrow the "InterruptedException".(΄ν­8‚ÿέπ.
+W
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(‰ρβωÿÿÿÿ8‚ÿέπ.
+E
+java:S1659"%Declare "busybox" on a separate line.(΅¤ν›ÿÿÿÿÿ8‚ÿέπ.
+S
+java:S1874"3Remove this use of "versionCode"; it is deprecated.(”Υ¥ύÿÿÿÿ8‚ÿέπ.
+E
+java:S1659"*Declare "AIREPLAY_WEP" on a separate line.(‰Πυι8‚ÿέπ.
+U	java:S899";Do something with the "boolean" value returned by "delete".(ηΪ”8‚ÿέπ.
+W
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(υ―•έϊÿÿÿÿ8‚ÿέπ.
+W
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(ΩψΊ±όÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(ΘΨϊύÿÿÿÿ8‚ÿέπ.
+I
+java:S1659")Declare "mdk3dos_dir" on a separate line.( ρ‚έÿÿÿÿÿ8‚ÿέπ.
+W
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(θ¬Òÿÿÿÿÿ8‚ÿέπ.
+U
+java:S1874":Remove this use of "getFragmentManager"; it is deprecated.(δΜήΰ8‚ÿέπ.
+H
+java:S1659"(Declare "latestBody" on a separate line.(ρύ΄‚ϋÿÿÿÿ8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(ωΠΟή8‚ÿέπ.
+[
+java:S1874";Remove this use of "FragmentTransaction"; it is deprecated.(ΈΨ­τÿÿÿÿÿ8‚ÿέπ.
+W
+java:S1874"7Remove this use of "FragmentManager"; it is deprecated.(¤•ΐύÿÿÿÿ8‚ÿέπ.
+w
+java:S3008"WRename this field "aliases_file" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(·έ·ύÿÿÿÿ8‚ÿέπ.
+J
+java:S1659"*Declare "actions_path" on a separate line.(΅¤ν›ÿÿÿÿÿ8‚ÿέπ.
+p
+java:S3008"URename this field "aliases_in" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(½ς»Ι8‚ÿέπ.
+_
+java:S1874"?Remove this use of "commitAllowingStateLoss"; it is deprecated.(‹–¨ωÿÿÿÿ8‚ÿέπ.
+X
+java:S1874"=Remove this use of "TRANSIT_FRAGMENT_OPEN"; it is deprecated.(νΌ€Ω8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(ÿΤόÿÿÿÿ8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(ΰ‰‡™8‚ÿέπ.
+P
+java:S2696"6Make the enclosing method "static" or remove this set.(ήªe8‚ÿέπ.
+A
+java:S1659"&Declare "monstart" on a separate line.(–θ8‚ÿέπ.
+L
+java:S1659"1Declare "CHROOT_BOTH_MISSING" on a separate line.(•–™‘8‚ÿέπ.
+J
+java:S1066"/Merge this if statement with the enclosing one.(ΖΧΠΑ8‚ÿέπ.
+X
+java:S1874"8Remove this use of "beginTransaction"; it is deprecated.(ΈΨ­τÿÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(ΐλΦύϊÿÿÿÿ8‚ÿέπ.
+P
+java:S2696"6Make the enclosing method "static" or remove this set.(γπ$8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(υ¥¨ϋÿÿÿÿ8‚ÿέπ.
+<	java:S131""Add a default case to this switch.(Ώ›έ”8‚ÿέπ.
+O
+java:S1659"/Declare "show_client_count" on a separate line.(ΰκέ¨ϊÿÿÿÿ8‚ÿέπ.
+V
+java:S1874";Remove this use of "FragmentTransaction"; it is deprecated.(νΌ€Ω8‚ÿέπ.
+U
+java:S1874":Remove this use of "getFragmentManager"; it is deprecated.(ήΉ8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(‰δ―8‚ÿέπ.
+J
+java:S1874"/Remove this use of "replace"; it is deprecated.(…ϋΆ8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(±τΐ°8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(·ƒψπόÿÿÿÿ8‚ÿέπ.
+F
+java:S1659",Declare "PROCESS_MDK_BF" on a separate line.(ΥΊ©8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(‹½°µϊÿÿÿÿ8‚ÿέπ.
+‚
+java:S4087"bRemove this "close" call; closing the resource is handled automatically by the try-with-resources.(€¶Ί‡ύÿÿÿÿ8‚ÿέπ.
+J
+java:S1659"*Declare "airOnStartup" on a separate line.(ΰκέ¨ϊÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(Τ·λψÿÿÿÿ8‚ÿέπ.
+H
+java:S1659"(Declare "chroot_dir" on a separate line.( ρ‚έÿÿÿÿÿ8‚ÿέπ.
+s
+java:S3008"SRename this field "cap_path" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(΅¤ν›ÿÿÿÿÿ8‚ÿέπ.
+x
+java:S3008"XRename this field "last_aireplay" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ψγ±ήώÿÿÿÿ8‚ÿέπ.
+F
+java:S1659"+Declare "target_deauth" on a separate line.(–θ8‚ÿέπ.
+P
+java:S2696"6Make the enclosing method "static" or remove this set.(ΠΊμy8‚ÿέπ.
+p
+java:S3008"URename this field "pwr_filter" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ω¤Ύύ8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(”Ό―Ό8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(‰γΨδωÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(«οµύωÿÿÿÿ8‚ÿέπ.
+v
+java:S3008"VRename this field "mdk3dos_dir" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.( ρ‚έÿÿÿÿÿ8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(–‘ρ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(άΣοφύÿÿÿÿ8‚ÿέπ.
+Q
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(άH8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(Λ¦Òλ8‚ÿέπ.
+l
+java:S2095"LUse try-with-resources or close this "BufferedReader" in a "finally" clause.(³φ ψÿÿÿÿ8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(Βάσξ8‚ÿέπ.
+w
+java:S3008"WRename this field "actions_path" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(΅¤ν›ÿÿÿÿÿ8‚ÿέπ.
+R
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(®χΜ―8‚ÿέπ.
+e	java:S128"LEnd this switch case with an unconditional break, return or throw statement.(ΧρΈ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(ΎΨƒΞÿÿÿÿÿ8‚ÿέπ.
+B
+java:S1659""Declare "arch" on a separate line.(΅¤ν›ÿÿÿÿÿ8‚ÿέπ.
+F
+java:S1659",Declare "PROCESS_REAVER" on a separate line.(ΥΊ©8‚ÿέπ.
+V
+java:S1874";Remove this use of "FragmentTransaction"; it is deprecated.(νΌ€Ω8‚ÿέπ.
+W
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(›„Ύÿÿÿÿÿ8‚ÿέπ.
+Z
+java:S1874":Remove this use of "getFragmentManager"; it is deprecated.(ρ«¤ηϋÿÿÿÿ8‚ÿέπ.
+G
+java:S1659"-Declare "PROCESS_MDK_DOS" on a separate line.(ΥΊ©8‚ÿέπ.
+W
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(ƒΐύόÿÿÿÿ8‚ÿέπ.
+a
+java:S2142"FEither re-interrupt this method or rethrow the "InterruptedException".(δ Ή€8‚ÿέπ.
+B
+java:S1659""Declare "band" on a separate line.(ξΌνΤϊÿÿÿÿ8‚ÿέπ.
+J
+java:S1066"/Merge this if statement with the enclosing one.(ΥίΞµ8‚ÿέπ.
+N
+java:S1659".Declare "SORT_DATA_FRAMES" on a separate line.(»φγυϊÿÿÿÿ8‚ÿέπ.
+
+java:S1319"pThe return type of this method should be an interface such as "List" rather than the implementation "ArrayList".(ΡΧεώÿÿÿÿ8‚ÿέπ.
+O
+java:S1066"/Merge this if statement with the enclosing one.(™Γ…χωÿÿÿÿ8‚ÿέπ.
+s
+java:S3776"SRefactor this method to reduce its Cognitive Complexity from 200 to the 15 allowed.(ÒΉÿÿÿÿÿ8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(―½Β“8‚ÿέπ.
+n
+java:S2095"NUse try-with-resources or close this "FileOutputStream" in a "finally" clause.(¤Τ’«ύÿÿÿÿ8‚ÿέπ.
+[
+java:S1874";Remove this use of "FragmentTransaction"; it is deprecated.(ΈΨ­τÿÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(³½Πκϋÿÿÿÿ8‚ÿέπ.
+r
+java:S3008"RRename this field "wl_path" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(΅¤ν›ÿÿÿÿÿ8‚ÿέπ.
+|
+java:S3008"\Rename this field "show_client_count" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ΰκέ¨ϊÿÿÿÿ8‚ÿέπ.
+;
+java:S1659"!Declare "dir" on a separate line.(ζ½;8‚ÿέπ.
+W
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(€ρ¦ÿÿÿÿÿ8‚ÿέπ.
+K
+java:S1659"0Declare "enable_on_airodump" on a separate line.(–θ8‚ÿέπ.
+‚
+java:S3252"gUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_LONG".(µ¤ψα8‚ÿέπ.
+\
+java:S1874"<Remove this use of "THREAD_POOL_EXECUTOR"; it is deprecated.(Ώίθ©ώÿÿÿÿ8‚ÿέπ.
+J
+java:S1874"/Remove this use of "replace"; it is deprecated.(„Ί‘8‚ÿέπ.
+I
+java:S1659"/Declare "FRAGMENT_SETTINGS" on a separate line.(’ϋ^8‚ÿέπ.
+e
+java:S1874"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(–¦¶Π8‚ÿέπ.
+t
+java:S3008"ZRename this field "disable_monMode" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Γ‡ώd8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(’­Ηύÿÿÿÿ8‚ÿέπ.
+I
+java:S1659"/Declare "custom_chroot_cmd" on a separate line.(Γ‡ώd8‚ÿέπ.
+R
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(ΖΥ8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(ΗΩοΜ8‚ÿέπ.
+V	java:S110"<This class has 9 parents which is greater than 5 authorized.(²Ϊ±8‚ÿέπ.
+V
+java:S1874"6Remove this use of "addToBackStack"; it is deprecated.(©λΰ»ψÿÿÿÿ8‚ÿέπ.
+P
+java:S1874"5Remove this use of "setTransition"; it is deprecated.(νΌ€Ω8‚ÿέπ.
+w
+java:S3008"\Rename this field "bootkali_init_bin" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(χ‘Γ²8‚ÿέπ.
+m
+java:S3008"RRename this field "show_ap" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ά…“―8‚ÿέπ.
+X
+java:S1874"=Remove this use of "TRANSIT_FRAGMENT_OPEN"; it is deprecated.(νΌ€Ω8‚ÿέπ.
+X
+java:S1874"8Remove this use of "beginTransaction"; it is deprecated.(ΈΨ­τÿÿÿÿÿ8‚ÿέπ.
+U
+java:S1874":Remove this use of "getFragmentManager"; it is deprecated.(ζΎΠύ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(ρ«¤ηϋÿÿÿÿ8‚ÿέπ.
+O
+java:S1874"/Remove this use of "replace"; it is deprecated.(»ΚΒ¬ψÿÿÿÿ8‚ÿέπ.
+R
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(¬Λ8‚ÿέπ.
+F
+java:S1659"&Declare "SORT_PWR" on a separate line.(»φγυϊÿÿÿÿ8‚ÿέπ.
+x
+java:S3008"]Rename this field "enable_on_airodump" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(–θ8‚ÿέπ.
+I
+java:S1066"/Merge this if statement with the enclosing one.(θϊ°8‚ÿέπ.
+K
+java:S2446"0"notify" may not wake up the appropriate thread.(­ΐτΙ8‚ÿέπ.
+V
+java:S1874"6Remove this use of "addToBackStack"; it is deprecated.(©λΰ»ψÿÿÿÿ8‚ÿέπ.
+P
+java:S2696"6Make the enclosing method "static" or remove this set.(άΞ~8‚ÿέπ.
+u
+java:S3008"URename this field "show_notif" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ΰκέ¨ϊÿÿÿÿ8‚ÿέπ.
+U	java:S899";Do something with the "boolean" value returned by "delete".(Ρ½Γχ8‚ÿέπ.
+v
+java:S3008"VRename this field "last_reaver" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ψγ±ήώÿÿÿÿ8‚ÿέπ.
+U
+java:S1141"5Extract this nested try block into a separate method.(΅»Άόωÿÿÿÿ8‚ÿέπ.
+H
+java:S1659"(Declare "SORT_ESSID" on a separate line.(»φγυϊÿÿÿÿ8‚ÿέπ.
+H
+java:S1659"-Declare "handshake_notif" on a separate line.(΄ª‘8‚ÿέπ.
+J
+java:S1659"*Declare "aircrack_dir" on a separate line.( ρ‚έÿÿÿÿÿ8‚ÿέπ.
+>
+java:S1659"$Declare "BAND_5" on a separate line.(¥’ι8‚ÿέπ.
+R
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(μγµ®8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(΄‰½όÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(κ†µΨÿÿÿÿÿ8‚ÿέπ.
+]
+java:S1874"=Remove this use of "popBackStackImmediate"; it is deprecated.(ΰ½ηύÿÿÿÿ8‚ÿέπ.
+V
+java:S1874"6Remove this use of "addToBackStack"; it is deprecated.(©λΰ»ψÿÿÿÿ8‚ÿέπ.
+P
+java:S1874"0Remove this use of "getState"; it is deprecated.(«½Πλψÿÿÿÿ8‚ÿέπ.
+^
+java:S1874">Remove this use of "getBackStackEntryCount"; it is deprecated.(ώψτώÿÿÿÿ8‚ÿέπ.
+O
+java:S1874"/Remove this use of "replace"; it is deprecated.(«£Ψ°ύÿÿÿÿ8‚ÿέπ.
+X
+java:S1874"8Remove this use of "beginTransaction"; it is deprecated.(ΈΨ­τÿÿÿÿÿ8‚ÿέπ.
+W
+java:S1874"<Remove this use of "THREAD_POOL_EXECUTOR"; it is deprecated.(έ―Υ£8‚ÿέπ.
+a
+java:S1075"ARefactor your code to get this URI from a customizable parameter.(­θµσψÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(Ζιφϊÿÿÿÿ8‚ÿέπ.
+Q
+java:S1874"1Remove this use of "AsyncTask"; it is deprecated.(δϊΈψÿÿÿÿ8‚ÿέπ.
+a
+java:S2142"FEither re-interrupt this method or rethrow the "InterruptedException".(ς¶Θ8‚ÿέπ.
+u
+java:S3008"URename this field "mdk3bf_dir" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.( ρ‚έÿÿÿÿÿ8‚ÿέπ.
+a
+java:S2142"FEither re-interrupt this method or rethrow the "InterruptedException".(ς¶Θ8‚ÿέπ.
+V
+java:S1874"6Remove this use of "getNetworkInfo"; it is deprecated.(«½Πλψÿÿÿÿ8‚ÿέπ.
+@
+java:S1659"%Declare "show_st" on a separate line.(ά…“―8‚ÿέπ.
+]
+java:S1874"CRemove this use of "getExternalStorageDirectory"; it is deprecated.(ª¶(8‚ÿέπ.
+G
+java:S1659"'Declare "data_path" on a separate line.(΅¤ν›ÿÿÿÿÿ8‚ÿέπ.
+W
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(ΗψΣ›ψÿÿÿÿ8‚ÿέπ.
+H
+java:S1659"(Declare "latestLink" on a separate line.(ρύ΄‚ϋÿÿÿÿ8‚ÿέπ.
+i
+java:S4042"NUse "java.nio.file.Files#delete" here for better messages on error conditions.(ηΪ”8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(°ΉΪ8‚ÿέπ.
+Q
+java:S1874"1Remove this use of "CONNECTED"; it is deprecated.(«½Πλψÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(­ª΄ρύÿÿÿÿ8‚ÿέπ.
+P
+java:S1874"5Remove this use of "setTransition"; it is deprecated.(νΌ€Ω8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(Ήµΰ›8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(™¤Η¤8‚ÿέπ.
+K
+java:S1659"0Declare "CHROOT_BIN_MISSING" on a separate line.(•–™‘8‚ÿέπ.
+O
+java:S1874"/Remove this use of "Handler"; it is deprecated.(Ϊ€ηκώÿÿÿÿ8‚ÿέπ.
+J
+java:S1659"*Declare "aireplay_dir" on a separate line.( ρ‚έÿÿÿÿÿ8‚ÿέπ.
+u
+java:S3008"URename this field "reaver_dir" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.( ρ‚έÿÿÿÿÿ8‚ÿέπ.
+Y
+java:S1874"9Remove this use of "PreferenceManager"; it is deprecated.(”ίυΞψÿÿÿÿ8‚ÿέπ.
+R
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(…ΰ›8‚ÿέπ.
+r
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 30 to the 15 allowed.(ΐ§ΖΥψÿÿÿÿ8‚ÿέπ.
+R
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(Ϋ—υ8‚ÿέπ.
+p
+java:S3008"URename this field "show_na_st" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ά…“―8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(ή­ω©ψÿÿÿÿ8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(ϋ‹–8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(Ψ‹‡ÿÿÿÿÿ8‚ÿέπ.
+O
+java:S1874"/Remove this use of "replace"; it is deprecated.(ΡΖΫϊÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(πΫ•ίÿÿÿÿÿ8‚ÿέπ.
+H
+java:S1172"(Remove this unused method parameter "v".(ΊΎΑ«ϊÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(©χυ™ύÿÿÿÿ8‚ÿέπ.
+O
+java:S1874"/Remove this use of "replace"; it is deprecated.(£‹έψÿÿÿÿ8‚ÿέπ.
+j
+java:S1874"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(Γ«•·ÿÿÿÿÿ8‚ÿέπ.
+Y
+java:S1874"9Remove this use of "executeOnExecutor"; it is deprecated.(Ώίθ©ώÿÿÿÿ8‚ÿέπ.
+Q
+java:S1874"1Remove this use of "CONNECTED"; it is deprecated.(«½Πλψÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(ν’ϊιÿÿÿÿÿ8‚ÿέπ.
+P
+java:S2696"6Make the enclosing method "static" or remove this set.(Ξ³¨]8‚ÿέπ.
+P
+java:S1874"0Remove this use of "getState"; it is deprecated.(«½Πλψÿÿÿÿ8‚ÿέπ.
+V
+java:S1874";Remove this use of "FragmentTransaction"; it is deprecated.(νΌ€Ω8‚ÿέπ.
+J
+java:S1066"/Merge this if statement with the enclosing one.(ςΎΏ8‚ÿέπ.
+X
+java:S1874"=Remove this use of "TRANSIT_FRAGMENT_OPEN"; it is deprecated.(νΌ€Ω8‚ÿέπ.
+^
+java:S1874">Remove this use of "getBackStackEntryCount"; it is deprecated.(—«Γώÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(Ϋ―¶ÿÿÿÿÿ8‚ÿέπ.
+W
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(«“ίοÿÿÿÿÿ8‚ÿέπ.
+w
+java:S3008"WRename this field "aireplay_dir" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.( ρ‚έÿÿÿÿÿ8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(Ύ³κμ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(–Σµ‚ύÿÿÿÿ8‚ÿέπ.
+Q
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(υ«κ8‚ÿέπ.
+w
+java:S3008"WRename this field "show_details" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ΰκέ¨ϊÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(πΙΗώÿÿÿÿ8‚ÿέπ.
+Q
+java:S1874"1Remove this use of "AsyncTask"; it is deprecated.(Ώίθ©ώÿÿÿÿ8‚ÿέπ.
+s
+java:S3008"SRename this field "ap_count" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ΡίΫΫόÿÿÿÿ8‚ÿέπ.
+i
+java:S4042"NUse "java.nio.file.Files#delete" here for better messages on error conditions.(έΨÿ¤8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(γέΞ8‚ÿέπ.
+C	java:S108")Either remove or fill this block of code.(΄ν­8‚ÿέπ.
+V
+java:S1874"6Remove this use of "addToBackStack"; it is deprecated.(©λΰ»ψÿÿÿÿ8‚ÿέπ.
+[
+java:S1874";Remove this use of "FragmentTransaction"; it is deprecated.(ΈΨ­τÿÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(ΗΣ›Ίύÿÿÿÿ8‚ÿέπ.
+W
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(«ά¤Ηψÿÿÿÿ8‚ÿέπ.
+I
+java:S1659")Declare "manufDBFile" on a separate line.(΅¤ν›ÿÿÿÿÿ8‚ÿέπ.
+p
+java:S3008"URename this field "wpa_thread" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(“ÿΉζ8‚ÿέπ.
+_
+java:S1874"?Remove this use of "commitAllowingStateLoss"; it is deprecated.(‹–¨ωÿÿÿÿ8‚ÿέπ.
+C
+java:S1172"(Remove this unused method parameter "v".(ΚΚ¤Ή8‚ÿέπ.
+E
+java:S1659"%Declare "wl_path" on a separate line.(΅¤ν›ÿÿÿÿÿ8‚ÿέπ.
+F
+java:S1659",Declare "enable_monMode" on a separate line.(Γ‡ώd8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(„ώΫι8‚ÿέπ.
+D
+java:S1659"$Declare "prefix" on a separate line.( ρ‚έÿÿÿÿÿ8‚ÿέπ.
+P
+java:S2696"6Make the enclosing method "static" or remove this set.(ΔΖ΅8‚ÿέπ.
+m
+java:S3008"RRename this field "show_st" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ά…“―8‚ÿέπ.
+e
+java:S1874"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(ΛΠƒ8‚ÿέπ.
+D
+java:S1659")Declare "error_notif" on a separate line.(΄ª‘8‚ÿέπ.
+o
+java:S3008"TRename this field "pref_edit" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ƒ΅ΙΚ8‚ÿέπ.
+a
+java:S2142"FEither re-interrupt this method or rethrow the "InterruptedException".(΄ν­8‚ÿέπ.
+K
+java:S1659"+Declare "last_aireplay" on a separate line.(Ψγ±ήώÿÿÿÿ8‚ÿέπ.
+T	java:S899";Do something with the "boolean" value returned by "delete".(μ‡Z8‚ÿέπ.
+R
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(Μκ‚“8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(¤σ ›ϊÿÿÿÿ8‚ÿέπ.
+r
+java:S3008"WRename this field "manuf_filter" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ρΨ―8‚ÿέπ.
+U
+java:S1141"5Extract this nested try block into a separate method.(΅»Άόωÿÿÿÿ8‚ÿέπ.
+w
+java:S3008"WRename this field "sort_reverse" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(²µ»ϋÿÿÿÿ8‚ÿέπ.
+P
+java:S2696"6Make the enclosing method "static" or remove this set.(κ•π?8‚ÿέπ.
+^
+java:S1874"CRemove this use of "getExternalStorageDirectory"; it is deprecated.(ΦϋΑ8‚ÿέπ.
+r
+java:S3008"WRename this field "cont_on_fail" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(–θ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(£Òώόÿÿÿÿ8‚ÿέπ.
+t
+java:S3008"TRename this field "data_path" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(΅¤ν›ÿÿÿÿÿ8‚ÿέπ.
+{
+java:S3008"[Rename this field "aireplay_running" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(―ίρηϋÿÿÿÿ8‚ÿέπ.
+x
+java:S3008"XRename this field "last_airodump" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ψγ±ήώÿÿÿÿ8‚ÿέπ.
+Z
+java:S1874":Remove this use of "getFragmentManager"; it is deprecated.(Σ©ÿ¨ώÿÿÿÿ8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(°ψΨή8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(έΟΤΝ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(σΖ¥υωÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(ΔϋΌϊÿÿÿÿ8‚ÿέπ.
+V
+java:S1874"6Remove this use of "getNetworkInfo"; it is deprecated.(«½Πλψÿÿÿÿ8‚ÿέπ.
+S
+java:S1874"3Remove this use of "versionCode"; it is deprecated.(’­Ηύÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(άγ¤ρωÿÿÿÿ8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(»λÒ8‚ÿέπ.
+C
+java:S1659"(Declare "always_cap" on a separate line.(–θ8‚ÿέπ.
+E
+java:S1659"*Declare "FRAGMENT_MDK" on a separate line.(κΟƒ8‚ÿέπ.
+{
+java:S3008"[Rename this field "reaver_sess_path" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(΅¤ν›ÿÿÿÿÿ8‚ÿέπ.
+c
+java:S1874"CRemove this use of "getDefaultSharedPreferences"; it is deprecated.(”ίυΞψÿÿÿÿ8‚ÿέπ.
+Z
+java:S1874":Remove this use of "getFragmentManager"; it is deprecated.(»κ”Εψÿÿÿÿ8‚ÿέπ.
+F
+java:S1659"&Declare "last_mdk" on a separate line.(Ψγ±ήώÿÿÿÿ8‚ÿέπ.
+L
+java:S1602",Remove useless curly braces around statement(™κ·ύÿÿÿÿ8‚ÿέπ.
+H
+java:S1659".Declare "PROCESS_AIREPLAY" on a separate line.(ΥΊ©8‚ÿέπ.
+G
+java:S1659"-Declare "FRAGMENT_REAVER" on a separate line.(’ϋ^8‚ÿέπ.
+q
+java:S3008"VRename this field "error_notif" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(΄ª‘8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(Η‡ξΕ8‚ÿέπ.
+X
+java:S1874"8Remove this use of "beginTransaction"; it is deprecated.(ΈΨ­τÿÿÿÿÿ8‚ÿέπ.
+w
+java:S3008"WRename this field "airodump_dir" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.( ρ‚έÿÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(ι‰η‡ϋÿÿÿÿ8‚ÿέπ.
+[	java:S899"BDo something with the "boolean" value returned by "createNewFile".(³αΩz8‚ÿέπ.
+_
+java:S1874"?Remove this use of "commitAllowingStateLoss"; it is deprecated.(‹–¨ωÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(»ΘΊΧÿÿÿÿÿ8‚ÿέπ.
+J
+java:S1659"*Declare "airodump_dir" on a separate line.( ρ‚έÿÿÿÿÿ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(ΆΎ­ ÿÿÿÿÿ8‚ÿέπ.
+s
+java:S3008"SRename this field "notif_on" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Υ½²ώÿÿÿÿ8‚ÿέπ.
+s
+java:S3008"SRename this field "last_mdk" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ψγ±ήώÿÿÿÿ8‚ÿέπ.
+r
+java:S3008"WRename this field "progress_int" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÿάέΪ8‚ÿέπ.
+w
+java:S3008"WRename this field "aircrack_dir" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.( ρ‚έÿÿÿÿÿ8‚ÿέπ.
+I
+java:S1659")Declare "last_reaver" on a separate line.(Ψγ±ήώÿÿÿÿ8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(Ϋ΄„ƒ8‚ÿέπ.
+R
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(ε·νΐ8‚ÿέπ.
+N
+java:S1659".Declare "firm_backup_file" on a separate line.(΅¤ν›ÿÿÿÿÿ8‚ÿέπ.
+w
+java:S3008"WRename this field "cap_tmp_path" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(΅¤ν›ÿÿÿÿÿ8‚ÿέπ.
+U	java:S899";Do something with the "boolean" value returned by "delete".(έΨÿ¤8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(Κ©ύ»8‚ÿέπ.
+R
+java:S1874"7Remove this use of "publishProgress"; it is deprecated.(ξ¶8‚ÿέπ.
+F
+java:S1659"&Declare "st_count" on a separate line.(ΡίΫΫόÿÿÿÿ8‚ÿέπ.
+S
+java:S1874"3Remove this use of "versionCode"; it is deprecated.(ϊ€†ÿÿÿÿÿ8‚ÿέπ.
+s
+java:S3008"YRename this field "enable_monMode" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Γ‡ώd8‚ÿέπ.
+u
+java:S3008"ZRename this field "handshake_notif" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(΄ª‘8‚ÿέπ.
+‹
+java:S1319"pThe return type of this method should be an interface such as "List" rather than the implementation "ArrayList".(ÿαλ8‚ÿέπ.
+H	java:S108")Either remove or fill this block of code.(υχ£πϊÿÿÿÿ8‚ÿέπ.
+M
+java:S1874"-Remove this use of "State"; it is deprecated.(«½Πλψÿÿÿÿ8‚ÿέπ.
+c
+java:S1874"CRemove this use of "getExternalStorageDirectory"; it is deprecated.(“΅ΡΗψÿÿÿÿ8‚ÿέπ.
+q
+java:S1905"VRemove this unnecessary cast to "org.sonar.java.resolve.Symbols$UnknownType@58db6712".(’νª8‚ÿέπ.
+H
+java:S1659".Declare "PROCESS_AIRCRACK" on a separate line.(ΥΊ©8‚ÿέπ.
+k	java:S128"LEnd this switch case with an unconditional break, return or throw statement.(ΐµ½ ϋÿÿÿÿ8‚ÿέπ.
+A
+java:S1659"&Declare "watchdog" on a separate line.(–θ8‚ÿέπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(±‡Ρ8‚ÿέπ.
+V
+java:S2696"6Make the enclosing method "static" or remove this set.(–‰ÿÿÿÿÿ8ξ›δδπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(Ψ³€8ξ›δδπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(μΖ’…8ξ›δδπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(ΌΖ½α8ξ›δδπ.
+T
+java:S1874"9Remove this use of "executeOnExecutor"; it is deprecated.(έ―Υ£8ξ›δδπ.
+`
+java:S1874"@Remove this use of "dismissAllowingStateLoss"; it is deprecated.(Ϊ ΑΒϋÿÿÿÿ8ξ›δδπ.
+H
+java:S1874".Remove this use of "cancel"; it is deprecated.(±»8ξ›δδπ.
+Q
+java:S2696"6Make the enclosing method "static" or remove this set.(›²Β8ξ›δδπ.

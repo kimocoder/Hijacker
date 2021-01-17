@@ -1,0 +1,35 @@
+
+C
+java:S1604@"(Make this anonymous inner class a lambda(Ê ä¬üÿÿÿÿ
+q	java:S116="WRename this field "test_cur_cmd" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Õå¡ÿÿÿÿÿ
+m	java:S116>"XRename this field "test_progress" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(úÙ”ù
+Q
+java:S1874:"6Remove this use of "DialogFragment"; it is deprecated.(ê´˜¿şÿÿÿÿ
+]
+java:S2142¸"FEither re-interrupt this method or rethrow the "InterruptedException".(ò¶È
+f
+java:S1874È"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(à“æ…øÿÿÿÿ
+V
+java:S1161È":Add the "@Override" annotation above this method signature(à“æ…øÿÿÿÿ
+O
+java:S1874Ê"3Remove this use of "getActivity"; it is deprecated.(õ±ŞÙşÿÿÿÿ
+J
+java:S1874Ô"3Remove this use of "getActivity"; it is deprecated.( ô•À
+a
+java:S1874ç"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(‰¦ì·
+N
+java:S1874ç"7Remove this use of "FragmentManager"; it is deprecated.(‰¦ì·
+B
+java:S1874è",Remove this use of "show"; it is deprecated.(¡ïši
+`
+java:S1874ë"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(–”çE
+L
+java:S1874ì"0Remove this use of "onCancel"; it is deprecated.(âœ¥øÿÿÿÿ
+f
+java:S1874ğ"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(µ‚µõıÿÿÿÿ
+F
+java:S1874ñ"/Remove this use of "onStart"; it is deprecated.(ï†æ
+M
+java:S1874ò"1Remove this use of "getDialog"; it is deprecated.(÷ï¼ôüÿÿÿÿ
+e
+java:S3252ô"NUse static access with "android.content.DialogInterface" for "BUTTON_NEUTRAL".(–Ï„

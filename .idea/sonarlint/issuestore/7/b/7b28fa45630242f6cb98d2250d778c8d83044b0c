@@ -1,0 +1,40 @@
+
+J
+java:S1604L"(Make this anonymous inner class a lambda(øŠåÍşÿÿÿÿ8ÑˆÅİğ.
+m
+java:S3008)"PRename this field "is_ap" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÉÄöÿ8ÑˆÅİğ.
+o
+java:S3008-"RRename this field "exit_on" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ş‘Ø8ÑˆÅİğ.
+E
+java:S1659/"#Declare "manuf" on a separate line.(üíó«ûÿÿÿÿ8ÑˆÅİğ.
+C
+java:S1659/"!Declare "mac" on a separate line.(üíó«ûÿÿÿÿ8ÑˆÅİğ.
+D
+java:S1659/""Declare "sec1" on a separate line.(üíó«ûÿÿÿÿ8ÑˆÅİğ.
+G
+java:S1659/"%Declare "numbers" on a separate line.(üíó«ûÿÿÿÿ8ÑˆÅİğ.
+D
+java:S1659/""Declare "sec2" on a separate line.(üíó«ûÿÿÿÿ8ÑˆÅİğ.
+R
+java:S1874("0Remove this use of "Fragment"; it is deprecated.( Úêçıÿÿÿÿ8ÑˆÅİğ.
+g
+java:S18741"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(«ÃÀ÷8ÑˆÅİğ.
+c
+java:S2142;"FEither re-interrupt this method or rethrow the "InterruptedException".(´í­Œ8ÑˆÅİğ.
+E	java:S108;")Either remove or fill this block of code.(´í­Œ8ÑˆÅİğ.
+P
+java:S1874H"3Remove this use of "getActivity"; it is deprecated.(”ŞÄÁ8ÑˆÅİğ.
+g
+java:S1874Z"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(öÿÕÅ8ÑˆÅİğ.
+R
+java:S1874["0Remove this use of "onResume"; it is deprecated.(çóà±úÿÿÿÿ8ÑˆÅİğ.
+U
+java:S1874]"3Remove this use of "getActivity"; it is deprecated.(»²¤¢üÿÿÿÿ8ÑˆÅİğ.
+g
+java:S1874g"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(ßû¢½8ÑˆÅİğ.
+Q
+java:S1874h"/Remove this use of "onPause"; it is deprecated.(´¬á®ÿÿÿÿÿ8ÑˆÅİğ.
+l
+java:S1874n"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(İßéàúÿÿÿÿ8ÑˆÅİğ.
+N
+java:S1874o"1Remove this use of "onDestroy"; it is deprecated.(ÍÊ·´8ÑˆÅİğ.

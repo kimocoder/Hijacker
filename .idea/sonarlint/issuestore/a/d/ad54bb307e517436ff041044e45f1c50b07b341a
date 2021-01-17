@@ -1,0 +1,26 @@
+
+D
+java:S1659")Declare "isDirectory" on a separate line.(‘ϋώ8€ÿέπ.
+C	java:S108")Either remove or fill this block of code.(΄ν­8€ÿέπ.
+m
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 23 to the 15 allowed.(ÒΉ²£8€ÿέπ.
+F
+java:S1659"+Declare "isUnknownType" on a separate line.(‘ϋώ8€ÿέπ.
+I
+java:S1066"/Merge this if statement with the enclosing one.(αΖ¬38€ÿέπ.
+r
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(Δς£ψϋÿÿÿÿ8€ÿέπ.
+
+java:S1130"mRemove the declaration of thrown exception 'java.lang.IllegalArgumentException' which is a runtime exception.(Δς£ψϋÿÿÿÿ8€ÿέπ.
+H
+java:S1659"(Declare "parentPath" on a separate line.(Ι¦αΒϊÿÿÿÿ8€ÿέπ.
+B
+java:S1659""Declare "name" on a separate line.(Ι¦αΒϊÿÿÿÿ8€ÿέπ.
+C	java:S108")Either remove or fill this block of code.(΄ν­8€ÿέπ.
+C	java:S108")Either remove or fill this block of code.(Ιµέ¬8€ÿέπ.
+?
+java:S1659"$Declare "isFile" on a separate line.(‘ϋώ8€ÿέπ.
+a
+java:S2142"FEither re-interrupt this method or rethrow the "InterruptedException".(΄ν­8€ÿέπ.
+a
+java:S2142"FEither re-interrupt this method or rethrow the "InterruptedException".(΄ν­8€ÿέπ.

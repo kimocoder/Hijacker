@@ -20,7 +20,6 @@ package com.hijacker;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import androidx.appcompat.app.AlertDialog;
 import android.view.View;

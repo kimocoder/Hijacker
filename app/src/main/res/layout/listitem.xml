@@ -20,7 +20,8 @@
             android:paddingEnd="10dp"
             android:paddingStart="5dp"
             android:paddingTop="5dp"
-            app:srcCompat="@drawable/ap2" />
+            app:srcCompat="@drawable/ap2"
+            android:contentDescription="TODO" />
 
         <TextView
             android:id="@+id/icon_count_view"

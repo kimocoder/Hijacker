@@ -87,14 +87,18 @@ import java.util.Objects;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import static android.os.Environment.getExternalStorageDirectory;
+import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT;
 import static com.hijacker.AP.getAPByMac;
 import static com.hijacker.CustomAction.TYPE_ST;
 import static com.hijacker.Device.trimMac;
 import static com.hijacker.IsolatedFragment.is_ap;
 import static com.hijacker.MDKFragment.ados;
 import static com.hijacker.MDKFragment.bf;
+import static com.hijacker.R.id.fragment1;
 import static com.hijacker.Shell.getFreeShell;
 import static com.hijacker.Shell.runOne;
+import static java.lang.Thread.sleep;
 
 public class MainActivity extends AppCompatActivity{
     static final String NETHUNTER_BOOTKALI_BASH = "/data/data/com.offsec.nethunter/files/scripts/bootkali_bash";
@@ -225,10 +229,8 @@ public class MainActivity extends AppCompatActivity{
                     pref_edit.putBoolean("disclaimerAccepted", true);
                     pref_edit.apply();
                 });
-                customDialog.setNeutralButton(getString(R.string.not_agree), () -> {
-                    // Exit
-                    MainActivity.this.finish();
-                });
+                // Exit
+                customDialog.setNeutralButton(getString(R.string.not_agree), MainActivity.this::finish);
 
                 customDialog.show(getFragmentManager(), "CustomDialog for disclaimer");
             }
@@ -248,22 +250,22 @@ public class MainActivity extends AppCompatActivity{
                             FragmentTransaction ft = mFragmentManager.beginTransaction();
                             switch(menuItem.getItemId()){
                                 case FRAGMENT_AIRODUMP:
-                                    ft.replace(R.id.fragment1, is_ap==null ? new MyListFragment() : new IsolatedFragment());
+                                    ft.replace(fragment1, is_ap==null ? new MyListFragment() : new IsolatedFragment());
                                     break;
                                 case FRAGMENT_MDK:
-                                    ft.replace(R.id.fragment1, new MDKFragment());
+                                    ft.replace(fragment1, new MDKFragment());
                                     break;
                                 case FRAGMENT_REAVER:
-                                    ft.replace(R.id.fragment1, reaverFragment);
+                                    ft.replace(fragment1, reaverFragment);
                                     break;
                                 case FRAGMENT_CRACK:
-                                    ft.replace(R.id.fragment1, crackFragment);
+                                    ft.replace(fragment1, crackFragment);
                                     break;
                                 case FRAGMENT_CUSTOM:
-                                    ft.replace(R.id.fragment1, customActionFragment);
+                                    ft.replace(fragment1, customActionFragment);
                                     break;
                                 case FRAGMENT_SETTINGS:
-                                    ft.replace(R.id.fragment1, new SettingsFragment());
+                                    ft.replace(fragment1, new SettingsFragment());
                                     break;
                             }
                             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
@@ -327,7 +329,7 @@ public class MainActivity extends AppCompatActivity{
             ap_count = findViewById(R.id.ap_count);
             st_count = findViewById(R.id.st_count);
             progress = findViewById(R.id.progressBar);
-            rootView = findViewById(R.id.fragment1);
+            rootView = findViewById(fragment1);
             overflow[0] = getDrawable(R.drawable.overflow0);
             overflow[1] = getDrawable(R.drawable.overflow1);
             overflow[2] = getDrawable(R.drawable.overflow2);
@@ -369,7 +371,7 @@ public class MainActivity extends AppCompatActivity{
             publishProgress(getString(R.string.init_files));
             path = getFilesDir().getAbsolutePath();
             cap_tmp_path = path + "/cap_tmp";
-            data_path = Environment.getExternalStorageDirectory() + "/Hijacker";
+            data_path = getExternalStorageDirectory() + "/Hijacker";
             actions_path = data_path + "/actions";
             wl_path = data_path + "/wordlists";
             cap_path = data_path + "/capture_files";
@@ -608,10 +610,10 @@ public class MainActivity extends AppCompatActivity{
                 prefix = "LD_PRELOAD=" + path + "/lib/";
                 if(devChipset.startsWith("4339")) {
                     //BCM4339
-                    prefix += "libfakeioctl.so";
+                    //prefix += "libfakeioctl.so";
                 }else if(devChipset.startsWith("4358")){
                     //BCM4358
-                    prefix += "libnexmon.so";
+                    //prefix += "libnexmon.so";
                 }else{
                     //Default (detected but not included)
                     SettingsFragment.allow_prefix = true;       //Allow user to change the prefix
@@ -619,7 +621,7 @@ public class MainActivity extends AppCompatActivity{
 
                     if(prefix==null){
                         //No user-set prefix, use default
-                        prefix = "LD_PRELOAD=" + path + "/lib/libfakeioctl.so";
+                        //prefix = "LD_PRELOAD=" + path + "/lib/libfakeioctl.so";
                     }
                 }
 
@@ -659,14 +661,14 @@ public class MainActivity extends AppCompatActivity{
                     try {
                         progress_int = 0;
                         while (progress_int <= deauthWait && wpacheckcont) {
-                            Thread.sleep(1000);
+                            sleep(1000);
                             progress_int++;
                             runInHandler(() -> progress.setProgress(progress_int));
                         }
                         if (wpacheckcont) {
                             runInHandler(() -> {
                                 if (!background)
-                                    Snackbar.make(findViewById(R.id.fragment1), getString(R.string.stopped_to_capture), Snackbar.LENGTH_SHORT).show();
+                                    Snackbar.make(findViewById(fragment1), getString(R.string.stopped_to_capture), LENGTH_SHORT).show();
                                 else
                                     Toast.makeText(MainActivity.this, getString(R.string.stopped_to_capture), Toast.LENGTH_SHORT).show();
                                 progress.setProgress(deauthWait);
@@ -714,7 +716,7 @@ public class MainActivity extends AppCompatActivity{
                                     }
                                     buffer = out.readLine();
                                 }
-                                Thread.sleep(700);
+                                sleep(700);
                             }
                         }
                     }
@@ -735,11 +737,11 @@ public class MainActivity extends AppCompatActivity{
 
                         if (found) {
                             if (!background) {
-                                Snackbar s = Snackbar.make(findViewById(R.id.fragment1), getString(R.string.handshake_captured) + ' ' + capfile, Snackbar.LENGTH_LONG);
+                                Snackbar s = Snackbar.make(findViewById(fragment1), getString(R.string.handshake_captured) + ' ' + capfile, Snackbar.LENGTH_LONG);
                                 s.setAction(R.string.crack, v -> {
                                     CrackFragment.capfile_text = capfile;
                                     FragmentTransaction ft = mFragmentManager.beginTransaction();
-                                    ft.replace(R.id.fragment1, MainActivity.this.crackFragment);
+                                    ft.replace(fragment1, MainActivity.this.crackFragment);
                                     ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                                     ft.addToBackStack(null);
                                     ft.commitAllowingStateLoss();
@@ -851,9 +853,7 @@ public class MainActivity extends AppCompatActivity{
                     //This should be changed to a broadcast receiver
                     new Thread(() -> {
                         try{
-                            while(!internetAvailable()){
-                                Thread.sleep(1000);
-                            }
+                            while(!internetAvailable()) sleep(1000);
                             checkForUpdate(false);
                         }catch(InterruptedException ignored){}
                     }).start();
@@ -862,7 +862,7 @@ public class MainActivity extends AppCompatActivity{
 
             //Delete old report, it's not needed if no exception is thrown up to this point (requires storage access)
             publishProgress(getString(R.string.deleting_bug_report));
-            File report = new File(Environment.getExternalStorageDirectory() + "/report.txt");
+            File report = new File(getExternalStorageDirectory() + "/report.txt");
             if(report.exists()) report.delete();
 
             //Show FirstRunDialog
@@ -890,7 +890,8 @@ public class MainActivity extends AppCompatActivity{
         }
         @Override
         protected void onPostExecute(final Boolean success){
-            if(!success){
+            if (success) {
+            } else {
                 // Initialization incomplete, can't continue!!!
                 System.exit(1);
             }
@@ -903,7 +904,7 @@ public class MainActivity extends AppCompatActivity{
             //Load default fragment (airodump)
             if(mFragmentManager.getBackStackEntryCount()==0){
                 FragmentTransaction ft = mFragmentManager.beginTransaction();
-                ft.replace(R.id.fragment1, new MyListFragment());
+                ft.replace(fragment1, new MyListFragment());
                 ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                 ft.addToBackStack(null);
                 ft.commitAllowingStateLoss();
@@ -928,21 +929,23 @@ public class MainActivity extends AppCompatActivity{
 
     void extract(String filename, String out_dir){
         File f = new File(out_dir, filename);
-        if(f.exists()) f.delete();          //Delete file in case it's outdated
+        if(f.exists()) {
+            f.delete();          //Delete file in case it's outdated
+        }
         try{
-            InputStream in = getResources().getAssets().open(filename);
-            FileOutputStream out = new FileOutputStream(f);
+            FileOutputStream out;
+            try (InputStream in = getResources().getAssets().open(filename)) {
+                out = new FileOutputStream(f);
 
-            byte[] buf = new byte[BUFFER_SIZE];
-            int len;
-            while((len = in.read(buf))>0){
-                out.write(buf, 0, len);
+                byte[] buf = new byte[BUFFER_SIZE];
+                int len;
+                while ((len = in.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+                in.close();
             }
-            in.close();
             out.close();
-            if(true){
-                runOne("chmod 755 " + out_dir + "/" + filename);
-            }
+            runOne("chmod 755 " + out_dir + "/" + filename);
         }catch(IOException e){
             Log.e("HIJACKER/FileProvider", "Exception copying from assets", e);
         }
@@ -1160,25 +1163,24 @@ public class MainActivity extends AppCompatActivity{
     static void loadAliases(){
         aliases_file = new File(data_path + "/aliases.txt");
         try{
-            if(!aliases_file.exists()){
-                aliases_file.createNewFile();
-            }else{
+            if(!aliases_file.exists()) aliases_file.createNewFile();
+            else{
                 if(debug) Log.d("HIJACKER/loadAliases", "Reading aliases file...");
                 try{
-                    BufferedReader aliases_out = new BufferedReader(new FileReader(aliases_file));
-                    String buffer = aliases_out.readLine();
-                    while(buffer!=null){
-                        //Line format: 00:11:22:33:44:55 Alias
-                        if(buffer.charAt(17)==' ' && buffer.length()>18){
-                            String mac = buffer.substring(0, 17);
-                            String alias = buffer.substring(18);
-                            aliases.put(mac, alias);
-                        }else{
-                            Log.e("HIJACKER/loadAliases", "Aliases file format error: " + buffer);
+                    try (BufferedReader aliases_out = new BufferedReader(new FileReader(aliases_file))) {
+                        String buffer = aliases_out.readLine();
+                        while (buffer != null) {
+                            //Line format: 00:11:22:33:44:55 Alias
+                            if (buffer.charAt(17) == ' ' && buffer.length() > 18) {
+                                String mac = buffer.substring(0, 17);
+                                String alias = buffer.substring(18);
+                                aliases.put(mac, alias);
+                            } else {
+                                Log.e("HIJACKER/loadAliases", "Aliases file format error: " + buffer);
+                            }
+                            buffer = aliases_out.readLine();
                         }
-                        buffer = aliases_out.readLine();
                     }
-                    aliases_out.close();
                 }catch(IOException e){
                     Log.e("HIJACKER/loadAliases1", e.toString());
                 }
@@ -1190,6 +1192,7 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         switch(item.getItemId()){
@@ -1221,7 +1224,7 @@ public class MainActivity extends AppCompatActivity{
             case R.id.settings:
                 if(currentFragment!=FRAGMENT_SETTINGS){
                     FragmentTransaction ft = mFragmentManager.beginTransaction();
-                    ft.replace(R.id.fragment1, new SettingsFragment());
+                    ft.replace(fragment1, new SettingsFragment());
                     ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                     ft.addToBackStack(null);
                     ft.commitAllowingStateLoss();
@@ -1268,7 +1271,9 @@ public class MainActivity extends AppCompatActivity{
         notif_on = false;
         mNotificationManager.cancelAll();
         CustomAction.save();
-        if(watchdogTask!=null) watchdogTask.cancel(true);
+        if(watchdogTask!=null) {
+            watchdogTask.cancel(true);
+        }
         try{
             stop(PROCESS_AIRODUMP);
             stop(PROCESS_AIREPLAY);
@@ -1291,9 +1296,7 @@ public class MainActivity extends AppCompatActivity{
         if(keyCode==KeyEvent.KEYCODE_BACK){
             if(mDrawerLayout.isDrawerOpen(GravityCompat.START)){
                 mDrawerLayout.closeDrawers();
-            }else if(mFragmentManager.getBackStackEntryCount()>1){
-                mFragmentManager.popBackStackImmediate();
-            }else{
+            }else if (mFragmentManager.getBackStackEntryCount() <= 1) {
                 CustomDialog customDialog = new CustomDialog();
                 customDialog.setTitle(getString(R.string.exit_dialog_title));
                 customDialog.setMessage(getString(R.string.exit_dialog_message));
@@ -1303,6 +1306,8 @@ public class MainActivity extends AppCompatActivity{
                 });
                 customDialog.setNegativeButton(getString(R.string.cancel), null);
                 customDialog.show(getFragmentManager(), "CustomDialog for exit");
+            } else {
+                mFragmentManager.popBackStackImmediate();
             }
             return true;
         }
@@ -1330,7 +1335,7 @@ public class MainActivity extends AppCompatActivity{
     }
     @SuppressLint("MissingSuperCall")
     @Override
-    protected void onSaveInstanceState(Bundle outState){
+    protected void onSaveInstanceState(@NonNull Bundle outState){
         //No call for super(), avoid IllegalStateException on FragmentManagerImpl.checkStateLoss.
     }
 
@@ -1339,6 +1344,7 @@ public class MainActivity extends AppCompatActivity{
             super(MainActivity.this, R.layout.listitem);
         }
 
+        @SuppressLint("SetTextI18n")
         @NonNull
         @Override
         public View getView(int position, View convertView, @NonNull ViewGroup parent){
@@ -1543,7 +1549,7 @@ public class MainActivity extends AppCompatActivity{
         if(is_ap!=null){
             IsolatedFragment.exit_on = mFragmentManager.getBackStackEntryCount();
             FragmentTransaction ft = mFragmentManager.beginTransaction();
-            ft.replace(R.id.fragment1, new IsolatedFragment());
+            ft.replace(fragment1, new IsolatedFragment());
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             ft.addToBackStack(null);
             ft.commitAllowingStateLoss();
@@ -1734,20 +1740,22 @@ public class MainActivity extends AppCompatActivity{
                 });
                 customDialog.setNeutralButton(getString(R.string.cancel), null);
 
-                runInHandler(() -> customDialog.show(getFragmentManager(), "CustomDialog for update"));
+                runInHandler(() -> {
+                    customDialog.show(getFragmentManager(), "CustomDialog for update");
+                });
             }else{
-                if(showMessages) Snackbar.make(rootView, getString(R.string.already_on_latest), Snackbar.LENGTH_SHORT).show();
+                if(showMessages) Snackbar.make(rootView, getString(R.string.already_on_latest), LENGTH_SHORT).show();
             }
         }catch(Exception e){
             Log.e("HIJACKER/update", e.toString());
-            if(showMessages) Snackbar.make(rootView, getString(R.string.unknown_error), Snackbar.LENGTH_SHORT).show();
+            if(showMessages) Snackbar.make(rootView, getString(R.string.unknown_error), LENGTH_SHORT).show();
         }finally{
             if(showMessages) runInHandler(() -> progress.setIndeterminate(false));
         }
     }
     boolean internetAvailable(){
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        return Objects.requireNonNull(connectivityManager.getNetworkInfo(1)).getState()==NetworkInfo.State.CONNECTED || Objects.requireNonNull(connectivityManager.getNetworkInfo(0)).getState()==NetworkInfo.State.CONNECTED;
+        return !(Objects.requireNonNull(connectivityManager.getNetworkInfo(1)).getState() != NetworkInfo.State.CONNECTED && Objects.requireNonNull(connectivityManager.getNetworkInfo(0)).getState() != NetworkInfo.State.CONNECTED);
     }
     static boolean createReport(File out, String filesDir, String stackTrace, Process shell){
         if(!out.exists()){
@@ -1774,7 +1782,7 @@ public class MainActivity extends AppCompatActivity{
             if(stackTrace!=null) writer.write("\nStack trace:\n" + stackTrace + '\n');
 
             String cmd = "echo pref_file--------------------------------------; cat /data/data/com.hijacker/shared_prefs/com.hijacker_preferences.xml;";
-            cmd += " echo aliases file-----------------------------------; " + busybox_tmp + " cat " + Environment.getExternalStorageDirectory() + "/Hijacker/aliases.txt;";
+            cmd += " echo aliases file-----------------------------------; " + busybox_tmp + " cat " + getExternalStorageDirectory() + "/Hijacker/aliases.txt;";
             cmd += " echo app directory----------------------------------; " + busybox_tmp + " ls -lR " + filesDir + ';';
             cmd += " echo fw_bcmdhd--------------------------------------; strings /vendor/firmware/fw_bcmdhd.bin | grep \"FWID:\";";
             cmd += " echo ps---------------------------------------------; ps | " + busybox_tmp + " grep -e air -e mdk -e reaver;";

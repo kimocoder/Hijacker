@@ -1,0 +1,45 @@
+
+@
+java:S1659"%Declare "message" on a separate line.(õ×™ýøÿÿÿÿ
+?
+java:S1659 ")Declare "neutralText" on a separate line.(žèÜ
+@
+java:S1659 "*Declare "negativeText" on a separate line.(žèÜ
+G
+java:S1659"",Declare "onNeutralClick" on a separate line.(­Ð«úÿÿÿÿ
+H
+java:S1659""-Declare "onNegativeClick" on a separate line.(­Ð«úÿÿÿÿ
+Q
+java:S1874"6Remove this use of "DialogFragment"; it is deprecated.(çÜÆùÿÿÿÿ
+e
+java:S1874$"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(à“æ…øÿÿÿÿ
+I
+java:S1874&"3Remove this use of "getActivity"; it is deprecated.( ô•À
+K
+java:S2446-"0"notify" may not wake up the appropriate thread.(ËÔ‹»þÿÿÿÿ
+K
+java:S24465"0"notify" may not wake up the appropriate thread.(ËÔ‹»þÿÿÿÿ
+K
+java:S2446="0"notify" may not wake up the appropriate thread.(ËÔ‹»þÿÿÿÿ
+`
+java:S1874D"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(‰¦ì·
+M
+java:S1874D"7Remove this use of "FragmentManager"; it is deprecated.(‰¦ì·
+B
+java:S1874E",Remove this use of "show"; it is deprecated.(Ôš„ò
+`
+java:S1874H"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(úÑ¡î
+G
+java:S1874I"1Remove this use of "onDismiss"; it is deprecated.(É†–§
+K
+java:S2446L"0"notify" may not wake up the appropriate thread.(óÄ£¶øÿÿÿÿ
+`
+java:S1874^"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(¹Ç‡ÿ
+P
+java:S1161^":Add the "@Override" annotation above this method signature(¹Ç‡ÿ
+h	java:S100_"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(øÇØûúÿÿÿÿ
+\
+java:S2142d"FEither re-interrupt this method or rethrow the "InterruptedException".(´í­Œ
+O
+java:S2274b":Remove this call to "wait" or move it into a "while" loop.(ç£ŠM
+>	java:S108d")Either remove or fill this block of code.(´í­Œ

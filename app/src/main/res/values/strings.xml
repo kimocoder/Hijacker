@@ -319,11 +319,11 @@
 
     <!-- Default Preferences -->
     <string name="iface" translatable="false">wlan0</string>
-    <string name="prefix" translatable="false">LD_PRELOAD=/vendor/lib/libfakeioctl.so</string>
-    <string name="chroot_dir" translatable="false">/data/local/nhsystem/kali-armhf</string>
+    <string name="prefix" translatable="false" />
+    <string name="chroot_dir" translatable="false">/data/local/nhsystem/kali-arm64</string>
     <string name="monstart" translatable="false">false</string>
-    <string name="enable_monMode" translatable="false">nexutil -m true</string>
-    <string name="disable_monMode" translatable="false">nexutil -m false</string>
+    <string name="enable_monMode" translatable="false" />
+    <string name="disable_monMode" translatable="false" />
     <string name="enable_on_airodump" translatable="false">true</string>
     <string name="deauthWait" translatable="false">20</string>
     <string name="show_notif" translatable="false">true</string>
@@ -432,4 +432,6 @@
     <string name="already_on_latest">You are running the latest version</string>
     <string name="github_title">Go to GitHub</string>
     <string name="version_title">Version</string>
+    <string name="master_path">%d%s</string>
+    <string name="master_path2">/</string>
 </resources>

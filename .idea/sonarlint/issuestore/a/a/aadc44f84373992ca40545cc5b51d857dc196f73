@@ -1,0 +1,38 @@
+
+c
+java:S2095v"HUse try-with-resources or close this "FileWriter" in a "finally" clause.(çÄ¤èıÿÿÿÿ
+K
+java:S1874*"6Remove this use of "DialogFragment"; it is deprecated.(ŠÎ{
+e
+java:S1874."JDon't override a deprecated method or explicitly mark it as "@Deprecated".(à“æ…øÿÿÿÿ
+I
+java:S1874/"3Remove this use of "getActivity"; it is deprecated.( ô•À
+I
+java:S18740"3Remove this use of "getActivity"; it is deprecated.(ß²ª®
+e
+java:S1874L"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(µ‚µõıÿÿÿÿ
+E
+java:S1874M"/Remove this use of "onStart"; it is deprecated.(ï†æ
+L
+java:S1874N"1Remove this use of "getDialog"; it is deprecated.(÷ï¼ôüÿÿÿÿ
+j
+java:S3252P"OUse static access with "android.content.DialogInterface" for "BUTTON_POSITIVE".(ÆÄ†Œùÿÿÿÿ
+L
+java:S1874]"1Remove this use of "getString"; it is deprecated.(³†Œ’ıÿÿÿÿ
+L
+java:S1874g"1Remove this use of "getString"; it is deprecated.(ë€Ê¾ûÿÿÿÿ
+W	java:S899p"BDo something with the "boolean" value returned by "createNewFile".(ïœ
+G
+java:S1874r"1Remove this use of "getString"; it is deprecated.(‹µ¬
+W
+java:S1874"@Remove this use of "dismissAllowingStateLoss"; it is deprecated.(ÌÌÓÙ
+O
+java:S1874"3Remove this use of "getActivity"; it is deprecated.(‰Û«èşÿÿÿÿ
+H
+java:S1874’"1Remove this use of "getString"; it is deprecated.(êîã§
+a
+java:S1874—"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(‰¦ì·
+N
+java:S1874—"7Remove this use of "FragmentManager"; it is deprecated.(‰¦ì·
+C
+java:S1874˜",Remove this use of "show"; it is deprecated.(Ôš„ò

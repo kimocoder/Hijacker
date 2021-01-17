@@ -1,0 +1,122 @@
+
+Š
+java:S3252½"gUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_LONG".(‚¾äøÿÿÿÿ8Î„ÛÙğ.
+q
+java:S3008/"TRename this field "bf_switch" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ôèâú8Î„ÛÙğ.
+R
+java:S2696~"6Make the enclosing method "static" or remove this set.(ığÔb8Î„ÛÙğ.
+v
+java:S30083"TRename this field "ssid_file" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¹·ß¥øÿÿÿÿ8Î„ÛÙğ.
+T
+java:S2696"6Make the enclosing method "static" or remove this set.(ˆ¯Áˆ8Î„ÛÙğ.
+S
+java:S2696¯"6Make the enclosing method "static" or remove this set.(‘ªšR8Î„ÛÙğ.
+S
+java:S2696±"6Make the enclosing method "static" or remove this set.(ığÔb8Î„ÛÙğ.
+U
+java:S1874r"3Remove this use of "getActivity"; it is deprecated.(»²¤¢üÿÿÿÿ8Î„ÛÙğ.
+T
+java:S2696‘"6Make the enclosing method "static" or remove this set.(•ÑÑ8Î„ÛÙğ.
+S
+java:S2696B"6Make the enclosing method "static" or remove this set.(£ïõ‘8Î„ÛÙğ.
+m	java:S1161"QRename this field "aes_cb" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ü»ÎÒ8Î„ÛÙğ.
+t
+java:S3008."RRename this field "ados_ap" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÁŸâúÿÿÿÿ8Î„ÛÙğ.
+Š
+java:S3252´"gUse static access with "com.google.android.material.snackbar.BaseTransientBottomBar" for "LENGTH_LONG".(×ÅÊõıÿÿÿÿ8Î„ÛÙğ.
+V
+java:S1874‚"3Remove this use of "getActivity"; it is deprecated.(ÃÏåƒÿÿÿÿÿ8Î„ÛÙğ.
+T
+java:S1874´"1Remove this use of "getString"; it is deprecated.(×ÅÊõıÿÿÿÿ8Î„ÛÙğ.
+>
+java:S16594"!Declare "aes" on a separate line.(´¡ß¼8Î„ÛÙğ.
+F
+java:S1659/")Declare "ados_switch" on a separate line.(ôèâú8Î„ÛÙğ.
+p
+java:S3776¨"RRefactor this method to reduce its Cognitive Complexity from 34 to the 15 allowed.(¿ÓùÚ8Î„ÛÙğ.
+D
+java:S16595""Declare "ados" on a separate line.(Š¸ˆ™şÿÿÿÿ8Î„ÛÙğ.
+A
+java:S16591"$Declare "wep_cb" on a separate line.(Ü»ÎÒ8Î„ÛÙğ.
+Q
+java:S1874v"/Remove this use of "onPause"; it is deprecated.(´¬á®ÿÿÿÿÿ8Î„ÛÙğ.
+A
+java:S16591"$Declare "opn_cb" on a separate line.(Ü»ÎÒ8Î„ÛÙğ.
+n	java:S1161"RRename this field "tkip_cb" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ü»ÎÒ8Î„ÛÙğ.
+R
+java:S2696|"6Make the enclosing method "static" or remove this set.(‘ªšR8Î„ÛÙğ.
+Y
+java:S2696®"6Make the enclosing method "static" or remove this set.(¡ŠåÌşÿÿÿÿ8Î„ÛÙğ.
+G
+java:S1874Ï"1Remove this use of "getString"; it is deprecated.(×ÿ®
+X
+java:S2696}"6Make the enclosing method "static" or remove this set.(ÔôòŞûÿÿÿÿ8Î„ÛÙğ.
+A
+java:S16591"$Declare "aes_cb" on a separate line.(Ü»ÎÒ8Î„ÛÙğ.
+g
+java:S1874u"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(ßû¢½8Î„ÛÙğ.
+`
+java:S1117«"=Rename "ssid_file" which hides the field declared at line 51.(³šˆ¶øÿÿÿÿ8Î„ÛÙğ.
+?
+java:S16594""Declare "tkip" on a separate line.(´¡ß¼8Î„ÛÙğ.
+T
+java:S1874œ"1Remove this use of "getString"; it is deprecated.(±‰…ºıÿÿÿÿ8Î„ÛÙğ.
+o	java:S1161"SRename this field "adhoc_cb" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ü»ÎÒ8Î„ÛÙğ.
+X
+java:S2696x"6Make the enclosing method "static" or remove this set.(„êÍÏûÿÿÿÿ8Î„ÛÙğ.
+B
+java:S16591"%Declare "tkip_cb" on a separate line.(Ü»ÎÒ8Î„ÛÙğ.
+g
+java:S18747"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(«ÃÀ÷8Î„ÛÙğ.
+T
+java:S2696¬"6Make the enclosing method "static" or remove this set.(ÏˆÄğ8Î„ÛÙğ.
+O
+java:S1874›"1Remove this use of "getString"; it is deprecated.(››üÈ8Î„ÛÙğ.
+Y
+java:S2696­"6Make the enclosing method "static" or remove this set.(ïĞŞûÿÿÿÿ8Î„ÛÙğ.
+g
+java:S1874X"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(öÿÕÅ8Î„ÛÙğ.
+T
+java:S1874½"1Remove this use of "getString"; it is deprecated.(‚¾äøÿÿÿÿ8Î„ÛÙğ.
+m	java:S1161"QRename this field "opn_cb" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ü»ÎÒ8Î„ÛÙğ.
+q	java:S1161"URename this field "managed_cb" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ü»ÎÒ8Î„ÛÙğ.
+>
+java:S16594"!Declare "wep" on a separate line.(´¡ß¼8Î„ÛÙğ.
+Y
+java:S2696°"6Make the enclosing method "static" or remove this set.(ÔôòŞûÿÿÿÿ8Î„ÛÙğ.
+X
+java:S2696z"6Make the enclosing method "static" or remove this set.(ïĞŞûÿÿÿÿ8Î„ÛÙğ.
+X
+java:S2696a"6Make the enclosing method "static" or remove this set.(ÜÉ÷Ğşÿÿÿÿ8Î„ÛÙğ.
+C
+java:S16591"&Declare "adhoc_cb" on a separate line.(Ü»ÎÒ8Î„ÛÙğ.
+m	java:S1161"QRename this field "wep_cb" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ü»ÎÒ8Î„ÛÙğ.
+@
+java:S16594"#Declare "adhoc" on a separate line.(´¡ß¼8Î„ÛÙğ.
+s
+java:S3008/"VRename this field "ados_switch" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ôèâú8Î„ÛÙğ.
+V
+java:S18748"9Remove this use of "setRetainInstance"; it is deprecated.(ø“®ô8Î„ÛÙğ.
+X
+java:S2696{"6Make the enclosing method "static" or remove this set.(¡ŠåÌşÿÿÿÿ8Î„ÛÙğ.
+R
+java:S1874,"0Remove this use of "Fragment"; it is deprecated.(¶ºÍüüÿÿÿÿ8Î„ÛÙğ.
+R
+java:S1874Y"0Remove this use of "onResume"; it is deprecated.(çóà±úÿÿÿÿ8Î„ÛÙğ.
+M
+java:S2696á"6Make the enclosing method "static" or remove this set.(›˜²Â
+X
+java:S2696C"6Make the enclosing method "static" or remove this set.(Ì¯¨²ıÿÿÿÿ8Î„ÛÙğ.
+M
+java:S1874Â"1Remove this use of "getString"; it is deprecated.(Ş“€ÿÿÿÿÿ
+t	java:S1162"XRename this field "select_button" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(•–í8Î„ÛÙğ.
+M
+java:S2696Ù"6Make the enclosing method "static" or remove this set.(÷´¶
+I
+java:S16593"'Declare "ssid_file" on a separate line.(¹·ß¥øÿÿÿÿ8Î„ÛÙğ.
+w
+java:S30083"URename this field "custom_mac" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¹·ß¥øÿÿÿÿ8Î„ÛÙğ.
+>
+java:S16594"!Declare "opn" on a separate line.(´¡ß¼8Î„ÛÙğ.
+S
+java:S2696y"6Make the enclosing method "static" or remove this set.(ÏˆÄğ8Î„ÛÙğ.

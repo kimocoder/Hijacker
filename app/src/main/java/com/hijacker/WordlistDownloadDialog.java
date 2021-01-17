@@ -25,7 +25,6 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.DownloadManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -37,7 +36,6 @@ import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -219,7 +217,7 @@ public class WordlistDownloadDialog extends DialogFragment{
             return wordlists.size();
         }
     }
-    private class Wordlist{
+    private static class Wordlist{
         final int size;
         final String filename;
         final String download_url;

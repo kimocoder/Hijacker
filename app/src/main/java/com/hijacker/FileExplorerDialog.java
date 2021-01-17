@@ -21,10 +21,8 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -32,7 +30,6 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import static com.hijacker.MainActivity.background;
