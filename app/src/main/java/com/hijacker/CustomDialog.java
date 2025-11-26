@@ -2,6 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
+    Copyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,12 +19,12 @@ package com.hijacker;
  */
 
 import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 
 import static com.hijacker.MainActivity.background;
 
@@ -32,51 +33,51 @@ public class CustomDialog extends DialogFragment {
     String positiveText, neutralText, negativeText;
     boolean cancelable = true;
     Runnable onPositiveClick, onNeutralClick, onNegativeClick;
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         setCancelable(cancelable);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        if(title!=null) builder.setTitle(title);
-        if(message!=null) builder.setMessage(message);
-        if(positiveText!=null){
-            builder.setPositiveButton(positiveText, new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int id){
-                    if(onPositiveClick!=null) onPositiveClick.run();
-                    synchronized(CustomDialog.this){
-                        CustomDialog.this.notify();
-                    }
-                }
-            });
-        }
+        AlertDialog.Builder builder = getBuilder();
         if(neutralText!=null){
-            builder.setNeutralButton(neutralText, new DialogInterface.OnClickListener(){
-                @Override
-                public void onClick(DialogInterface dialog, int which){
-                    if(onNeutralClick!=null) onNeutralClick.run();
-                    synchronized(CustomDialog.this){
-                        CustomDialog.this.notify();
-                    }
+            builder.setNeutralButton(neutralText, (dialog, which) -> {
+                if(onNeutralClick!=null) onNeutralClick.run();
+                synchronized(CustomDialog.this){
+                    CustomDialog.this.notify();
                 }
             });
         }
         if(negativeText!=null){
-            builder.setNegativeButton(negativeText, new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int id){
-                    if(onNegativeClick!=null) onNegativeClick.run();
-                    synchronized(CustomDialog.this){
-                        CustomDialog.this.notify();
-                    }
+            builder.setNegativeButton(negativeText, (dialog, id) -> {
+                if(onNegativeClick!=null) onNegativeClick.run();
+                synchronized(CustomDialog.this){
+                    CustomDialog.this.notify();
                 }
             });
         }
         return builder.create();
     }
+
+    private AlertDialog.Builder getBuilder() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        if(title!=null) builder.setTitle(title);
+        if(message!=null) builder.setMessage(message);
+        if(positiveText!=null){
+            builder.setPositiveButton(positiveText, (dialog, id) -> {
+                if(onPositiveClick!=null) onPositiveClick.run();
+                synchronized(CustomDialog.this){
+                    CustomDialog.this.notify();
+                }
+            });
+        }
+        return builder;
+    }
+
     @Override
-    public void show(FragmentManager fragmentManager, String tag){
+    public void show(@NonNull FragmentManager fragmentManager, String tag){
         if(!background) super.show(fragmentManager, tag);
     }
     @Override
-    public void onDismiss(DialogInterface dialogInterface){
+    public void onDismiss(@NonNull DialogInterface dialogInterface){
         super.onDismiss(dialogInterface);
 
         synchronized(this){
@@ -99,11 +100,7 @@ public class CustomDialog extends DialogFragment {
         this.onNegativeClick = runnable;
     }
     public void setCancelable(boolean cancelable){ this.cancelable = cancelable; }
-    public void _wait(){
-        try{
-            synchronized(this){
-                wait();
-            }
-        }catch(InterruptedException ignored){}
+    public void _wait() {
+        // No-op: avoid blocking the background setup thread. Dialogs are handled via callbacks.
     }
 }

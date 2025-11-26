@@ -2,6 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
+    Copyright (C) 2024  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,12 +21,12 @@ package com.hijacker;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
-import android.app.Fragment;
-import android.os.AsyncTask;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import android.os.Bundle;
 import com.google.android.material.snackbar.Snackbar;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +44,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static android.widget.Toast.LENGTH_SHORT;
 import static com.hijacker.AP.OPN;
@@ -68,14 +71,12 @@ import static com.hijacker.MainActivity.mFragmentManager;
 import static com.hijacker.MainActivity.monstart;
 import static com.hijacker.MainActivity.notification;
 import static com.hijacker.MainActivity.prefix;
-import static com.hijacker.MainActivity.progress;
 import static com.hijacker.MainActivity.reaver_dir;
 import static com.hijacker.MainActivity.runInHandler;
 import static com.hijacker.MainActivity.stop;
 
 public class ReaverFragment extends Fragment{
     static ReaverTask task;
-
     View fragmentView, optionsContainer;
     Button start_button, select_button;
     TextView consoleView;
@@ -83,7 +84,6 @@ public class ReaverFragment extends Fragment{
     CheckBox pixie_dust_cb, ignored_locked_cb, eap_fail_cb, small_dh_cb, no_nack_cb;
     ScrollView consoleScrollView;
     boolean autostart = false;
-
     //Dimensions to restore animated views
     int normalOptHeight = -1;
     //User options
@@ -91,9 +91,8 @@ public class ReaverFragment extends Fragment{
     static boolean pixie_dust_enabled = true, pixie_dust, ignore_locked, eap_fail, small_dh, no_nack;
     static AP ap = null;
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         fragmentView = inflater.inflate(R.layout.reaver_fragment, container, false);
-        setRetainInstance(true);
 
         optionsContainer = fragmentView.findViewById(R.id.options_container);
         consoleView = fragmentView.findViewById(R.id.console);
@@ -108,15 +107,12 @@ public class ReaverFragment extends Fragment{
         select_button = fragmentView.findViewById(R.id.select_ap);
         start_button = fragmentView.findViewById(R.id.start_button);
 
-        pinDelayView.setOnEditorActionListener(new TextView.OnEditorActionListener(){
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event){
-                if(actionId == EditorInfo.IME_ACTION_NEXT){
-                    lockedDelayView.requestFocus();
-                    return true;
-                }
-                return false;
+        pinDelayView.setOnEditorActionListener((v, actionId, event) -> {
+            if(actionId == EditorInfo.IME_ACTION_NEXT){
+                lockedDelayView.requestFocus();
+                return true;
             }
+            return false;
         });
 
         if(task==null) task = new ReaverTask();
@@ -133,61 +129,53 @@ public class ReaverFragment extends Fragment{
             pixie_dust_enabled = true;
         }
 
-        select_button.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                PopupMenu popup = new PopupMenu(getActivity(), view);
+        select_button.setOnClickListener(view -> {
+            PopupMenu popup = new PopupMenu(getActivity(), view);
 
-                popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
-                int i = 0;
-                for(AP ap : AP.APs){
-                    popup.getMenu().add(0, i, i, ap.toString());
-                    if(ap.sec==UNKNOWN  || ap.sec==OPN){
-                        popup.getMenu().getItem(i).setEnabled(false);
-                    }
-                    i++;
+            popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
+            int i = 0;
+            for(AP ap : AP.APs){
+                popup.getMenu().add(0, i, i, ap.toString());
+                if(ap.sec==UNKNOWN  || ap.sec==OPN){
+                    popup.getMenu().getItem(i).setEnabled(false);
                 }
-                popup.getMenu().add(1, i, i, "Custom");
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    public boolean onMenuItemClick(android.view.MenuItem item) {
-                        //ItemId = i in for()
-                        if(item.getGroupId()==0){
-                            custom_mac = null;
-                            AP temp = AP.APs.get(item.getItemId());
-                            if(ap!=temp){
-                                ap = temp;
-                            }
-                            select_button.setText(ap.toString());
-                        }else{
-                            //Clcked custom
-                            final EditTextDialog dialog = new EditTextDialog();
-                            dialog.setTitle(getString(R.string.custom_ap_title));
-                            dialog.setHint(getString(R.string.mac_address));
-                            dialog.setRunnable(new Runnable(){
-                                @Override
-                                public void run(){
-                                    ap = null;
-                                    custom_mac = dialog.result;
-                                    select_button.setText(dialog.result);
-                                }
-                            });
-                            dialog.show(mFragmentManager, "EditTextDialog");
-                        }
-                        return true;
-                    }
-                });
-                popup.show();
+                i++;
             }
-        });
-        start_button.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                if(task.getStatus()!=AsyncTask.Status.RUNNING){
-                    attemptStart();
+            popup.getMenu().add(1, i, i, "Custom");
+            popup.setOnMenuItemClickListener(item -> {
+                //ItemId = i in for()
+                if(item.getGroupId()==0){
+                    custom_mac = null;
+                    AP temp = AP.APs.get(item.getItemId());
+                    if(ap!=temp){
+                        ap = temp;
+                    }
+                    select_button.setText(ap.toString());
                 }else{
-                    stop(PROCESS_REAVER);
-                    task.cancel(true);
+                    //Clcked custom
+                    final EditTextDialog dialog = new EditTextDialog();
+                    dialog.setTitle(getString(R.string.custom_ap_title));
+                    dialog.setHint(getString(R.string.mac_address));
+                    dialog.setRunnable(new Runnable(){
+                        @Override
+                        public void run(){
+                            ap = null;
+                            custom_mac = dialog.result;
+                            select_button.setText(dialog.result);
+                        }
+                    });
+                    dialog.show(mFragmentManager, "EditTextDialog");
                 }
+                return true;
+            });
+            popup.show();
+        });
+        start_button.setOnClickListener(view -> {
+            if(!task.isRunning()){
+                attemptStart();
+            }else{
+                stop(PROCESS_REAVER);
+                task.cancel(true);
             }
         });
 
@@ -200,28 +188,28 @@ public class ReaverFragment extends Fragment{
         if(ap==null && custom_mac==null){
             Snackbar.make(fragmentView, getString(R.string.select_ap), Snackbar.LENGTH_LONG).show();
         }else{
-            if(pinDelayView.getText().toString().equals("")){
+            if(pinDelayView.getText().toString().isEmpty()){
                 pinDelayView.setError(getString(R.string.field_required));
                 pinDelayView.requestFocus();
                 return;
             }
-            if(lockedDelayView.getText().toString().equals("")){
+            if(lockedDelayView.getText().toString().isEmpty()){
                 lockedDelayView.setError(getString(R.string.field_required));
                 lockedDelayView.requestFocus();
                 return;
             }
 
             task = new ReaverTask();
-            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            task.start();
         }
     }
-    ReaverFragment setAutostart(boolean autostart){
-        this.autostart = autostart;
+    ReaverFragment setAutostart(){
+        this.autostart = true;
         return this;
     }
     static boolean isRunning(){
         if(task==null) return false;
-        return task.getStatus()==AsyncTask.Status.RUNNING;
+        return task.isRunning();
     }
     static void stopReaver(){
         //Does NOT completely stop reaver, only the app's task
@@ -234,16 +222,11 @@ public class ReaverFragment extends Fragment{
     public void onResume() {
         super.onResume();
         currentFragment = FRAGMENT_REAVER;
-        ((MainActivity)getActivity()).refreshDrawer();
+        ((MainActivity) requireActivity()).refreshDrawer();
 
         //Console text is saved/restored on pause/resume
         consoleView.setText(console_text);
-        consoleView.post(new Runnable() {
-            @Override
-            public void run() {
-                consoleScrollView.fullScroll(View.FOCUS_DOWN);
-            }
-        });
+        consoleView.post(() -> consoleScrollView.fullScroll(View.FOCUS_DOWN));
     }
     @Override
     public void onPause(){
@@ -274,7 +257,7 @@ public class ReaverFragment extends Fragment{
         start_button.setText(isRunning() ? R.string.stop : R.string.start);
 
         //Restore animated views
-        if(task.getStatus()==AsyncTask.Status.RUNNING){
+        if(task.isRunning()){
             ViewGroup.LayoutParams layoutParams = optionsContainer.getLayoutParams();
             layoutParams.height = 0;
             optionsContainer.setLayoutParams(layoutParams);
@@ -287,12 +270,7 @@ public class ReaverFragment extends Fragment{
         }
 
         if(autostart){
-            optionsContainer.post(new Runnable(){
-                @Override
-                public void run(){
-                    attemptStart();
-                }
-            });
+            optionsContainer.post(this::attemptStart);
             autostart = false;
         }
     }
@@ -337,14 +315,9 @@ public class ReaverFragment extends Fragment{
             ENV_OUT.append("source monstart-nh");
             ENV_OUT.append(cont_on_fail ? "; " : " && ");
         }
-        if(!custom_chroot_cmd.equals("")){
+        if(!custom_chroot_cmd.isEmpty()){
             if(custom_chroot_cmd.contains("'") && activity!=null){
-                runInHandler(new Runnable(){
-                    @Override
-                    public void run(){
-                        Toast.makeText(activity, activity.getString(R.string.custom_chroot_cmd_illegal), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                runInHandler(() -> Toast.makeText(activity, activity.getString(R.string.custom_chroot_cmd_illegal), Toast.LENGTH_SHORT).show());
             }else{
                 ENV_OUT.append(custom_chroot_cmd);
                 ENV_OUT.append(cont_on_fail ? "; " : " && ");
@@ -352,12 +325,14 @@ public class ReaverFragment extends Fragment{
         }
         return ENV_OUT.toString();
     }
-    class ReaverTask extends AsyncTask<Void, String, Boolean>{
+    class ReaverTask {
         String pinDelay, lockedDelay;
         boolean ignoreLocked, eapFail, smallDH, pixieDust, noNack;
         ValueAnimator sizeAnimator;
-        @Override
-        protected void onPreExecute(){
+        private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "ReaverTaskThread"));
+        private volatile boolean cancelled = false;
+
+        void preExecute(){
             pinDelay = pinDelayView.getText().toString();
             lockedDelay = lockedDelayView.getText().toString();
             ignoreLocked = ignored_locked_cb.isChecked();
@@ -367,25 +342,35 @@ public class ReaverFragment extends Fragment{
             noNack = no_nack_cb.isChecked();
 
             start_button.setText(R.string.stop);
-            progress.setIndeterminate(true);
+            MainActivity.setProgressIndeterminate(true);
 
             normalOptHeight = optionsContainer.getHeight();
 
             sizeAnimator = ValueAnimator.ofInt(optionsContainer.getHeight(), 0);
             sizeAnimator.setTarget(optionsContainer);
-            sizeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener(){
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation){
-                    ViewGroup.LayoutParams layoutParams = optionsContainer.getLayoutParams();
-                    layoutParams.height = (int)animation.getAnimatedValue();
-                    optionsContainer.setLayoutParams(layoutParams);
-                }
+            sizeAnimator.addUpdateListener(animation -> {
+                ViewGroup.LayoutParams layoutParams = optionsContainer.getLayoutParams();
+                layoutParams.height = (int)animation.getAnimatedValue();
+                optionsContainer.setLayoutParams(layoutParams);
             });
             sizeAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
             sizeAnimator.start();
         }
-        @Override
-        protected Boolean doInBackground(Void... params){
+
+        void start(){
+            executor.submit(() -> {
+                preExecute();
+                Boolean result = doInBackground();
+                if(cancelled) postCancel(); else postDone();
+                return null;
+            });
+        }
+
+        void cancel(boolean mayInterrupt){
+            cancelled = true;
+        }
+
+        Boolean doInBackground(){
             last_action = System.currentTimeMillis();
             stop(PROCESS_AIRODUMP);            //Can't have channels changing from anywhere else
             try{
@@ -400,14 +385,14 @@ public class ReaverFragment extends Fragment{
                 if(noNack) args += " -N";
                 String cmd;
                 if(pixieDust){
-                    publishProgress(getString(R.string.chroot_warning));
+                    postProgress(getString(R.string.chroot_warning));
                     if(bootkali_init_bin.equals(NETHUNTER_BOOTKALI_BASH)){
                         //Not in nethunter, need to initialize the chroot environment
                         Runtime.getRuntime().exec("su -c " + bootkali_init_bin);       //Make sure kali has booted
                     }
                     args += " -K 1";
-                    cmd = "chroot " + MainActivity.chroot_dir + " /bin/bash -c \'" + get_chroot_env(getActivity()) + "reaver " + args + "\'";
-                    publishProgress("\nRunning: " + cmd);
+                    cmd = "chroot " + MainActivity.chroot_dir + " /bin/bash -c '" + get_chroot_env(getActivity()) + "reaver " + args + "'";
+                    postProgress("\nRunning: " + cmd);
                     ProcessBuilder pb = new ProcessBuilder("su");
                     pb.redirectErrorStream(true);
                     Process dc = pb.start();
@@ -417,7 +402,7 @@ public class ReaverFragment extends Fragment{
                     in.flush();
                 }else{
                     cmd = "su -c " + prefix + " " + reaver_dir + " " + args;
-                    publishProgress("\nRunning: " + cmd);
+                    postProgress("\nRunning: " + cmd);
                     Process dc = Runtime.getRuntime().exec(cmd);
                     out = new BufferedReader(new InputStreamReader(dc.getInputStream()));
                 }
@@ -425,65 +410,72 @@ public class ReaverFragment extends Fragment{
                 last_reaver = cmd;
 
                 String buffer;
-                while(!isCancelled() && (buffer = out.readLine())!=null){
-                    publishProgress(buffer);
+                while(!cancelled && (buffer = out.readLine())!=null){
+                    postProgress(buffer);
                 }
-                publishProgress("Done");
+                postProgress("Done");
             }catch(IOException e){
                 Log.e("HIJACKER/Exception", "Caught Exception in ReaverFragment: " + e.toString());
             }
 
             return true;
         }
-        @Override
-        protected void onProgressUpdate(String... text){
-            text[0] += '\n';
-            if(currentFragment==FRAGMENT_REAVER && !background){
-                consoleView.append(text[0]);
-                consoleScrollView.fullScroll(View.FOCUS_DOWN);
-            }else{
-                console_text += text[0];
-            }
+
+        void postProgress(String... text){
+            String s = text[0] + '\n';
+            runInHandler(() -> {
+                if(currentFragment==FRAGMENT_REAVER && !background){
+                    consoleView.append(s);
+                    consoleScrollView.fullScroll(View.FOCUS_DOWN);
+                }else{
+                    console_text += s;
+                }
+            });
         }
-        @Override
-        protected void onPostExecute(final Boolean success){
-            done();
+
+        void postDone(){
+            runInHandler(this::done);
         }
-        @Override
-        protected void onCancelled(){
-            done();
+        void postCancel(){
+            runInHandler(this::done);
         }
+
         void done(){
             start_button.setText(R.string.start);
-            progress.setIndeterminate(false);
+            MainActivity.setProgressIndeterminate(false);
 
             sizeAnimator = ValueAnimator.ofInt(0, normalOptHeight);
             sizeAnimator.setTarget(optionsContainer);
-            sizeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener(){
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation){
-                    ViewGroup.LayoutParams layoutparams = optionsContainer.getLayoutParams();
-                    layoutparams.height = (int)animation.getAnimatedValue();
-                    optionsContainer.setLayoutParams(layoutparams);
-                }
+            sizeAnimator.addUpdateListener(animation -> {
+                ViewGroup.LayoutParams layoutparams = optionsContainer.getLayoutParams();
+                layoutparams.height = (int)animation.getAnimatedValue();
+                optionsContainer.setLayoutParams(layoutparams);
             });
             sizeAnimator.addListener(new Animator.AnimatorListener() {
                 @Override
-                public void onAnimationStart(Animator animation){}
+                public void onAnimationStart(@NonNull Animator animation){}
                 @Override
-                public void onAnimationEnd(Animator animation){
+                public void onAnimationEnd(@NonNull Animator animation){
                     consoleScrollView.fullScroll(View.FOCUS_DOWN);
                 }
                 @Override
-                public void onAnimationCancel(Animator animation){}
+                public void onAnimationCancel(@NonNull Animator animation){}
                 @Override
-                public void onAnimationRepeat(Animator animation){}
+                public void onAnimationRepeat(@NonNull Animator animation){}
             });
             sizeAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
             sizeAnimator.start();
 
             notification();
         }
+
+        int getStatus(){
+            // Deprecated-style status kept for compatibility; 1 means running.
+            return cancelled ? 0 : 1;
+        }
+
+        boolean isRunning() {
+            return !cancelled;
+        }
     }
 }
-

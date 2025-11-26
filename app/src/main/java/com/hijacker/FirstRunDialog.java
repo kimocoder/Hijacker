@@ -2,6 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
+    Copyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,43 +19,36 @@ package com.hijacker;
  */
 
 import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import android.view.View;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 import android.widget.Button;
 
 import static com.hijacker.MainActivity.isArchValid;
 import static com.hijacker.MainActivity.background;
 
 public class FirstRunDialog extends DialogFragment {
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         setCancelable(false);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         builder.setMessage(R.string.first_run);
         builder.setTitle(R.string.first_run_title);
-        builder.setPositiveButton(R.string.install_firmware, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {}
+        builder.setPositiveButton(R.string.install_firmware, (dialog, id) -> {});
+        builder.setNegativeButton(R.string.home, (dialog, id) -> {
+            // Go to Home
+            dismissAllowingStateLoss();
         });
-        builder.setNegativeButton(R.string.home, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                // Go to Home
-                dismissAllowingStateLoss();
-            }
-        });
-        builder.setNeutralButton(R.string.exit, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                getActivity().finish();
-            }
-        });
+        builder.setNeutralButton(R.string.exit, (dialog, which) -> requireActivity().finish());
         return builder.create();
     }
     @Override
-    public void show(FragmentManager fragmentManager, String tag){
+    public void show(@NonNull FragmentManager fragmentManager, String tag){
         if(!background) super.show(fragmentManager, tag);
     }
     @Override
@@ -68,29 +62,22 @@ public class FirstRunDialog extends DialogFragment {
         if(!isArchValid()){
             positiveButton.setEnabled(false);
         }else{
-            positiveButton.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v){
-                    // Open InstallFirmwareDialog to install Nexmon
-                    new InstallFirmwareDialog().show(getFragmentManager(), "InstallFirmwareDialog");
-                }
+            positiveButton.setOnClickListener(v -> {
+                // Open InstallFirmwareDialog to install Nexmon
+                new InstallFirmwareDialog().show(requireActivity().getSupportFragmentManager(), "InstallFirmwareDialog");
             });
         }
     }
     @Override
-    public void onDismiss(DialogInterface dialogInterface){
+    public void onDismiss(@NonNull DialogInterface dialogInterface) {
         super.onDismiss(dialogInterface);
 
-        synchronized(this){
+        synchronized(this) {
             notify();
         }
     }
 
-    public void _wait(){
-        try{
-            synchronized(this){
-                wait();
-            }
-        }catch(InterruptedException ignored){}
+    public void _wait() {
+        // No-op: do not block the setup thread. Continue setup and handle actions via callbacks.
     }
 }

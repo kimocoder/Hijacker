@@ -30,6 +30,7 @@
     <string name="select">Select</string>
     <string name="download">Download</string>
     <string name="size">Size</string>
+    <string name="size_kb_format">%1$s: %2$dKB</string>
     <string name="no_internet">No internet connection</string>
     <string name="unknown_error">An unknown error occurred</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>
@@ -49,6 +50,7 @@
     <string name="mac">MAC:</string>
     <string name="channel">Channel:</string>
     <string name="power">Power:</string>
+    <string name="power_value">-%1$d</string>
     <string name="enc">Encryption:</string>
     <string name="auth">Authentication:</string>
     <string name="cipher">Cipher:</string>
@@ -128,6 +130,7 @@
     <string name="export">Export</string>
     <string name="export_title">Export…</string>
     <string name="output_file_title">Output file</string>
+    <string name="output_file_template">%1$s/output.txt</string>
     <string name="visible">Visible</string>
     <string name="output_file_exists">File already exists. Long click to overwrite.</string>
     <string name="output_file_cant_write">Can\'t write to that file</string>
@@ -191,7 +194,10 @@
     <string name="stop">Stop</string>
     <string name="disconnect_all">Disconnect All</string>
     <string name="dos">DoS</string>
-
+    <!-- IsolatedFragment formatted strings (use placeholders instead of concatenation) -->
+    <string name="isolated_sec1">Enc: %1$s | Auth: %2$s | Cipher: %3$s</string>
+    <string name="isolated_numbers">B: %1$d | D: %2$d | #s: %3$d</string>
+    <string name="isolated_sec2">PWR: %1$d | Channel: %2$d</string>
     <!-- Main -->
     <string name="cap_notfound">cap file not found</string>
     <string name="disconnect_started">Disconnect All started</string>

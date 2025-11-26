@@ -2,6 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
+    Copyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,29 +18,20 @@ package com.hijacker;
     along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-import android.os.FileObserver;
 import android.util.Log;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import static com.hijacker.AP.getAPByMac;
 import static com.hijacker.MainActivity.BAND_2;
 import static com.hijacker.MainActivity.BAND_5;
 import static com.hijacker.MainActivity.BAND_BOTH;
-import static com.hijacker.MainActivity.MAX_READLINE_SIZE;
 import static com.hijacker.MainActivity.airodump_dir;
 import static com.hijacker.MainActivity.always_cap;
 import static com.hijacker.MainActivity.band;
 import static com.hijacker.MainActivity.busybox;
-import static com.hijacker.MainActivity.cap_path;
 import static com.hijacker.MainActivity.cap_tmp_path;
 import static com.hijacker.MainActivity.debug;
 import static com.hijacker.MainActivity.enable_monMode;
@@ -59,11 +51,13 @@ import static com.hijacker.Shell.runOne;
 
 class Airodump{
     static final String TAG = "HIJACKER/Airodump";
+    // Tracks whether airodump explicitly toggled the driver con_mode to monitor (1)
+    private static boolean conModeToggled = false;
     private static int channel = 0;
     private static boolean forWPA = false, forWEP = false, running = false;
     private static String mac = null;
-    private static String capFile = null;
-    static CapFileObserver capFileObserver = null;
+    static String capFile = null;
+    static AirodumpCapFileObserver capFileObserver = null;
 
     static void reset(){
         stop();
@@ -80,14 +74,14 @@ class Airodump{
         }
         channel = ch;
     }
-    static void setMac(String new_mac){
+    static void setMac(String new_mac) {
         if(isRunning()){
             Log.e(TAG, "Can't change settings while airodump is running");
             throw new IllegalStateException("Airodump is still running");
         }
         mac = new_mac;
     }
-    static void setForWPA(boolean bool){
+    static void setForWPA() {
         if(isRunning()){
             Log.e(TAG, "Can't change settings while airodump is running");
             throw new IllegalStateException("Airodump is still running");
@@ -96,9 +90,9 @@ class Airodump{
             Log.e(TAG, "Can't set forWPA when forWEP is enabled");
             throw new IllegalStateException("Tried to set forWPA when forWEP is enabled");
         }
-        forWPA = bool;
+        forWPA = true;
     }
-    static void setForWEP(boolean bool){
+    static void setForWEP() {
         if(isRunning()){
             Log.e(TAG, "Can't change setting while airodump is running");
             throw new IllegalStateException("Airodump is still running");
@@ -107,7 +101,7 @@ class Airodump{
             Log.e(TAG, "Can't set forWEP when forWPA is enabled");
             throw new IllegalStateException("Tried to set forWEP when forWPA is enabled");
         }
-        forWEP = bool;
+        forWEP = true;
     }
     static void setAP(AP ap){
         if(isRunning()){
@@ -120,7 +114,7 @@ class Airodump{
     static int getChannel(){ return channel; }
     static String getMac(){ return mac; }
     static String getCapFile(){
-        while(!capFileObserver.found_cap_file() && writingToFile()){}
+        while(capFileObserver == null || (!capFileObserver.found_cap_file() && writingToFile())){}
         return capFile;
     }
     static boolean writingToFile(){ return (forWEP || forWPA || always_cap) && isRunning(); }
@@ -140,6 +134,101 @@ class Airodump{
     }
     static void start(){
         // Construct the command
+        String cmd = getString();
+
+        // Always log key runtime settings to help debugging when 'debug' flag may be off
+        Log.d(TAG, "start(): enable_on_airodump=" + enable_on_airodump + " iface='" + iface + "' prefix='" + prefix + "'");
+
+        // Force monitor mode attempt regardless of preference (for diagnostics/testing)
+        Log.w(TAG, "Forcing con_mode probe/write regardless of enable_on_airodump preference");
+
+        try{
+            if(iface!=null && iface.startsWith("wlan0")){
+                Shell probeShell = getFreeShell();
+                Log.d(TAG, "Probing for /sys/module/wlan/parameters/con_mode (iface='" + iface + "')");
+                probeShell.run("if [ -e /sys/module/wlan/parameters/con_mode ]; then echo EXISTS; else echo NO; fi; echo ENDCHK");
+                String probeResult = MainActivity.getLastLine(probeShell.getShell_out(), "ENDCHK");
+                probeShell.done();
+                Log.d(TAG, "Probe result: '" + probeResult + "'");
+                if(probeResult != null && "EXISTS".equals(probeResult.trim())){
+                    Log.d(TAG, "con_mode found, attempting direct su -c write to enable monitor via sysfs (iface='" + iface + "')");
+                    try{
+                        String suWrite = "ip link set " + iface + " down; sh -c 'echo 4 > /sys/module/wlan/parameters/con_mode' 2>&1; cat /sys/module/wlan/parameters/con_mode; ip link set " + iface + " up";
+                        String out = runSuAndCapture(suWrite);
+                        Log.d(TAG, "Direct su write output: '" + out + "'");
+                        String verifyVal = null;
+                        if(out!=null){
+                            String[] lines = out.split("\\r?\\n");
+                            for(int i=lines.length-1;i>=0;i--){
+                                String l = lines[i].trim();
+                                if(!l.isEmpty()){ verifyVal = l; break; }
+                            }
+                        }
+
+                        if(verifyVal==null || !"4".equals(verifyVal.trim())){
+                            if(busybox!=null && !busybox.isEmpty()){
+                                String suBusy = "ip link set " + iface + " down; echo 4 | " + busybox + " tee /sys/module/wlan/parameters/con_mode 2>&1; cat /sys/module/wlan/parameters/con_mode; ip link set " + iface + " up";
+                                String out2 = runSuAndCapture(suBusy);
+                                Log.d(TAG, "Direct busybox write output: '" + out2 + "'");
+                                if(out2!=null){
+                                    String[] lines = out2.split("\\r?\\n");
+                                    for(int i=lines.length-1;i>=0;i--){
+                                        String l = lines[i].trim();
+                                        if(!l.isEmpty()){ verifyVal = l; break; }
+                                    }
+                                }
+                            }
+                        }
+
+                        if(verifyVal != null && verifyVal.trim().matches("\\d+") && !"0".equals(verifyVal.trim())){
+                            conModeToggled = true;
+                            Log.d(TAG, "conModeToggled set to true (verified via direct su), con_mode='" + verifyVal.trim() + "'");
+                        }else{
+                            Log.e(TAG, "Direct su writes failed to set con_mode (value='" + verifyVal + "'), falling back to enable_monMode");
+                            runOne(enable_monMode);
+                        }
+                    }catch(Exception w){
+                        Log.e(TAG, "Direct su -c attempt failed: " + w);
+                        runOne(enable_monMode);
+                    }
+                }else{
+                    Log.d(TAG, "con_mode not present, falling back to enable_monMode");
+                    runOne(enable_monMode);
+                }
+            }else{
+                runOne(enable_monMode);
+            }
+        }catch(Exception e){
+            Log.e(TAG, "Failed to probe/enable sysfs monitor mode: " + e);
+            runOne(enable_monMode);
+        }
+
+        capFile = null;
+        running = true;
+        if(capFileObserver==null) capFileObserver = new AirodumpCapFileObserver(cap_tmp_path, 0);
+        capFileObserver.startWatching();
+
+        if(debug) Log.d("HIJACKER/Airodump.start", cmd);
+        try{
+            Runtime.getRuntime().exec(cmd);
+            last_action = System.currentTimeMillis();
+            last_airodump = cmd;
+        }catch(IOException e){
+            e.printStackTrace();
+            Log.e("HIJACKER/Exception", "Caught Exception in Airodump.start() read thread: " + e);
+        }
+
+        runInHandler(() -> {
+            if(menu!=null){
+                menu.getItem(1).setIcon(R.drawable.stop_drawable);
+                menu.getItem(1).setTitle(R.string.stop);
+            }
+            refreshState();
+            notification();
+        });
+    }
+
+    private static String getString() {
         String cmd = "su -c " + prefix + " " + airodump_dir + " --update 9999999 --write-interval 1 --band ";
 
         if(band==BAND_5 || band==BAND_BOTH || channel>20) cmd += "a";
@@ -152,73 +241,101 @@ class Airodump{
         else if(always_cap) cmd += "/cap  --output-format pcap,csv ";
         else cmd += "/cap  --output-format csv ";
 
-        // If we are starting for WEP capture, capture only IVs
         if(forWEP) cmd += "--ivs ";
 
-        // If we have a valid channel, select it (airodump does not recognize 5ghz channels here)
         if(channel>0 && channel<20) cmd += "--channel " + channel + " ";
 
-        // If we have a specific MAC, listen for it
         if(mac!=null) cmd += "--bssid " + mac + " ";
 
         cmd += iface;
-
-        // Enable monitor mode
-        if(enable_on_airodump) runOne(enable_monMode);
-
-        // Stop any airodump instances
-        stop();
-
-        capFile = null;
-        running = true;
-        capFileObserver.startWatching();
-
-        if(debug) Log.d("HIJACKER/Airodump.start", cmd);
-        try{
-            Runtime.getRuntime().exec(cmd);
-            last_action = System.currentTimeMillis();
-            last_airodump = cmd;
-        }catch(IOException e){
-            e.printStackTrace();
-            Log.e("HIJACKER/Exception", "Caught Exception in Airodump.start() read thread: " + e.toString());
-        }
-
-        runInHandler(new Runnable(){
-            @Override
-            public void run(){
-                if(menu!=null){
-                    menu.getItem(1).setIcon(R.drawable.stop_drawable);
-                    menu.getItem(1).setTitle(R.string.stop);
-                }
-                refreshState();
-                notification();
-            }
-        });
+        return cmd;
     }
+
     static void stop(){
         last_action = System.currentTimeMillis();
         running = false;
-        capFileObserver.stopWatching();
-        runInHandler(new Runnable(){
-            @Override
-            public void run(){
-                if(menu!=null){
-                    menu.getItem(1).setIcon(R.drawable.start_drawable);
-                    menu.getItem(1).setTitle(R.string.start);
-                }
+        if(capFileObserver!=null) capFileObserver.stopWatching();
+        runInHandler(() -> {
+            if(menu!=null){
+                menu.getItem(1).setIcon(R.drawable.start_drawable);
+                menu.getItem(1).setTitle(R.string.start);
             }
         });
         stopWPA();
         runOne(busybox + " kill $(" + busybox + " pidof airodump-ng)");
+        try{
+            if(iface!=null && iface.startsWith("wlan0")){
+                Shell probeShell = getFreeShell();
+                probeShell.run("if [ -e /sys/module/wlan/parameters/con_mode ]; then echo EXISTS; else echo NO; fi; echo ENDCHK");
+                String probeResult = MainActivity.getLastLine(probeShell.getShell_out(), "ENDCHK");
+                probeShell.done();
+                if(probeResult != null && "EXISTS".equals(probeResult.trim())){
+                    boolean shouldReset = conModeToggled;
+                    if(!shouldReset){
+                        Shell checkShell = getFreeShell();
+                        Log.d(TAG, "Checking current con_mode value");
+                        checkShell.run("cat /sys/module/wlan/parameters/con_mode; echo ENDCHK");
+                        String val = MainActivity.getLastLine(checkShell.getShell_out(), "ENDCHK");
+                        checkShell.done();
+                        Log.d(TAG, "Current con_mode value: '" + val + "'");
+                        if(val != null && val.trim().matches("\\d+") && !"0".equals(val.trim())) shouldReset = true;
+                    }
+                    if(shouldReset){
+                        Log.d(TAG, "Resetting monitor mode via sysfs for wlan0 (shouldReset=" + shouldReset + ")");
+                        try{
+                            String suReset = "ip link set " + iface + " down; sh -c 'echo 0 > /sys/module/wlan/parameters/con_mode' 2>&1; cat /sys/module/wlan/parameters/con_mode; ip link set " + iface + " up";
+                            String outR = runSuAndCapture(suReset);
+                            if(debug) Log.d(TAG, "Direct su reset output: '" + outR + "'");
+                            String verifyValR = null;
+                            if(outR!=null){
+                                String[] lines = outR.split("\\r?\\n");
+                                for(int i=lines.length-1;i>=0;i--){
+                                    String l = lines[i].trim();
+                                    if(!l.isEmpty()){ verifyValR = l; break; }
+                                }
+                            }
+
+                            if(verifyValR==null || !"0".equals(verifyValR.trim())){
+                                if(busybox!=null && !busybox.isEmpty()){
+                                    String suBusyR = "ip link set " + iface + " down; echo 0 | " + busybox + " tee /sys/module/wlan/parameters/con_mode 2>&1; cat /sys/module/wlan/parameters/con_mode; ip link set " + iface + " up";
+                                    String outR2 = runSuAndCapture(suBusyR);
+                                    if(debug) Log.d(TAG, "Direct busybox reset output: '" + outR2 + "'");
+                                    if(outR2!=null){
+                                        String[] lines = outR2.split("\\r?\\n");
+                                        for(int i=lines.length-1;i>=0;i--){
+                                            String l = lines[i].trim();
+                                            if(!l.isEmpty()){ verifyValR = l; break; }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if(verifyValR != null && "0".equals(verifyValR.trim())){
+                                conModeToggled = false;
+                                try{
+                                    String wifiOut = runSuAndCapture("svc wifi enable; sleep 2; echo WIFI_DONE");
+                                    Log.d(TAG, "svc wifi enable output: '" + wifiOut + "'");
+                                }catch(Exception ex){
+                                    Log.e(TAG, "Failed to run 'svc wifi enable': " + ex);
+                                }
+                            }else{
+                                Log.e(TAG, "Failed to reset con_mode to 0 (value='" + verifyValR + "')");
+                            }
+                        }catch(Exception w){
+                            Log.e(TAG, "Failed to reset con_mode via direct su: " + w);
+                        }
+                    }
+                }
+            }
+        }catch(Exception e){
+            Log.e(TAG, "Failed to probe/reset con_mode: " + e);
+        }
         AP.saveAll();
         ST.saveAll();
 
-        runInHandler(new Runnable(){
-            @Override
-            public void run(){
-                refreshState();
-                notification();
-            }
+        runInHandler(() -> {
+            refreshState();
+            notification();
         });
     }
     static boolean isRunning(){
@@ -255,7 +372,7 @@ class Airodump{
             for(i=123; i<buffer.length(); i++){
                 if(buffer.charAt(i)==' ' && buffer.charAt(i+1)==' '){
                     for(j=i;j<buffer.length();j++){
-                        buffer = buffer.substring(0, 123) + buffer.substring(124, buffer.length());
+                        buffer = buffer.substring(0, 123) + buffer.substring(124);
                     }
                     i--;
                 }
@@ -310,161 +427,45 @@ class Airodump{
         }
     }
 
-    static class CapFileObserver extends FileObserver{
-        static String TAG = "HIJACKER/CapFileObs";
-        String master_path;
-        Shell shell = null;
-        boolean found_cap_file = false;
-        public CapFileObserver(String path, int mask) {
-            super(path, mask);
-            master_path = path;
-        }
-        @Override
-        public void onEvent(int event, @Nullable String path){
-            if(path==null){
-                Log.e(TAG, "Received event " + event + " for null path");
-                return;
-            }
-            boolean isPcap = path.endsWith(".pcap");
+    // Run a single root command via su -c and capture stdout (returns combined stdout text)
+    private static String runSuAndCapture(String command){
+        try{
+            Process p = Runtime.getRuntime().exec(new String[]{"su","-c",command});
+            BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            StringBuilder sb = new StringBuilder();
 
-            switch(event){
-                case FileObserver.CREATE:
-                    // Airodump started, pcap or csv file was just created
+            // Start a waiter thread that blocks on p.waitFor(); we will poll that thread to implement a timeout
+            Thread waiter = new Thread(() -> {
+                try{ p.waitFor(); }catch(InterruptedException ignored){}
+            });
+            waiter.start();
 
-                    if(isPcap){
-                        capFile = master_path + '/' + path;
-                        found_cap_file = true;
+            long start = System.currentTimeMillis();
+            long timeoutMs = 3000;
+
+            // Poll for output and for process termination until timeout
+            while(System.currentTimeMillis() - start < timeoutMs){
+                try{
+                    while(r.ready()){
+                        String line = r.readLine();
+                        if(line==null) break;
+                        sb.append(line).append('\n');
                     }
-                    break;
+                }catch(IOException ignored){}
 
-                case FileObserver.MODIFY:
-                    // Airodump just updated pcap or csv
-                    if(!isPcap){
-                        readCsv(master_path + '/' + path, shell);
-                    }
-                    break;
+                if(!waiter.isAlive()) break;
 
-                default:
-                    // Unknown event received (should never happen)
-                    Log.e(TAG, "Unknown event received: " + event);
-                    Log.e(TAG, "for file " + path);
-                    break;
+                try{ Thread.sleep(50); }catch(InterruptedException ignored){}
             }
-        }
-        @Override
-        public void startWatching(){
-            super.startWatching();
-            shell = getFreeShell();
 
-            found_cap_file = false;
-        }
-        @Override
-        public void stopWatching(){
-            super.stopWatching();
+            try{ while(r.ready()){ String line = r.readLine(); if(line==null) break; sb.append(line).append('\n'); } }catch(IOException ignored){}
 
-            if(shell!=null) {
-                if (writingToFile()) {
-                    shell.run(busybox + " mv " + capFile + " " + cap_path + '/');
-                }
-                shell.run(busybox + " rm " + cap_tmp_path + "/*");
-                shell.done();
-                shell = null;
-            }
-        }
-        boolean found_cap_file(){
-            return found_cap_file;
-        }
-        void readCsv(String csv_path, @NonNull Shell shell){
-            shell.clearOutput();
-            shell.run(busybox + " cat " + csv_path + "; echo ENDOFCAT");
-            BufferedReader out = shell.getShell_out();
-            try {
+            if(waiter.isAlive()){ try{ p.destroy(); }catch(Exception ignored){} waiter.interrupt(); }
 
-                int type = 0;           // 0 = AP, 1 = ST
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                while(true){
-                    String line = out.readLine();
-                    Log.d(TAG, line);
-                    if(line.equals("ENDOFCAT"))
-                        break;
-
-                    if(line.equals(""))
-                        continue;
-                    if(line.startsWith("BSSID")) {
-                        type = 0;
-                        continue;
-                    }else if(line.startsWith("Station")) {
-                        type = 1;
-                        continue;
-                    }
-
-                    line = line.replace(", ", ",");
-                    String[] fields = line.split(",");
-                    Log.i(TAG, line);
-                    if(type == 0){
-                        // Parse AP
-                        // BSSID, First time seen, Last time seen, channel, Speed, Privacy,Cipher,
-                        // Authentication, Power, # beacons, # IVs (or data??), LAN IP, ID-length, ESSID, Key
-
-                        String bssid = fields[0];
-                        try {
-                            Date first_seen = sdf.parse(fields[1]);
-                            Date last_seen = sdf.parse(fields[2]);
-                        }catch(ParseException e){
-                            e.printStackTrace();
-                            Log.e(TAG, e.toString());
-                        }
-                        int ch = Integer.parseInt(fields[3].replace(" ", ""));
-                        int speed = Integer.parseInt(fields[4].replace(" ", ""));
-                        String enc = fields[5];
-                        String cipher = fields[6];
-                        String auth = fields[7];
-                        int pwr = Integer.parseInt(fields[8].replace(" ", ""));
-                        int beacons = Integer.parseInt(fields[9].replace(" ", ""));
-                        int data = Integer.parseInt(fields[10].replace(" ", ""));
-                        String lan_ip = fields[11].replace(" ", "");
-                        int id_length = Integer.parseInt(fields[12].replace(" ", ""));
-                        String essid = id_length > 0 ? fields[13] : null;
-
-                        String key = fields.length>14 ? fields[14] : null;
-
-                        addAP(essid, bssid, enc, cipher, auth, pwr, beacons, data, 0, ch);
-                    }else{
-                        // Parse ST
-                        //Station MAC, First time seen, Last time seen, Power, # packets, BSSID, Probed ESSIDs
-
-                        String mac = fields[0];
-                        try {
-                            Date first_seen = sdf.parse(fields[1]);
-                            Date last_seen = sdf.parse(fields[2]);
-                        }catch(ParseException e){
-                            e.printStackTrace();
-                            Log.e(TAG, e.toString());
-                        }
-                        int pwr = Integer.parseInt(fields[3].replace(" ", ""));
-                        int packets = Integer.parseInt(fields[4].replace(" ", ""));
-                        String bssid = fields[5];
-                        if(bssid.charAt(0)=='(') bssid = null;
-
-                        String probes = "";
-                        if(fields.length==7) {
-                            probes = fields[6];
-                        }else if(fields.length>7){
-                            // Multiple probes are separated by comma, so concatenate them
-                            probes = "";
-                            for(int i=6; i<fields.length; i++){
-                                probes += fields[i] + ", ";
-                            }
-                            probes = probes.substring(0, probes.length()-2);
-                        }
-
-                        addST(mac, bssid, probes, pwr, 0, packets);
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.e(TAG, e.toString());
-            }
+            return sb.toString();
+        }catch(Exception e){
+            Log.e(TAG, "runSuAndCapture exception: " + e);
+            return null;
         }
     }
 }

@@ -2,6 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
+    Copyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,34 +21,32 @@ package com.hijacker;
 import android.Manifest;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
-import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.app.DownloadManager;
+import androidx.fragment.app.DialogFragment;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
 import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.media.MediaScannerConnection;
 
 import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.lang.ref.WeakReference;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -58,66 +57,97 @@ public class WordlistDownloadDialog extends DialogFragment{
     View dialogView;
     ListView listView;
     ProgressBar progressBar;
-
-    LoadTask task;
+    ExecutorService executor;
     WordlistAdapter adapter;
     ArrayList<Wordlist> wordlists = new ArrayList<>();
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState){
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        dialogView = getActivity().getLayoutInflater().inflate(R.layout.wordlist_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        dialogView = requireActivity().getLayoutInflater().inflate(R.layout.wordlist_dialog, null);
 
         listView = dialogView.findViewById(R.id.wl_listview);
         progressBar = dialogView.findViewById(R.id.wl_pb);
 
         builder.setView(dialogView);
         builder.setTitle(R.string.wordlist_dialog_title);
-        builder.setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which){}
-        });
+        builder.setNeutralButton(R.string.cancel, (dialog, which) -> {});
 
         adapter = new WordlistAdapter();
         listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l){
-                beginDownload(wordlists.get(i));
-                dismissAllowingStateLoss();
-            }
+        listView.setOnItemClickListener((adapterView, view, i, l) -> {
+            beginDownload(wordlists.get(i));
+            dismissAllowingStateLoss();
         });
 
 
-        task = new LoadTask();
-        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        // start background loader using an executor to avoid AsyncTask deprecation and leaks
+        executor = Executors.newSingleThreadExecutor();
+        executor.submit(new LoadTaskRunnable(this));
 
         return builder.create();
     }
+    @Override
+    public void onDestroyView(){
+        super.onDestroyView();
+        // shutdown executor if running
+        if(executor!=null && !executor.isShutdown()) executor.shutdownNow();
+    }
+
     void beginDownload(Wordlist wl){
         //Check for external storage and internet permission
-        if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.INTERNET)!=PackageManager.PERMISSION_GRANTED){
+        final String[] needed = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET};
+        if(!PermissionUtils.hasPermissions(requireActivity(), needed)){
+            // Request missing permissions on UI thread and notify user
+            requireActivity().runOnUiThread(() -> PermissionUtils.requestMissingPermissions(requireActivity(), needed, 0));
             Toast.makeText(getActivity(), getString(R.string.no_permissions), Toast.LENGTH_SHORT).show();
             return;
         }
 
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(wl.download_url));
         request.setTitle(wl.filename);
-        request.allowScanningByMediaScanner();
+        // allowScanningByMediaScanner() is deprecated. Instead, enqueue the download and
+        // scan the file with MediaScannerConnection when the file appears on disk.
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setDestinationUri(Uri.fromFile(new File(wl_path, wl.filename)));
+        final File destFile = new File(wl_path, wl.filename);
+        request.setDestinationUri(Uri.fromFile(destFile));
 
-        DownloadManager manager = (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
+        DownloadManager manager = (DownloadManager) requireActivity().getSystemService(Context.DOWNLOAD_SERVICE);
         if(manager!=null){
             manager.enqueue(request);
+
+            // Background task: wait briefly for the file to appear and then scan it so it's visible
+            // to media providers (replacement for the deprecated allowScanningByMediaScanner()).
+            java.util.concurrent.Executors.newSingleThreadExecutor().submit(() -> {
+                try{
+                    int waited = 0;
+                    while(!destFile.exists() && waited < 60_000){
+                        Thread.sleep(500);
+                        waited += 500;
+                    }
+                    if(destFile.exists()){
+                        Context ctx = null;
+                        try{ ctx = requireActivity().getApplicationContext(); }catch(Throwable ignored){}
+                        if(ctx!=null) MediaScannerConnection.scanFile(ctx, new String[]{destFile.getAbsolutePath()}, null, null);
+                    }
+                }catch(InterruptedException ignored){ }
+            });
         }else{
             Toast.makeText(getActivity(), getString(R.string.cant_start_download), Toast.LENGTH_SHORT).show();
         }
     }
 
-    class LoadTask extends AsyncTask<Void, String, Boolean>{
+    // Replaced deprecated AsyncTask with a static Runnable to avoid leaking the fragment
+    private static class LoadTaskRunnable implements Runnable{
+        private final WeakReference<WordlistDownloadDialog> ref;
+        LoadTaskRunnable(WordlistDownloadDialog dialog){
+            this.ref = new WeakReference<>(dialog);
+        }
         @Override
-        protected Boolean doInBackground(Void... params){
+        public void run(){
+            WordlistDownloadDialog dialog = ref.get();
+            if(dialog==null) return;
+            boolean success = true;
             try{
                 HttpsURLConnection connection = (HttpsURLConnection) (new URL(WORDLISTS_LINK).openConnection());
                 connection.setConnectTimeout(5000);
@@ -126,87 +156,91 @@ public class WordlistDownloadDialog extends DialogFragment{
                 JsonReader reader = new JsonReader(new InputStreamReader(connection.getInputStream()));
                 reader.beginArray();
                 if(!reader.hasNext()){
-                    //No releases
                     Log.e("HIJACKER/WlLoadTask", "No files found");
-                    return false;
-                }
-
-                //Run through all the objects in the files array
-                while(reader.hasNext()){
-                    reader.beginObject();
-
-                    String filename = null, download_url = null;
-                    int size = -1;
-                    //Run through all the names in the 'file' object
+                    success = false;
+                } else {
+                    // collect items into a local list first
+                    ArrayList<Wordlist> tmp = new ArrayList<>();
                     while(reader.hasNext()){
-                        String field = reader.nextName();
-                        switch(field){
-                            case "name":
-                                filename = reader.nextString();
-                                break;
-                            case "size":
-                                size = reader.nextInt();
-                                break;
-                            case "download_url":
-                                download_url = reader.nextString();
-                                break;
-                            default:
-                                reader.skipValue();
-                                break;
+                        reader.beginObject();
+                        String filename = null, download_url = null;
+                        int size = -1;
+                        while(reader.hasNext()){
+                            String field = reader.nextName();
+                            switch(field){
+                                case "name":
+                                    filename = reader.nextString();
+                                    break;
+                                case "size":
+                                    size = reader.nextInt();
+                                    break;
+                                case "download_url":
+                                    download_url = reader.nextString();
+                                    break;
+                                default:
+                                    reader.skipValue();
+                                    break;
+                            }
                         }
+                        reader.endObject();
+                        if(filename!=null && download_url!=null) tmp.add(new Wordlist(filename, size, download_url));
                     }
-                    reader.endObject();
-
-                    wordlists.add(new Wordlist(filename, size, download_url));
+                    reader.endArray();
+                    reader.close();
+                    // swap into fragment's list
+                    WordlistDownloadDialog finalDialog = ref.get();
+                    if(finalDialog!=null){
+                        finalDialog.wordlists.clear();
+                        finalDialog.wordlists.addAll(tmp);
+                    }
                 }
-                reader.endArray();
-                reader.close();
             }catch(Exception e){
                 Log.e("HIJACKER/WlLoadTask", e.toString());
-                return false;
+                success = false;
             }
 
-            return true;
-        }
-        @Override
-        protected void onPostExecute(final Boolean success){
-            ObjectAnimator pb_animator = ObjectAnimator.ofFloat(progressBar, "alpha", 1, 0);
-            pb_animator.addListener(new Animator.AnimatorListener(){
-                @Override
-                public void onAnimationStart(Animator animator){}
-                @Override
-                public void onAnimationEnd(Animator animator){
-                    progressBar.setIndeterminate(false);
+            // post UI updates on main thread
+            WordlistDownloadDialog finalDialog = ref.get();
+            if(finalDialog==null) return;
+            final boolean successResult = success;
+            finalDialog.requireActivity().runOnUiThread(() -> {
+                ObjectAnimator pb_animator = ObjectAnimator.ofFloat(finalDialog.progressBar, "alpha", 1f, 0f);
+                pb_animator.addListener(new Animator.AnimatorListener(){
+                    @Override
+                    public void onAnimationStart(@NonNull Animator animator){}
+                    @Override
+                    public void onAnimationEnd(@NonNull Animator animator){
+                        if(finalDialog.progressBar!=null) finalDialog.progressBar.setIndeterminate(false);
+                    }
+                    @Override
+                    public void onAnimationCancel(@NonNull Animator animator){}
+                    @Override
+                    public void onAnimationRepeat(@NonNull Animator animator){}
+                });
+                pb_animator.start();
+
+                if(finalDialog.adapter!=null) finalDialog.adapter.notifyDataSetChanged();
+                if(!successResult){
+                    if(((MainActivity) finalDialog.requireActivity()).internetAvailable()){
+                        Toast.makeText(finalDialog.getActivity(), finalDialog.getString(R.string.unknown_error), Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(finalDialog.getActivity(), finalDialog.getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
+                    }
                 }
-                @Override
-                public void onAnimationCancel(Animator animator){}
-                @Override
-                public void onAnimationRepeat(Animator animator){}
             });
-            pb_animator.start();
-
-            adapter.notifyDataSetChanged();
-            if(!success){
-                if(((MainActivity)getActivity()).internetAvailable()){
-                    Toast.makeText(getActivity(), getString(R.string.unknown_error), Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(getActivity(), getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
-                }
-            }
         }
     }
     class WordlistAdapter extends ArrayAdapter<Tile>{
         WordlistAdapter(){
-            super(WordlistDownloadDialog.this.getActivity(), R.layout.two_line_selectable_item);
+            super(WordlistDownloadDialog.this.requireActivity(), R.layout.two_line_selectable_item);
         }
 
-        @SuppressLint("SetTextI18n")
         @NonNull
         @Override
         public View getView(int position, View convertView, @NonNull ViewGroup parent){
             View itemview = convertView;
             if(itemview==null){
-                itemview = getActivity().getLayoutInflater().inflate(R.layout.two_line_selectable_item, parent, false);
+                itemview = requireActivity().getLayoutInflater().inflate(R.layout.two_line_selectable_item, parent, false);
             }
 
             Wordlist current = wordlists.get(position);
@@ -215,7 +249,8 @@ public class WordlistDownloadDialog extends DialogFragment{
             TextView secondary_tv = itemview.findViewById(R.id.secondary_text_view);
 
             main_tv.setText(current.filename);
-            secondary_tv.setText(getString(R.string.size) + ": " + current.size/1024 + "KB");
+            int sizeKb = current.size/1024;
+            secondary_tv.setText(getString(R.string.size_kb_format, getString(R.string.size), sizeKb));
 
             return itemview;
         }
@@ -225,7 +260,7 @@ public class WordlistDownloadDialog extends DialogFragment{
             return wordlists.size();
         }
     }
-    private class Wordlist{
+    private static class Wordlist{
         int size;
         String filename, download_url;
         Wordlist(String filename, int size, String url){

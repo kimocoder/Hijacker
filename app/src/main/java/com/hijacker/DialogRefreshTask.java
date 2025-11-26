@@ -1,27 +1,43 @@
 package com.hijacker;
 
 import android.annotation.SuppressLint;
-import android.os.AsyncTask;
 import androidx.annotation.NonNull;
 
-class DialogRefreshTask extends AsyncTask<Void, Void, Boolean>{
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+class DialogRefreshTask {
     @SuppressLint("StaticFieldLeak")        // This object will exist as long as the device dialog exists
     DeviceDialog deviceDialog;
+    private ExecutorService executor;
+    private volatile boolean shouldStop = false;
+
     DialogRefreshTask(@NonNull DeviceDialog deviceDialog){
         this.deviceDialog = deviceDialog;
     }
-    @Override
-    protected Boolean doInBackground(Void... params){
-        try{
-            while(deviceDialog.isResumed()){
-                publishProgress();
-                Thread.sleep(1000);
+
+    void start(){
+        if(executor!=null) return;
+        shouldStop = false;
+        executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "DialogRefreshThread"));
+        executor.submit(() -> {
+            try{
+                while(!shouldStop && deviceDialog.isResumed()){
+                    deviceDialog.onRefresh();
+                    Thread.sleep(1000);
+                }
+            }catch(InterruptedException ignored){}
+            finally{
+                stop();
             }
-        }catch(InterruptedException ignored){}
-        return true;
+        });
     }
-    @Override
-    protected void onProgressUpdate(Void... progress){
-        deviceDialog.onRefresh();
+
+    void stop(){
+        shouldStop = true;
+        if(executor!=null){
+            try{ executor.shutdownNow(); }catch(Exception ignored){}
+            executor = null;
+        }
     }
 }

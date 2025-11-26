@@ -18,6 +18,7 @@ package com.hijacker;
  */
 
 import android.util.Log;
+import java.util.Locale;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,7 +37,6 @@ import static com.hijacker.MainActivity.SORT_ESSID;
 import static com.hijacker.MainActivity.SORT_NOSORT;
 import static com.hijacker.MainActivity.SORT_PWR;
 import static com.hijacker.MainActivity.adapter;
-import static com.hijacker.MainActivity.ap_count;
 import static com.hijacker.MainActivity.debug;
 import static com.hijacker.MainActivity.manuf_filter;
 import static com.hijacker.MainActivity.notification;
@@ -48,7 +48,6 @@ import static com.hijacker.MainActivity.show_na_st;
 import static com.hijacker.MainActivity.show_st;
 import static com.hijacker.MainActivity.sort;
 import static com.hijacker.MainActivity.sort_reverse;
-import static com.hijacker.MainActivity.st_count;
 import static com.hijacker.MainActivity.toSort;
 import static com.hijacker.MainActivity.wep;
 import static com.hijacker.MainActivity.wpa;
@@ -129,7 +128,7 @@ class Tile {
             If nothing is found, then the new item should be added at the index we were
             when we gave up on searching.
         */
-        if(list.size()==0) return 0;
+        if(list.isEmpty()) return 0;
         Tile[] array = list.toArray(new Tile[0]);
         int L = 0, R = list.size()-1, M = 0;
         while(L<=R){
@@ -180,48 +179,32 @@ class Tile {
         adapter.notifyDataSetChanged();
     }
     static void onCountsChanged(){
-        ap_count.setText(Integer.toString(is_ap==null ? Tile.i : 1));
-        st_count.setText(Integer.toString(Tile.tiles.size() - Tile.i));
+        MainActivity.updateCounts();
         if(StatsDialog.isResumed){
             StatsDialog.runnable.run();
         }
         notification();
     }
 
-    static Comparator<Tile> AP_ESSID = new Comparator<Tile>(){
-        @Override
-        public int compare(Tile o1, Tile o2){
-            if(sort_reverse) return ((AP)o2.device).getESSID().compareToIgnoreCase(((AP)o1.device).getESSID());
-            else return ((AP)o1.device).getESSID().compareToIgnoreCase(((AP)o2.device).getESSID());
-        }
+    static Comparator<Tile> AP_ESSID = (o1, o2) -> {
+        if(sort_reverse) return ((AP)o2.device).getESSID().compareToIgnoreCase(((AP)o1.device).getESSID());
+        else return ((AP)o1.device).getESSID().compareToIgnoreCase(((AP)o2.device).getESSID());
     };
-    static Comparator<Tile> AP_BEACONS = new Comparator<Tile>(){
-        @Override
-        public int compare(Tile o1, Tile o2){
-            if(sort_reverse) return ((AP)o1.device).getBeacons() - ((AP)o2.device).getBeacons();
-            else return ((AP)o2.device).getBeacons() - ((AP)o1.device).getBeacons();
-        }
+    static Comparator<Tile> AP_BEACONS = (o1, o2) -> {
+        if(sort_reverse) return ((AP)o1.device).getBeacons() - ((AP)o2.device).getBeacons();
+        else return ((AP)o2.device).getBeacons() - ((AP)o1.device).getBeacons();
     };
-    static Comparator<Tile> AP_DATA = new Comparator<Tile>(){
-        @Override
-        public int compare(Tile o1, Tile o2){
-            if(sort_reverse) return ((AP)o1.device).getData() - ((AP)o2.device).getData();
-            else return ((AP)o2.device).getData() - ((AP)o1.device).getData();
-        }
+    static Comparator<Tile> AP_DATA = (o1, o2) -> {
+        if(sort_reverse) return ((AP)o1.device).getData() - ((AP)o2.device).getData();
+        else return ((AP)o2.device).getData() - ((AP)o1.device).getData();
     };
-    static Comparator<Tile> ST_FRAMES = new Comparator<Tile>(){
-        @Override
-        public int compare(Tile o1, Tile o2){
-            if(sort_reverse) return ((ST)o1.device).getFrames() - ((ST)o2.device).getFrames();
-            else return ((ST)o2.device).getFrames() - ((ST)o1.device).getFrames();
-        }
+    static Comparator<Tile> ST_FRAMES = (o1, o2) -> {
+        if(sort_reverse) return ((ST)o1.device).getFrames() - ((ST)o2.device).getFrames();
+        else return ((ST)o2.device).getFrames() - ((ST)o1.device).getFrames();
     };
-    static Comparator<Tile> AP_ST_PWR = new Comparator<Tile>(){
-        @Override
-        public int compare(Tile o1, Tile o2){
-            if(sort_reverse) return o1.device.pwr - o2.device.pwr;
-            else return o2.device.pwr - o1.device.pwr;
-        }
+    static Comparator<Tile> AP_ST_PWR = (o1, o2) -> {
+        if(sort_reverse) return o1.device.pwr - o2.device.pwr;
+        else return o2.device.pwr - o1.device.pwr;
     };
     static Comparator<Tile> getComparatorForAP(){
         switch(sort){

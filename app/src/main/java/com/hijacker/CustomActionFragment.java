@@ -2,6 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
+    Copyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,15 +21,17 @@ package com.hijacker;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
-import android.os.AsyncTask;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.ScrollView;
@@ -49,18 +52,15 @@ import static com.hijacker.MainActivity.debug;
 import static com.hijacker.MainActivity.getPIDs;
 import static com.hijacker.MainActivity.mFragmentManager;
 import static com.hijacker.MainActivity.notification;
-import static com.hijacker.MainActivity.progress;
 import static com.hijacker.Shell.runOne;
 
-public class CustomActionFragment extends Fragment{
+public class CustomActionFragment extends Fragment {
     static CustomActionTask task;
-
     View fragmentView;
     View optionsContainer;
     Button startBtn, targetBtn, actionBtn;
     TextView consoleView;
     ScrollView consoleScrollView;
-
     //Dimensions to restore animated views
     int normalOptHeight = -1;
     //User options
@@ -69,8 +69,7 @@ public class CustomActionFragment extends Fragment{
     static String console_text = "";
     @SuppressLint("SetTextI18n")
     @Override
-    public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState){
-        setRetainInstance(true);
+    public View onCreateView(@NonNull LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState){
         fragmentView = inflater.inflate(R.layout.custom_action_fragment, container, false);
 
         optionsContainer = fragmentView.findViewById(R.id.options_container);
@@ -82,29 +81,17 @@ public class CustomActionFragment extends Fragment{
 
         if(task==null) task = new CustomActionTask();
 
-        actionBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                showActionSelector();
-            }
-        });
-        targetBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                showTargetSelector();
-            }
-        });
-        startBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                if(isRunning()){
-                    //Stop
-                    startBtn.setEnabled(false);
-                    task.cancel(true);
-                }else{
-                    task = new CustomActionTask();
-                    task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                }
+        actionBtn.setOnClickListener(view -> showActionSelector());
+        targetBtn.setOnClickListener(view -> showTargetSelector());
+        startBtn.setOnClickListener(view -> {
+            if(isRunning()){
+                //Stop
+                startBtn.setEnabled(false);
+                // Use requestCancel() instead of deprecated AsyncTask.cancel(boolean)
+                task.requestCancel();
+            }else{
+                task = new CustomActionTask();
+                task.start();
             }
         });
 
@@ -114,16 +101,11 @@ public class CustomActionFragment extends Fragment{
     public void onResume(){
         super.onResume();
         currentFragment = FRAGMENT_CUSTOM;
-        ((MainActivity)getActivity()).refreshDrawer();
+        ((MainActivity) requireActivity()).refreshDrawer();
 
         //Console text is saved/restored on pause/resume
         consoleView.setText(console_text);
-        consoleView.post(new Runnable() {
-            @Override
-            public void run() {
-                consoleScrollView.fullScroll(View.FOCUS_DOWN);
-            }
-        });
+        consoleView.post(() -> consoleScrollView.fullScroll(View.FOCUS_DOWN));
     }
     @Override
     public void onPause(){
@@ -148,7 +130,7 @@ public class CustomActionFragment extends Fragment{
         startBtn.setText(isRunning() ? R.string.stop : R.string.start);
 
         //Restore animated views
-        if(task.getStatus()==AsyncTask.Status.RUNNING){
+        if(task!=null && task.isRunning()){
             ViewGroup.LayoutParams layoutParams = optionsContainer.getLayoutParams();
             layoutParams.height = 0;
             optionsContainer.setLayoutParams(layoutParams);
@@ -171,7 +153,8 @@ public class CustomActionFragment extends Fragment{
     }
     static boolean isRunning(){
         if(task==null) return false;
-        return task.getStatus()==AsyncTask.Status.RUNNING;
+        // Avoid deprecated AsyncTask.getStatus()/Status.RUNNING; use task's own running flag
+        return task.isRunning();
     }
 
     void showActionSelector(){
@@ -185,20 +168,18 @@ public class CustomActionFragment extends Fragment{
         }
         popup.getMenu().add(-1, 0, i+1, getString(R.string.manage_actions));
 
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(android.view.MenuItem item){
-                if(item.getGroupId()==-1){
-                    //Open actions manager
-                    FragmentTransaction ft = mFragmentManager.beginTransaction();
-                    ft.replace(R.id.fragment1, new CustomActionManagerFragment());
-                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                    ft.addToBackStack(null);
-                    ft.commitAllowingStateLoss();
-                }else{
-                    onActionSelected(cmds.get(item.getItemId()));
-                }
-                return true;
+        popup.setOnMenuItemClickListener(item -> {
+            if(item.getGroupId()==-1){
+                //Open actions manager
+                FragmentTransaction ft = mFragmentManager.beginTransaction();
+                ft.replace(R.id.fragment1, new CustomActionManagerFragment());
+                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                ft.addToBackStack(null);
+                ft.commitAllowingStateLoss();
+            }else{
+                onActionSelected(cmds.get(item.getItemId()));
             }
+            return true;
         });
         popup.show();
     }
@@ -212,7 +193,7 @@ public class CustomActionFragment extends Fragment{
             i = 0;
             for(AP ap : AP.APs){
                 popup.getMenu().add(TYPE_AP, i, i, ap.toString());
-                if(selectedAction.requiresClients() && ap.clients.size()==0){
+                if(selectedAction.requiresClients() && ap.clients.isEmpty()){
                     popup.getMenu().findItem(i).setEnabled(false);
                 }
                 i++;
@@ -228,20 +209,18 @@ public class CustomActionFragment extends Fragment{
             }
         }
 
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener(){
-            public boolean onMenuItemClick(android.view.MenuItem item){
-                switch(item.getGroupId()){
-                    case TYPE_AP:
-                        //ap
-                        onTargetSelected(AP.APs.get(item.getItemId()));
-                        break;
-                    case TYPE_ST:
-                        //st
-                        onTargetSelected(ST.STs.get(item.getItemId()));
-                        break;
-                }
-                return true;
+        popup.setOnMenuItemClickListener(item -> {
+            switch(item.getGroupId()){
+                case TYPE_AP:
+                    //ap
+                    onTargetSelected(AP.APs.get(item.getItemId()));
+                    break;
+                case TYPE_ST:
+                    //st
+                    onTargetSelected(ST.STs.get(item.getItemId()));
+                    break;
             }
+            return true;
         });
         if(popup.getMenu().size()>0) popup.show();
     }
@@ -269,16 +248,23 @@ public class CustomActionFragment extends Fragment{
         startBtn.setEnabled(true);
     }
 
-    class CustomActionTask extends AsyncTask<Void, String, Boolean>{
+    class CustomActionTask {
         Shell shell;
         ValueAnimator sizeAnimator;
-        @SuppressLint("WrongThread")
-        @Override
-        protected void onPreExecute(){
-            startBtn.setText(R.string.stop);
-            progress.setIndeterminate(true);
+        // Local cancellation flag to avoid calling deprecated AsyncTask.cancel(boolean)
+        private volatile boolean userRequestedCancel = false;
+        // Track running state to avoid calling deprecated AsyncTask.getStatus()/Status
+        private volatile boolean running = false;
+        private java.util.concurrent.ExecutorService executor;
+        private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-            publishProgress("\nRunning: " + selectedAction.getStartCmd());
+        @SuppressLint("WrongThread")
+        private void onPreExecute(){
+            running = true;
+            startBtn.setText(R.string.stop);
+            MainActivity.setProgressIndeterminate(true);
+
+            postProgress("\nRunning: " + selectedAction.getStartCmd());
             consoleScrollView.fullScroll(View.FOCUS_DOWN);
             if(debug) Log.d("HIJACKER/CustomCMDFrag", "Running: " + selectedAction.getStartCmd());
 
@@ -286,19 +272,16 @@ public class CustomActionFragment extends Fragment{
 
             sizeAnimator = ValueAnimator.ofInt(optionsContainer.getHeight(), 0);
             sizeAnimator.setTarget(optionsContainer);
-            sizeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener(){
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation){
-                    ViewGroup.LayoutParams layoutParams = optionsContainer.getLayoutParams();
-                    layoutParams.height = (int)animation.getAnimatedValue();
-                    optionsContainer.setLayoutParams(layoutParams);
-                }
+            sizeAnimator.addUpdateListener(animation -> {
+                ViewGroup.LayoutParams layoutParams = optionsContainer.getLayoutParams();
+                layoutParams.height = (int)animation.getAnimatedValue();
+                optionsContainer.setLayoutParams(layoutParams);
             });
             sizeAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
             sizeAnimator.start();
         }
-        @Override
-        protected Boolean doInBackground(Void... params){
+
+        private Boolean doInBackground(){
             shell = Shell.getFreeShell();
 
             //Start the action
@@ -309,8 +292,9 @@ public class CustomActionFragment extends Fragment{
             try{
                 String end = "ENDOFCUSTOM";
                 String buffer = out.readLine();
-                while(!end.equals(buffer) && !isCancelled()){
-                    publishProgress(buffer);
+                // Respect our own requestCancel() flag (avoid deprecated AsyncTask.isCancelled())
+                while(!end.equals(buffer) && !userRequestedCancel){
+                    postProgress(buffer);
                     buffer = out.readLine();
                 }
                 if(debug) Log.d("HIJACKER/CustomCMDFrag", "thread done");
@@ -318,10 +302,11 @@ public class CustomActionFragment extends Fragment{
                 return false;
             }
 
-            if(isCancelled()){
+            // Use our own cancellation flag instead of the deprecated AsyncTask.isCancelled()
+            if(userRequestedCancel){
                 if(selectedAction.hasProcessName()){
                     if(debug) Log.d("HIJACKER/CustomCMDFrag", "Killing process named " + selectedAction.getProcessName());
-                    publishProgress("Killing process named " + selectedAction.getProcessName());
+                    postProgress("Killing process named " + selectedAction.getProcessName());
 
                     ArrayList<Integer> list = getPIDs(selectedAction.getProcessName());
                     for(int i=0;i<list.size();i++){
@@ -331,68 +316,100 @@ public class CustomActionFragment extends Fragment{
 
                 if(selectedAction.hasStopCmd()){
                     if(debug) Log.d("HIJACKER/CustomCMDFrag", "Running: " + selectedAction.getStopCmd());
-                    publishProgress("Running: " + selectedAction.getStopCmd());
+                    postProgress("Running: " + selectedAction.getStopCmd());
 
                     runOne(selectedAction.getStopCmd());
                 }
-                publishProgress("Interrupted");
+                postProgress("Interrupted");
             }else{
-                publishProgress("Done");
+                postProgress("Done");
             }
 
             if(shell!=null) shell.done();
 
             return true;
         }
-        @Override
-        protected void onProgressUpdate(String... text){
-            text[0] += '\n';
-            if(currentFragment==FRAGMENT_CUSTOM && !background){
-                consoleView.append(text[0]);
-                consoleScrollView.fullScroll(View.FOCUS_DOWN);
-            }else{
-                console_text += text[0];
-            }
+
+        private void onPostExecute(final Boolean success){
+            mainHandler.post(this::done);
         }
-        @Override
-        protected void onPostExecute(final Boolean success){
-            done();
+
+        private void onCancelled(){
+            mainHandler.post(this::done);
         }
-        @Override
-        protected void onCancelled(){
-            done();
-        }
-        void done(){
+
+        private void done(){
+            // mark not running before restoring UI
+            running = false;
             startBtn.setEnabled(true);
             startBtn.setText(R.string.start);
-            progress.setIndeterminate(false);
+            MainActivity.setProgressIndeterminate(false);
 
             sizeAnimator = ValueAnimator.ofInt(0, normalOptHeight);
             sizeAnimator.setTarget(optionsContainer);
-            sizeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener(){
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation){
-                    ViewGroup.LayoutParams layoutparams = optionsContainer.getLayoutParams();
-                    layoutparams.height = (int)animation.getAnimatedValue();
-                    optionsContainer.setLayoutParams(layoutparams);
-                }
+            sizeAnimator.addUpdateListener(animation -> {
+                ViewGroup.LayoutParams layoutParams = optionsContainer.getLayoutParams();
+                layoutParams.height = (int)animation.getAnimatedValue();
+                optionsContainer.setLayoutParams(layoutParams);
             });
             sizeAnimator.addListener(new Animator.AnimatorListener() {
                 @Override
-                public void onAnimationStart(Animator animation) {}
+                public void onAnimationStart(@NonNull Animator animation) {}
                 @Override
-                public void onAnimationEnd(Animator animation) {
+                public void onAnimationEnd(@NonNull Animator animation) {
                     consoleScrollView.fullScroll(View.FOCUS_DOWN);
                 }
                 @Override
-                public void onAnimationCancel(Animator animation) {}
+                public void onAnimationCancel(@NonNull Animator animation) {}
                 @Override
-                public void onAnimationRepeat(Animator animation) {}
+                public void onAnimationRepeat(@NonNull Animator animation) {}
             });
             sizeAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
             sizeAnimator.start();
 
             notification();
+        }
+
+        // Request cancellation from the UI without calling the deprecated cancel(boolean)
+        void requestCancel(){
+            userRequestedCancel = true;
+            // Try to interrupt the AsyncTask by calling cancel(true) was deprecated; instead
+            // attempt to close the shell to make the loop exit faster and let AsyncTask finish.
+            try{
+                if(shell!=null){
+                    shell.done();
+                }
+            }catch(Exception ignored){}
+        }
+
+        // Post progress updates to the UI thread without using deprecated AsyncTask APIs
+        private void postProgress(final String text){
+            final String s = text + '\n';
+            new Handler(Looper.getMainLooper()).post(() -> {
+                if(currentFragment==FRAGMENT_CUSTOM && !background){
+                    consoleView.append(s);
+                    consoleScrollView.fullScroll(View.FOCUS_DOWN);
+                }else{
+                    console_text += s;
+                }
+            });
+        }
+
+        // Expose running state so callers don't need to use deprecated AsyncTask APIs
+        boolean isRunning(){
+            return running;
+        }
+
+        void start(){
+            if(running) return;
+            executor = java.util.concurrent.Executors.newSingleThreadExecutor(r -> new Thread(r, "CustomActionTaskThread"));
+            // run pre-execute on main
+            new Handler(Looper.getMainLooper()).post(this::onPreExecute);
+            executor.submit(() -> {
+                Boolean res = doInBackground();
+                onPostExecute(res);
+                return null;
+            });
         }
     }
 }

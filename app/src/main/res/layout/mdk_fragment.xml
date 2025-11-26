@@ -14,7 +14,7 @@
         android:layout_margin="5dp"
         android:background="?attr/colorPrimary">
 
-        <Switch
+        <androidx.appcompat.widget.SwitchCompat
             android:text="@string/bf_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -123,7 +123,7 @@
         android:layout_margin="5dp"
         android:background="?attr/colorPrimary">
 
-        <Switch
+        <androidx.appcompat.widget.SwitchCompat
             android:text="@string/ados_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

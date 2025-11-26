@@ -47,11 +47,8 @@ public class STDialog extends DeviceDialog {
 
         builder.setView(view);
         builder.setTitle(st.mac);
-        builder.setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //close
-            }
+        builder.setNegativeButton(R.string.close, (dialog, which) -> {
+            //close
         });
         return builder.create();
     }

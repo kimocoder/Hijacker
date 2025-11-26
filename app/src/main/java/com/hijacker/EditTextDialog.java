@@ -2,6 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
+    Chopyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,16 +19,16 @@ package com.hijacker;
  */
 
 import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.FragmentManager;
-import android.content.DialogInterface;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import android.view.KeyEvent;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import static com.hijacker.MainActivity.background;
 
@@ -37,21 +38,19 @@ public class EditTextDialog extends DialogFragment {
     View dialogView;
     EditText fieldView;
     private Runnable runnable = null;
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        dialogView = getActivity().getLayoutInflater().inflate(R.layout.edit_text_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        dialogView = requireActivity().getLayoutInflater().inflate(R.layout.edit_text_dialog, null);
 
         fieldView = dialogView.findViewById(R.id.edit_text);
-        fieldView.setOnEditorActionListener(new TextView.OnEditorActionListener(){
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event){
-                if(actionId == EditorInfo.IME_ACTION_DONE){
-                    onOK();
-                    return true;
-                }
-                return false;
+        fieldView.setOnEditorActionListener((v, actionId, event) -> {
+            if(actionId == EditorInfo.IME_ACTION_DONE){
+                onOK();
+                return true;
             }
+            return false;
         });
 
         if(title!=null) builder.setTitle(title);
@@ -59,17 +58,12 @@ public class EditTextDialog extends DialogFragment {
         if(defaultText!=null) fieldView.setText(defaultText);
 
         builder.setView(dialogView);
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id){}
-        });
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which){}
-        });
+        builder.setPositiveButton(R.string.ok, (dialog, id) -> {});
+        builder.setNegativeButton(R.string.cancel, (dialog, which) -> {});
         return builder.create();
     }
     @Override
-    public void show(FragmentManager fragmentManager, String tag){
+    public void show(@NonNull FragmentManager fragmentManager, String tag){
         if(!background) super.show(fragmentManager, tag);
     }
     @Override
@@ -77,18 +71,13 @@ public class EditTextDialog extends DialogFragment {
         super.onStart();
         AlertDialog d = (AlertDialog)getDialog();
         if(d != null){
-            d.getButton(Dialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v){
-                    onOK();
-                }
-            });
+            d.getButton(Dialog.BUTTON_POSITIVE).setOnClickListener(v -> onOK());
         }
     }
     void onOK(){
         fieldView.setError(null);
         result = fieldView.getText().toString();
-        if(result.equals("") && !allowEmpty){
+        if(result.isEmpty() && !allowEmpty){
             fieldView.setError(getString(R.string.field_required));
             fieldView.requestFocus();
             return;
@@ -105,8 +94,8 @@ public class EditTextDialog extends DialogFragment {
     void setHint(String hint){
         this.hint = hint;
     }
-    void setAllowEmpty(boolean allowEmpty){
-        this.allowEmpty = allowEmpty;
+    void setAllowEmpty(){
+        this.allowEmpty = true;
     }
     void setDefaultText(String text){ this.defaultText = text; }
 }

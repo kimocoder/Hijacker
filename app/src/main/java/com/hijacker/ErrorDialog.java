@@ -2,6 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
+    Copyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,33 +19,31 @@ package com.hijacker;
  */
 
 import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 
 import static com.hijacker.MainActivity.mNotificationManager;
-import static com.hijacker.MainActivity.error_notif;
 import static com.hijacker.MainActivity.background;
+import androidx.core.app.NotificationCompat;
+import android.app.NotificationManager;
+import android.content.Context;
 
 public class ErrorDialog extends DialogFragment {
     String message;
     String title;
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         if(title==null) title = getString(R.string.error);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {}
-        });
-        builder.setNeutralButton(R.string.exit, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                getActivity().finish();
-            }
-        });
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        builder.setPositiveButton(R.string.ok, (dialog, id) -> {});
+        builder.setNeutralButton(R.string.exit, (dialog, which) -> requireActivity().finish());
         if(message!=null) {
             builder.setTitle(title);
             builder.setMessage(this.message);
@@ -57,23 +56,30 @@ public class ErrorDialog extends DialogFragment {
     public void setMessage(String msg){ this.message = msg; }
     public void setTitle(String title){ this.title = title; }
     public void _wait(){
-        try{
-            synchronized(this){
-                this.wait();
-            }
-        }catch(InterruptedException ignored){}
+        // No-op: do not block the setup thread. Error handling is performed via notification when backgrounded.
     }
     @Override
-    public void show(FragmentManager fragmentManager, String tag){
+    public void show(@NonNull FragmentManager fragmentManager, String tag){
         if(!background) super.show(fragmentManager, tag);
         else{
-            error_notif.setContentTitle(title);
-            error_notif.setContentText(message);
-            mNotificationManager.notify(1, error_notif.build());
+            NotificationCompat.Builder error_notif = new NotificationCompat.Builder(requireActivity(), "error_channel")
+                    .setSmallIcon(R.drawable.ic_notification)
+                    .setContentTitle(title)
+                    .setContentText(message)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setAutoCancel(true);
+
+            // Use MainActivity's NotificationManager if available, otherwise get one from application context
+            if(mNotificationManager != null){
+                mNotificationManager.notify(1, error_notif.build());
+            }else{
+                NotificationManager nm = (NotificationManager) requireActivity().getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                if(nm!=null) nm.notify(1, error_notif.build());
+            }
         }
     }
     @Override
-    public void onDismiss(DialogInterface dialogInterface){
+    public void onDismiss(@NonNull DialogInterface dialogInterface){
         super.onDismiss(dialogInterface);
 
         synchronized(this){

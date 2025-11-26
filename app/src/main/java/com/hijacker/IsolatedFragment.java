@@ -2,6 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
+    Copyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,12 +18,13 @@ package com.hijacker;
     along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-import android.app.Fragment;
+import androidx.fragment.app.Fragment;
+
+import androidx.annotation.NonNull;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -38,7 +40,7 @@ import static com.hijacker.MainActivity.menu;
 import static com.hijacker.MainActivity.runInHandler;
 import static com.hijacker.MainActivity.wpa_thread;
 
-public class IsolatedFragment extends Fragment{
+public class IsolatedFragment extends Fragment {
     static AP is_ap;
     private Thread thread;
     private Runnable runnable;
@@ -47,20 +49,17 @@ public class IsolatedFragment extends Fragment{
     View fragmentView;
     TextView essid, manuf, mac, sec1, numbers, sec2;
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         fragmentView = inflater.inflate(R.layout.isolated_fragment, container, false);
 
-        runnable = new Runnable(){
-            @Override
-            public void run(){
-                cont = true;
-                try{
-                    while(cont){
-                        Thread.sleep(1000);
-                        runInHandler(refreshRunnable);
-                    }
-                }catch(InterruptedException ignored){}
-            }
+        runnable = () -> {
+            cont = true;
+            try{
+                while(cont){
+                    Thread.sleep(1000);
+                    runInHandler(refreshRunnable);
+                }
+            }catch(InterruptedException ignored){}
         };
         thread = new Thread(runnable);
 
@@ -73,12 +72,7 @@ public class IsolatedFragment extends Fragment{
 
         ListView listview = fragmentView.findViewById(R.id.listview);
         listview.setAdapter(MainActivity.adapter);
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, final View v, int i, long l){
-                Tile.tiles.get(i).device.getPopupMenu((MainActivity)getActivity(), v).show();
-            }
-        });
+        listview.setOnItemClickListener((adapterView, v, i, l) -> Tile.tiles.get(i).device.getPopupMenu((MainActivity)getActivity(), v).show());
 
         return fragmentView;
     }
@@ -89,9 +83,9 @@ public class IsolatedFragment extends Fragment{
                 essid.setText(is_ap.getESSID());
                 manuf.setText(is_ap.manuf);
                 mac.setText(is_ap.mac);
-                sec1.setText("Enc: " + is_ap.enc + " | Auth: " + is_ap.auth + " | Cipher: " + is_ap.cipher);
-                numbers.setText("B: " + is_ap.getBeacons() + " | D: " + is_ap.getData() + " | #s: " + is_ap.getIvs());
-                sec2.setText("PWR: " + is_ap.pwr + " | Channel: " + is_ap.ch);
+                sec1.setText(getString(R.string.isolated_sec1, is_ap.enc, is_ap.auth, is_ap.cipher));
+                numbers.setText(getString(R.string.isolated_numbers, is_ap.getBeacons(), is_ap.getData(), is_ap.getIvs()));
+                sec2.setText(getString(R.string.isolated_sec2, is_ap.pwr, is_ap.ch));
             }
         }
     };
@@ -99,7 +93,7 @@ public class IsolatedFragment extends Fragment{
     public void onResume() {
         super.onResume();
         currentFragment = FRAGMENT_AIRODUMP;
-        ((MainActivity)getActivity()).refreshDrawer();
+        ((MainActivity) requireActivity()).refreshDrawer();
         thread = new Thread(runnable);
         thread.start();
         ((Button)fragmentView.findViewById(R.id.crack)).setText(wpa_thread.isAlive() ? R.string.stop : R.string.crack);

@@ -49,7 +49,7 @@ class RootFile{
     private boolean exists = false, isFile = false, isDirectory = false, isUnknownType = false;
     RootFile(String path) throws IllegalArgumentException{
         if(path==null) throw new IllegalArgumentException("File path can't be null");
-        if(path.length()==0) throw new IllegalArgumentException("File path has zero length");
+        if(path.isEmpty()) throw new IllegalArgumentException("File path has zero length");
         if(path.charAt(0)!='/') throw new IllegalArgumentException("File path must start with /");
         if(path.contains("*")) throw new IllegalArgumentException("File path contains * character");
 

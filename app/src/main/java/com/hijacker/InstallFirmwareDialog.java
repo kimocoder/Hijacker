@@ -2,6 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2020  Christos Kyriakopoulos
+    Copyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,15 +19,19 @@ package com.hijacker;
  */
 
 import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.content.Intent;
+import android.provider.Settings;
 import com.google.android.material.snackbar.Snackbar;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -43,6 +48,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.hijacker.MainActivity.BUFFER_SIZE;
 import static com.hijacker.MainActivity.PROCESS_AIRODUMP;
@@ -70,10 +77,11 @@ public class InstallFirmwareDialog extends DialogFragment {
     String selectedUtilPath = null;
 
     String fs = null;
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        dialogView = getActivity().getLayoutInflater().inflate(R.layout.install_firmware, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        dialogView = requireActivity().getLayoutInflater().inflate(R.layout.install_firmware, null);
 
         progressBar = dialogView.findViewById(R.id.install_firm_progress);
         firmwareView = dialogView.findViewById(R.id.firmware_location);
@@ -85,18 +93,9 @@ public class InstallFirmwareDialog extends DialogFragment {
 
         builder.setView(dialogView);
         builder.setTitle(R.string.install_nexmon_title);
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {}
-        });
-        builder.setPositiveButton(R.string.install, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {}
-        });
-        builder.setNeutralButton(R.string.restore, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {}
-        });
+        builder.setNegativeButton(R.string.cancel, (dialog, which) -> {});
+        builder.setPositiveButton(R.string.install, (dialog, which) -> {});
+        builder.setNeutralButton(R.string.restore, (dialog, which) -> {});
         return builder.create();
     }
 
@@ -108,32 +107,22 @@ public class InstallFirmwareDialog extends DialogFragment {
         if(d != null) {
             positiveButton = d.getButton(Dialog.BUTTON_POSITIVE);
             positiveButton.setEnabled(false);
-            positiveButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    attemptInstall();
-                }
-            });
+            positiveButton.setOnClickListener(v -> attemptInstall());
 
             neutralButton = d.getButton(Dialog.BUTTON_NEUTRAL);
             neutralButton.setEnabled(false);
-            neutralButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    attemptRestore();
-                }
-            });
+            neutralButton.setOnClickListener(view -> attemptRestore());
 
-            new InitTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            new InitTask().start();
         }
     }
     @Override
-    public void onDismiss(final DialogInterface dialog) {
+    public void onDismiss(@NonNull final DialogInterface dialog) {
         super.onDismiss(dialog);
         if(shell!=null) shell.done();
     }
     @Override
-    public void show(FragmentManager fragmentManager, String tag){
+    public void show(@NonNull FragmentManager fragmentManager, String tag){
         if(!background) super.show(fragmentManager, tag);
     }
 
@@ -143,14 +132,14 @@ public class InstallFirmwareDialog extends DialogFragment {
         if(debug) Log.d(TAG, "Installing firmware in " + firm_location + " and utility in " + selectedUtilPath);
         install(firm_location, selectedUtilPath);
     }
-    void attemptRestore(){
+    void attemptRestore() {
         String firm_location = firmwareView.getText().toString();
 
         if(debug) Log.d("HIJACKER/InstFirm", "Restoring firmware in " + firm_location);
         restore(firm_location);
     }
 
-    boolean determineFS(){
+    boolean determineFS() {
         // Determine whether we are running on a system-as-root device by examining /proc/mounts
         if(fs!=null) return true;
 
@@ -163,7 +152,7 @@ public class InstallFirmwareDialog extends DialogFragment {
                 String[] split = str.split(" ");
 
                 if(split.length >= 2){
-                    if(str.split(" ")[1].equals("/system")){
+                    if(str.split(" ")[1].equals("/system")) {
                         fs = "/system";
                         return true;
                     }
@@ -305,8 +294,21 @@ public class InstallFirmwareDialog extends DialogFragment {
         dismissAllowingStateLoss();
     }
     void restore(String firm_location){
-        WifiManager wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if(wifiManager!=null) wifiManager.setWifiEnabled(false);
+        WifiManager wifiManager = (WifiManager) requireActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if(wifiManager!=null){
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.Q){
+                // Prior to Android Q we can toggle Wi-Fi programmatically
+                setWifiEnabledLegacy(wifiManager, false);
+            }else{
+                // From Android Q onward apps cannot toggle Wi-Fi directly. Open the Wi‑Fi settings panel and ask the user to disable it.
+                try{
+                    startActivity(new Intent(Settings.Panel.ACTION_WIFI));
+                }catch(Exception e){
+                    startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                }
+                Snackbar.make(dialogView, "Please disable Wi‑Fi in system settings", Snackbar.LENGTH_LONG).show();
+            }
+        }
 
         // Determine whether we should remount / or /system
         if(!determineFS()) return;
@@ -326,7 +328,19 @@ public class InstallFirmwareDialog extends DialogFragment {
 
         Log.d(TAG, "Firmware successfully restored");
         Toast.makeText(getActivity(), R.string.restored, Toast.LENGTH_SHORT).show();
-        if(wifiManager!=null) wifiManager.setWifiEnabled(true);
+        if(wifiManager!=null){
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.Q){
+                setWifiEnabledLegacy(wifiManager, true);
+            }else{
+                try{
+                    startActivity(new Intent(Settings.Panel.ACTION_WIFI));
+                }catch(Exception e){
+                    startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                }
+                Snackbar.make(dialogView, "Please enable Wi‑Fi in system settings", Snackbar.LENGTH_LONG).show();
+            }
+        }
+
         dismissAllowingStateLoss();
     }
 
@@ -351,81 +365,84 @@ public class InstallFirmwareDialog extends DialogFragment {
         return true;
     }
 
-    class InitTask extends AsyncTask<Void, Void, Void>{
+    class InitTask {
         String firmwarePath;
         String[] paths;
         boolean backupExists;
         int defaultIndex = 0;
-        @Override
-        protected void onPreExecute() {
+        private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "InitTaskThread"));
+        void start(){
             progressBar.setIndeterminate(true);
-        }
-        @Override
-        protected Void doInBackground(Void... voids){
-            shell = Shell.getFreeShell();
-            shell.setLog(true);
+            executor.submit(() -> {
+                shell = Shell.getFreeShell();
+                shell.setLog(true);
 
-            //Find firmware path
-            firmwarePath = findFirmwarePath(shell);
+                //Find firmware path
+                firmwarePath = findFirmwarePath(shell);
 
-            //Find paths to install nexutil
-            paths = Objects.requireNonNull(System.getenv("PATH")).split(":");
-            for(int i=0;i<paths.length;i++){
-                if(paths[i].equals(DEFAULT_UTIL_INSTALL_PATH)){
-                    //Default option is DEFAULT_UTIL_INSTALL_PATH
-                    defaultIndex = i;
-                    selectedUtilPath = paths[i];
-                    break;
+                //Find paths to install nexutil
+                paths = Objects.requireNonNull(System.getenv("PATH")).split(":");
+                for(int i=0;i<paths.length;i++){
+                    if(paths[i].equals(DEFAULT_UTIL_INSTALL_PATH)){
+                        //Default option is DEFAULT_UTIL_INSTALL_PATH
+                        defaultIndex = i;
+                        selectedUtilPath = paths[i];
+                        break;
+                    }
                 }
-            }
 
-            //Check for firmware backup
-            backupExists = new File(firm_backup_file).exists();
+                //Check for firmware backup
+                backupExists = new File(firm_backup_file).exists();
 
-            return null;
-        }
+                // Post results to UI thread
+                MainActivity.runInHandler(() -> {
+                    //Enable 'install' button if we have a firmware to install, have found the firmware path, and have at least one path to install the utility
+                    positiveButton.setEnabled( firmwarePath!=null && paths.length>0 && (devChipset.startsWith("4339") || devChipset.startsWith("4358")) );
 
-        @Override
-        protected void onPostExecute(Void result){
-            //Enable 'install' button if we have a firmware to install, have found the firmware path, and have at least one path to install the utility
-            positiveButton.setEnabled( firmwarePath!=null && paths.length>0 && (devChipset.startsWith("4339") || devChipset.startsWith("4358")) );
+                    //Enable 'restore' button only if we have a backup firmware to restore AND we know where to restore it
+                    neutralButton.setEnabled(new File(firm_backup_file).exists() && firmwarePath!=null);
 
-            //Enable 'restore' button only if we have a backup firmware to restore AND we know where to restore it
-            neutralButton.setEnabled(new File(firm_backup_file).exists() && firmwarePath!=null);
+                    //Update firmware textview
+                    if(firmwarePath==null){
+                        //Firmware not found
+                        firmwareView.setText(getString(R.string.firmware_not_found));
+                    }else{
+                        firmwareView.setText(firmwarePath);
+                    }
 
-            //Update firmware textview
-            if(firmwarePath==null){
-                //Firmware not found
-                firmwareView.setText(getString(R.string.firmware_not_found));
-            }else{
-                firmwareView.setText(firmwarePath);
-            }
+                    //Update backup checkbox
+                    if(!backupExists){
+                        backup_cb.setChecked(true);
+                    }
 
-            //Update backup checkbox
-            if(!backupExists){
-                backup_cb.setChecked(true);
-            }
+                    //Update paths spinner
+                    if(paths.length==0){
+                        //No paths found, add a default value
+                        paths = new String[]{ getString(R.string.none_found) };
+                        utilSpinner.setEnabled(false);
+                    }
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_item, paths);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    utilSpinner.setAdapter(adapter);
+                    utilSpinner.setSelection(defaultIndex);
+                    utilSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l){
+                            selectedUtilPath = (String) adapterView.getItemAtPosition(i);
+                        }
+                        @Override
+                        public void onNothingSelected(AdapterView<?> adapterView){}
+                    });
 
-            //Update paths spinner
-            if(paths.length==0){
-                //No paths found, add a default value
-                paths = new String[]{ getString(R.string.none_found) };
-                utilSpinner.setEnabled(false);
-            }
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, paths);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            utilSpinner.setAdapter(adapter);
-            utilSpinner.setSelection(defaultIndex);
-            utilSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l){
-                    selectedUtilPath = (String) adapterView.getItemAtPosition(i);
-                }
-                @Override
-                public void onNothingSelected(AdapterView<?> adapterView){}
+                    progressBar.setIndeterminate(false);
+                });
+                return null;
             });
-
-            progressBar.setIndeterminate(false);
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    private void setWifiEnabledLegacy(WifiManager wm, boolean enabled){
+        if(wm!=null) wm.setWifiEnabled(enabled);
     }
 }

@@ -2,6 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
+    Copyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,7 +33,6 @@ import static com.hijacker.MainActivity.actions_path;
 import static com.hijacker.MainActivity.aireplay_dir;
 import static com.hijacker.MainActivity.airodump_dir;
 import static com.hijacker.MainActivity.debug;
-import static com.hijacker.MainActivity.mFragmentManager;
 import static com.hijacker.MainActivity.iface;
 import static com.hijacker.MainActivity.mdk3bf_dir;
 import static com.hijacker.MainActivity.prefix;
@@ -41,15 +41,18 @@ import static com.hijacker.MainActivity.reaver_dir;
 class CustomAction{
     static final int TYPE_AP=0, TYPE_ST=1;
     static final List<CustomAction> cmds = new ArrayList<>();
-    private String title, start_cmd, stop_cmd, process_name;
-    private int type;
+    private String title;
+    private String start_cmd;
+    private String stop_cmd;
+    private final String process_name;
+    private final int type;
     private boolean requires_clients=false, requires_connected=false, has_process_name=false;
     CustomAction(String title, String start_cmd, String stop_cmd, String process_name, int type){
         this.title = title;
         this.start_cmd = start_cmd;
         this.stop_cmd = stop_cmd;
         this.process_name = process_name;
-        if(!process_name.equals("")) has_process_name = true;
+        if(!process_name.isEmpty()) has_process_name = true;
         this.type = type;
         cmds.add(this);
     }
@@ -61,7 +64,7 @@ class CustomAction{
     boolean requiresClients(){ return requires_clients; }
     boolean requiresConnected(){ return requires_connected; }
     boolean hasProcessName(){ return has_process_name; }
-    boolean hasStopCmd(){ return !stop_cmd.equals(""); }
+    boolean hasStopCmd(){ return !stop_cmd.isEmpty(); }
     int getType(){ return type; }
     void setTitle(String title){ this.title = title; }
     void setStartCmd(String start_cmd){ this.start_cmd = start_cmd; }
@@ -110,11 +113,9 @@ class CustomAction{
                 writer.write(action.process_name + '\n');
                 writer.close();
             }catch(IOException e){
-                Log.e("HIJACKER/CustomAction", "In save(): " + e.toString());
-                ErrorDialog dialog = new ErrorDialog();
-                dialog.setMessage("Error while saving " + action.title);
-                dialog.show(mFragmentManager, "ErrorDialog");
-            }
+                Log.e("HIJACKER/CustomAction", "In save(): " + e);
+                Log.e("HIJACKER/CustomAction", "Error while saving " + action.title);
+             }
         }
     }
     static void load(){
@@ -124,7 +125,7 @@ class CustomAction{
         if(!folder.exists()){
             folder.mkdir();
         }
-        File actions[] = folder.listFiles();
+        File[] actions = folder.listFiles();
         if(actions!=null){
             if(debug) Log.d("HIJACKER/CustomAction", "Reading custom actions...");
             for(File file : actions){
@@ -145,7 +146,7 @@ class CustomAction{
                     }
                     reader.close();
                 }catch(Exception e){
-                    Log.e("HIJACKER/CustomAction", "In load(): " + e.toString());
+                    Log.e("HIJACKER/CustomAction", "In load(): " + e);
                 }
             }
         }

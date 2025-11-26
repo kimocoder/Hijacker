@@ -4,6 +4,9 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
+# Add a project declaration so CMake's project() command is present as required.
+project(native-lib LANGUAGES C CXX)
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds it for you.
@@ -30,7 +33,7 @@ find_library( # Sets the name of the path variable.
               log-lib
 
               # Specifies the name of the NDK library that
-              # you wantjstring CMake to locate.
+              # you want string CMake to locate.
               log )
 
 # Specifies libraries CMake should link to your target library. You

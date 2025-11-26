@@ -2,6 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
+    Copyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,15 +19,18 @@ package com.hijacker;
  */
 
 import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.ImageView;
 
 import java.io.IOException;
 
@@ -51,7 +55,6 @@ import static com.hijacker.MainActivity.reaver_dir;
 import static com.hijacker.MainActivity.enable_monMode;
 import static com.hijacker.MainActivity.getPIDs;
 import static com.hijacker.MainActivity.runInHandler;
-import static com.hijacker.MainActivity.status;
 import static com.hijacker.MainActivity.stop;
 import static com.hijacker.Shell.runOne;
 
@@ -61,10 +64,11 @@ public class TestDialog extends DialogFragment {
     TextView test_cur_cmd;
     ProgressBar test_progress;
     Thread thread;
+    ImageView[] status = new ImageView[5];
     final Runnable runnable = new Runnable(){
         @Override
         public void run(){
-            final boolean results[] = {false, false, false, false, false};
+            final boolean[] results = {false, false, false, false, false};
             final String cmdMonMode = enable_monMode;
             final String cmdAirodump = "su -c " + prefix + " " + airodump_dir + " " + iface;
             final String cmdAireplay = "su -c " + prefix + " " + aireplay_dir + " --deauth 0 -a 11:22:33:44:55:66 " + iface;
@@ -79,21 +83,14 @@ public class TestDialog extends DialogFragment {
                 last_action = System.currentTimeMillis() + 10000;       //Make watchdog wait until the test is over
 
                 //Enable monitor mode
-                runInHandler(new Runnable(){
-                    @Override
-                    public void run(){
-                        test_cur_cmd.setText(enable_monMode);
-                    }
-                });
+                runInHandler(() -> test_cur_cmd.setText(enable_monMode));
                 Log.d("HIJACKER/test_thread", cmdMonMode);
                 runOne(cmdMonMode);
                 Thread.sleep(500);
-                runInHandler(new Runnable(){        //stop everything and turn on monitor mode
-                    @Override
-                    public void run(){
-                        status[0].setImageResource(R.drawable.testing_drawable);
-                        test_cur_cmd.setText(cmdAirodump);
-                    }
+                //stop everything and turn on monitor mode
+                runInHandler(() -> {
+                    status[0].setImageResource(R.drawable.testing_drawable);
+                    test_cur_cmd.setText(cmdAirodump);
                 });
 
                 //Airodump
@@ -101,21 +98,18 @@ public class TestDialog extends DialogFragment {
                 Runtime.getRuntime().exec(cmdAirodump);
                 Thread.sleep(TEST_WAIT);
 
-                if(getPIDs(PROCESS_AIRODUMP).size()==0) thread.interrupt();
+                if(getPIDs(PROCESS_AIRODUMP).isEmpty()) thread.interrupt();
                 else{
                     stop(PROCESS_AIRODUMP);
                     last_action = System.currentTimeMillis() + 10000;
                     results[0] = true;
                 }
-                runInHandler(new Runnable(){
-                    @Override
-                    public void run(){
-                        status[0].setImageResource(results[0] ? R.drawable.done_drawable : R.drawable.failed_drawable);
-                        test_progress.setProgress(1);
+                runInHandler(() -> {
+                    status[0].setImageResource(results[0] ? R.drawable.done_drawable : R.drawable.failed_drawable);
+                    test_progress.setProgress(1);
 
-                        test_cur_cmd.setText(cmdAireplay);
-                        status[1].setImageResource(R.drawable.testing_drawable);
-                    }
+                    test_cur_cmd.setText(cmdAireplay);
+                    status[1].setImageResource(R.drawable.testing_drawable);
                 });
 
                 //Aireplay
@@ -123,21 +117,18 @@ public class TestDialog extends DialogFragment {
                 Runtime.getRuntime().exec(cmdAireplay);
                 Thread.sleep(TEST_WAIT);
 
-                if(getPIDs(PROCESS_AIREPLAY).size()==0) results[1] = false;
+                if(getPIDs(PROCESS_AIREPLAY).isEmpty()) results[1] = false;
                 else{
                     stop(PROCESS_AIREPLAY);
                     last_action = System.currentTimeMillis() + 10000;
                     results[1] = true;
                 }
-                runInHandler(new Runnable(){
-                    @Override
-                    public void run(){
-                        status[1].setImageResource(results[1] ? R.drawable.done_drawable : R.drawable.failed_drawable);
-                        test_progress.setProgress(2);
+                runInHandler(() -> {
+                    status[1].setImageResource(results[1] ? R.drawable.done_drawable : R.drawable.failed_drawable);
+                    test_progress.setProgress(2);
 
-                        status[2].setImageResource(R.drawable.testing_drawable);
-                        test_cur_cmd.setText(cmdMdk);
-                    }
+                    status[2].setImageResource(R.drawable.testing_drawable);
+                    test_cur_cmd.setText(cmdMdk);
                 });
 
                 //MDK
@@ -145,21 +136,18 @@ public class TestDialog extends DialogFragment {
                 Runtime.getRuntime().exec(cmdMdk);
                 Thread.sleep(TEST_WAIT);
 
-                if(getPIDs(PROCESS_MDK_BF).size()==0) results[2] = false;
+                if(getPIDs(PROCESS_MDK_BF).isEmpty()) results[2] = false;
                 else{
                     stop(PROCESS_MDK_BF);
                     last_action = System.currentTimeMillis() + 10000;
                     results[2] = true;
                 }
-                runInHandler(new Runnable(){
-                    @Override
-                    public void run(){
-                        status[2].setImageResource(results[2] ? R.drawable.done_drawable : R.drawable.failed_drawable);
-                        test_progress.setProgress(3);
+                runInHandler(() -> {
+                    status[2].setImageResource(results[2] ? R.drawable.done_drawable : R.drawable.failed_drawable);
+                    test_progress.setProgress(3);
 
-                        status[3].setImageResource(R.drawable.testing_drawable);
-                        test_cur_cmd.setText(cmdReaver);
-                    }
+                    status[3].setImageResource(R.drawable.testing_drawable);
+                    test_cur_cmd.setText(cmdReaver);
                 });
 
                 //Reaver
@@ -167,52 +155,43 @@ public class TestDialog extends DialogFragment {
                 Runtime.getRuntime().exec(cmdReaver);
                 Thread.sleep(TEST_WAIT);
 
-                if(getPIDs(PROCESS_REAVER).size()==0) results[3] = false;
+                if(getPIDs(PROCESS_REAVER).isEmpty()) results[3] = false;
                 else{
                     stop(PROCESS_REAVER);
                     last_action = System.currentTimeMillis() + 10000;
                     results[3] = true;
                 }
-                runInHandler(new Runnable(){
-                    @Override
-                    public void run(){
-                        status[3].setImageResource(results[3] ? R.drawable.done_drawable : R.drawable.failed_drawable);
-                        test_progress.setProgress(4);
+                runInHandler(() -> {
+                    status[3].setImageResource(results[3] ? R.drawable.done_drawable : R.drawable.failed_drawable);
+                    test_progress.setProgress(4);
 
-                        status[4].setImageResource(R.drawable.testing_drawable);
-                        test_cur_cmd.setText(R.string.checking_chroot);
-                    }
+                    status[4].setImageResource(R.drawable.testing_drawable);
+                    test_cur_cmd.setText(R.string.checking_chroot);
                 });
 
                 //Chroot
                 final int chroot_check = checkChroot();
                 results[4] = chroot_check==CHROOT_FOUND;
-                runInHandler(new Runnable(){
-                    @Override
-                    public void run(){
-                        if(chroot_check!=CHROOT_FOUND){
-                            status[4].setImageResource(R.drawable.failed_drawable);
-                            if(chroot_check==CHROOT_DIR_MISSING) test_cur_cmd.setText(R.string.chroot_notfound);
-                            else if(chroot_check==CHROOT_BIN_MISSING) test_cur_cmd.setText(R.string.kali_notfound);
-                            else test_cur_cmd.setText(R.string.chroot_both_notfound);
-                        }else{
-                            test_cur_cmd.setText(R.string.done);
-                            status[4].setImageResource(R.drawable.done_drawable);
-                        }
-                        test_progress.setProgress(5);
+                runInHandler(() -> {
+                    if(chroot_check!=CHROOT_FOUND){
+                        status[4].setImageResource(R.drawable.failed_drawable);
+                        if(chroot_check==CHROOT_DIR_MISSING) test_cur_cmd.setText(R.string.chroot_notfound);
+                        else if(chroot_check==CHROOT_BIN_MISSING) test_cur_cmd.setText(R.string.kali_notfound);
+                        else test_cur_cmd.setText(R.string.chroot_both_notfound);
+                    }else{
+                        test_cur_cmd.setText(R.string.done);
+                        status[4].setImageResource(R.drawable.done_drawable);
                     }
+                    test_progress.setProgress(5);
                 });
 
             }catch(IOException | InterruptedException e){
                 Log.e("HIJACKER/test_thread", e.toString());
-                runInHandler(new Runnable(){
-                    @Override
-                    public void run(){
-                        for(int i=0;i<status.length;i++){
-                            status[i].setImageResource(results[i] ? R.drawable.done_drawable : R.drawable.failed_drawable);
-                        }
-                        test_progress.setProgress(5);
+                runInHandler(() -> {
+                    for(int i=0;i<status.length;i++){
+                        status[i].setImageResource(results[i] ? R.drawable.done_drawable : R.drawable.failed_drawable);
                     }
+                    test_progress.setProgress(5);
                 });
             }finally{
                 stop(PROCESS_AIRODUMP);
@@ -222,9 +201,10 @@ public class TestDialog extends DialogFragment {
             }
         }
     };
+    @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState){
         loadPreferences();
-        dialogView = getActivity().getLayoutInflater().inflate(R.layout.test, null);
+        dialogView = requireActivity().getLayoutInflater().inflate(R.layout.test, null);
 
         test_progress = dialogView.findViewById(R.id.test_progress);
         status[0] = dialogView.findViewById(R.id.imageView1);
@@ -234,7 +214,7 @@ public class TestDialog extends DialogFragment {
         status[4] = dialogView.findViewById(R.id.imageView5);
         test_cur_cmd = dialogView.findViewById(R.id.current_cmd);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
 
         test_progress.setProgress(0);
         status[0].setImageResource(android.R.color.transparent);
@@ -248,24 +228,16 @@ public class TestDialog extends DialogFragment {
 
         builder.setView(dialogView);
         builder.setTitle(R.string.testing);
-        builder.setNegativeButton(R.string.back, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                thread.interrupt();
-            }
-        });
-        builder.setNeutralButton(R.string.stop, new DialogInterface.OnClickListener(){
-            @Override
-            public void onClick(DialogInterface dialog, int which){}
-        });
+        builder.setNegativeButton(R.string.back, (dialog, which) -> thread.interrupt());
+        builder.setNeutralButton(R.string.stop, (dialog, which) -> {});
         return builder.create();
     }
     @Override
-    public void show(FragmentManager fragmentManager, String tag){
+    public void show(@NonNull FragmentManager fragmentManager, String tag){
         if(!notif_on) super.show(fragmentManager, tag);
     }
     @Override
-    public void onCancel(DialogInterface dialog){
+    public void onCancel(@NonNull DialogInterface dialog){
         super.onCancel(dialog);
         thread.interrupt();
     }
@@ -274,12 +246,7 @@ public class TestDialog extends DialogFragment {
         super.onStart();
         AlertDialog d = (AlertDialog)getDialog();
         if(d != null) {
-            d.getButton(Dialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    thread.interrupt();
-                }
-            });
+            d.getButton(Dialog.BUTTON_NEUTRAL).setOnClickListener(v -> thread.interrupt());
         }
     }
 }

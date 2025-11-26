@@ -18,8 +18,8 @@ package com.hijacker;
  */
 
 import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.FragmentManager;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 import android.os.Bundle;
 import androidx.appcompat.app.AlertDialog;
 import android.view.View;
@@ -51,6 +51,10 @@ public class LoadingDialog extends DialogFragment {
         title = str;
     }
     void setText(String str){
-        loadingDescription.setText(str);
+        // The dialog view may not be created yet (loadingDescription null). Store to title and update when view is ready.
+        title = str;
+        if(loadingDescription!=null){
+            loadingDescription.setText(str);
+        }
     }
 }

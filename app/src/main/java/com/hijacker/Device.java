@@ -2,6 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
+    Copyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,7 +18,8 @@ package com.hijacker;
     along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-import android.app.FragmentManager;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
 import android.view.View;
 import android.widget.PopupMenu;
 
@@ -41,6 +43,7 @@ abstract class Device{
         this.alias = aliases.get(this.mac);
         if(sort!=SORT_NOSORT) toSort = true;
     }
+    @NonNull
     public abstract String toString();
     abstract String getExported();
     abstract void showInfo(FragmentManager fragmentManager);
@@ -50,6 +53,6 @@ abstract class Device{
     abstract PopupMenu getPopupMenu(final MainActivity activity, final View v);
 
     static String trimMac(String mac){
-        return mac.subSequence(0, 2).toString() + mac.subSequence(3, 5).toString() + mac.subSequence(6, 8).toString();
+        return mac.subSequence(0, 2) + mac.subSequence(3, 5).toString() + mac.subSequence(6, 8);
     }
 }

@@ -2,6 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
+    Copyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,8 +21,6 @@ package com.hijacker;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.DownloadManager;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -34,28 +33,29 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.net.NetworkCapabilities;
+import android.net.Network;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.FileObserver;
 import android.os.Handler;
 import android.os.Looper;
-import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.util.JsonReader;
+import androidx.core.content.pm.PackageInfoCompat;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.KeyEvent;
@@ -83,6 +83,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -90,8 +94,6 @@ import static com.hijacker.AP.getAPByMac;
 import static com.hijacker.CustomAction.TYPE_ST;
 import static com.hijacker.Device.trimMac;
 import static com.hijacker.IsolatedFragment.is_ap;
-import static com.hijacker.MDKFragment.ados;
-import static com.hijacker.MDKFragment.bf;
 import static com.hijacker.Shell.getFreeShell;
 import static com.hijacker.Shell.runOne;
 
@@ -123,28 +125,39 @@ public class MainActivity extends AppCompatActivity{
     static boolean sort_reverse = false;
     static boolean toSort = false;     //Variable to mark that the list must be sorted, so Tile.sort() must be called
     //Views that need to be accessible globally
-    static TextView ap_count, st_count;                               //AP and ST count textviews in toolbar
-    static ProgressBar progress;
-    static Toolbar toolbar;
-    static View rootView;
-    static SparseArray<String> navTitlesMap = new SparseArray<>();             //SparseArray to map fragment IDs to their respective navigation titles
-    static Drawable[] overflow = {null, null, null, null, null, null, null, null};      //Drawables to use for overflow button icon
-    static ImageView[] status = {null, null, null, null, null};                         //Icons in TestDialog, set in TestDialog class
-    static int progress_int;
-    static long last_action;                        //Timestamp for the last action. Used in watchdog to avoid false positives
-    static Thread wpa_thread;
-    static Runnable wpa_runnable;
-    static Menu menu;
+    // UI views - avoid static references to Activity views to prevent leaks
+    TextView ap_count, st_count;                               //AP and ST count textviews in toolbar
+    ProgressBar progress;
+    Toolbar toolbar;
+    View rootView;
+    // Keep a static weak reference to application context only
+    // Do not keep NotificationCompat.Builder instances as static fields (they hold a Context and may leak an Activity).
+    // Keep the application context and build NotificationCompat.Builder on-demand.
+    static Context appContext;
+    // Hold a static reference to the MainActivity instance so static helpers can access instance views safely.
+    // This is acceptable because we store the Activity instance only while the Activity is alive; clear onDestroy if necessary.
+    static MainActivity instance;
+    static NotificationManager mNotificationManager;
+    // Notification builders cached (constructed with application context in setup)
+    static NotificationCompat.Builder notif;
+    static NotificationCompat.Builder error_notif;
+    static NotificationCompat.Builder handshake_notif;
+    static FragmentManager mFragmentManager;
+    static String path, cap_tmp_path, data_path, actions_path, wl_path, cap_path, reaver_sess_path, firm_backup_file, manufDBFile, arch, busybox;             //path: App files path (ends with .../files)
+    // Restored static globals used across the codebase
     static MyListAdapter adapter;
     static CustomActionAdapter custom_action_adapter;
     static FileExplorerAdapter file_explorer_adapter;
     static SharedPreferences pref;
     static SharedPreferences.Editor pref_edit;
+    static Drawable[] overflow = {null, null, null, null, null, null, null, null};
+    static SparseArray<String> navTitlesMap = new SparseArray<>();
+    static int progress_int;
     static ClipboardManager clipboard;
-    static NotificationCompat.Builder notif, error_notif, handshake_notif;
-    static NotificationManager mNotificationManager;
-    static FragmentManager mFragmentManager;
-    static String path, cap_tmp_path, data_path, actions_path, wl_path, cap_path, reaver_sess_path, firm_backup_file, manufDBFile, arch, busybox;             //path: App files path (ends with .../files)
+    static Thread wpa_thread;
+    static Runnable wpa_runnable;
+    static Menu menu;
+    static long last_action;
     static File aliases_file;
     static FileWriter aliases_in;
     static final HashMap<String, String> aliases = new HashMap<>();
@@ -163,7 +176,6 @@ public class MainActivity extends AppCompatActivity{
             monstart, always_cap, cont_on_fail, watchdog, target_deauth, enable_on_airodump, update_on_startup;
 
     WatchdogTask watchdogTask;
-
     ReaverFragment reaverFragment = new ReaverFragment();
     CrackFragment crackFragment = new CrackFragment();
     CustomActionFragment customActionFragment = new CustomActionFragment();
@@ -172,50 +184,74 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler(){
-            @Override
-            public void uncaughtException(Thread thread, Throwable throwable){
-                throwable.printStackTrace();
-                StringBuilder stackTrace = new StringBuilder();
-                stackTrace.append(throwable.getMessage()).append('\n');
-                for(int i=0;i<throwable.getStackTrace().length;i++){
-                    stackTrace.append(throwable.getStackTrace()[i].toString()).append('\n');
-                }
-
-                Intent intent = new Intent();
-                intent.setAction("com.hijacker.SendLogActivity");
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra("exception", stackTrace.toString());
-                startActivity(intent);
-
-                finish();
-                System.exit(1);
+        instance = this;
+        appContext = getApplicationContext();
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+            throwable.printStackTrace();
+            StringBuilder stackTrace = new StringBuilder();
+            stackTrace.append(throwable.getMessage()).append('\n');
+            for(int i=0;i<throwable.getStackTrace().length;i++){
+                stackTrace.append(throwable.getStackTrace()[i].toString()).append('\n');
             }
+
+            Intent intent = new Intent();
+            intent.setAction("com.hijacker.SendLogActivity");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("exception", stackTrace.toString());
+            startActivity(intent);
+
+            finish();
+            System.exit(1);
         });
-        adapter = new MyListAdapter();              //ALWAYS BEFORE setContentView AND setup(), can't stress it enough...
+        adapter = new MyListAdapter(); //ALWAYS BEFORE setContentView AND setup(), can't stress it enough...
         adapter.setNotifyOnChange(true);
         custom_action_adapter = new CustomActionAdapter();
         custom_action_adapter.setNotifyOnChange(true);
         file_explorer_adapter = new FileExplorerAdapter();
         file_explorer_adapter.setNotifyOnChange(true);
         setContentView(R.layout.activity_main);
+        // Initialize FragmentManager early so background setup tasks can show dialogs safely
+        mFragmentManager = getSupportFragmentManager();
 
-        new SetupTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        // Initialize NotificationManager early to avoid NPE when notifications are used before setup finishes
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        new SetupTask().start();
     }
-    private class SetupTask extends AsyncTask<Void, String, Boolean>{
+    private class SetupTask {
         LoadingDialog loadingDialog;
         ErrorDialog errorDialog;
         CustomDialog customDialog;
+        // Handler to post progress updates to the main thread (replacement for publishProgress)
+        private final Handler mainHandler = new Handler(Looper.getMainLooper());
+        private java.util.concurrent.ExecutorService executor;
+
+        private void postProgress(final String... progress){
+            mainHandler.post(() -> {
+                if(progress != null){
+                    if(progress.length > 0 && progress[0] != null){
+                        // Update loading dialog text
+                        if(loadingDialog != null) loadingDialog.setText(progress[0]);
+                    }else if(progress.length > 1 && progress[1] != null){
+                        // Show error via ErrorDialog
+                        if(errorDialog != null){
+                            errorDialog.setMessage(progress[1]);
+                            errorDialog.setTitle(progress.length == 3 ? progress[2] : null);
+                            errorDialog.show(mFragmentManager, "ErrorDialog");
+                        }
+                    }
+                }
+            });
+        }
         @SuppressLint("CommitPrefEdits")
-        @Override
         protected void onPreExecute(){
-            pref = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+            pref = MainActivity.this.getSharedPreferences(MainActivity.this.getPackageName() + "_preferences", Context.MODE_PRIVATE);
             pref_edit = pref.edit();
 
             errorDialog = new ErrorDialog();
             loadingDialog = new LoadingDialog();
             loadingDialog.setInitText(getString(R.string.starting_hijacker));
-            loadingDialog.show(getFragmentManager(), "LoadingDialog");
+            loadingDialog.show(mFragmentManager, "LoadingDialog");
 
             if(!pref.getBoolean("disclaimerAccepted", false)){
                 //First start
@@ -223,22 +259,14 @@ public class MainActivity extends AppCompatActivity{
                 customDialog.setCancelable(false);
                 customDialog.setTitle(getString(R.string.disclaimer_title));
                 customDialog.setMessage(getString(R.string.disclaimer));
-                customDialog.setPositiveButton(getString(R.string.agree), new Runnable(){
-                    @Override
-                    public void run(){
-                        pref_edit.putBoolean("disclaimerAccepted", true);
-                        pref_edit.apply();
-                    }
+                customDialog.setPositiveButton(getString(R.string.agree), () -> {
+                    pref_edit.putBoolean("disclaimerAccepted", true);
+                    pref_edit.apply();
                 });
-                customDialog.setNeutralButton(getString(R.string.not_agree), new Runnable(){
-                    @Override
-                    public void run(){
-                        // Exit
-                        MainActivity.this.finish();
-                    }
-                });
+                // Exit
+                customDialog.setNeutralButton(getString(R.string.not_agree), MainActivity.this::finish);
 
-                customDialog.show(getFragmentManager(), "CustomDialog for disclaimer");
+                customDialog.show(mFragmentManager, "CustomDialog for disclaimer");
             }
 
             //Initialize the drawer
@@ -246,46 +274,37 @@ public class MainActivity extends AppCompatActivity{
             navigationView = findViewById(R.id.nav_view);
             navigationView.getMenu().getItem(0).setChecked(true);
             navigationView.setNavigationItemSelectedListener(
-                    new NavigationView.OnNavigationItemSelectedListener() {
-                        @Override
-                        public boolean onNavigationItemSelected(MenuItem menuItem) {
-                            // set item as selected to persist highlight
-                            menuItem.setChecked(true);
-                            // close drawer when item is tapped
-                            mDrawerLayout.closeDrawers();
+                    menuItem -> {
+                        // set item as selected to persist highlight
+                        menuItem.setChecked(true);
+                        // close drawer when item is tapped
+                        mDrawerLayout.closeDrawers();
 
-                            if(currentFragment!=menuItem.getItemId()){
-                                FragmentTransaction ft = mFragmentManager.beginTransaction();
-                                switch(menuItem.getItemId()){
-                                    case FRAGMENT_AIRODUMP:
-                                        ft.replace(R.id.fragment1, is_ap==null ? new MyListFragment() : new IsolatedFragment());
-                                        break;
-                                    case FRAGMENT_MDK:
-                                        ft.replace(R.id.fragment1, new MDKFragment());
-                                        break;
-                                    case FRAGMENT_REAVER:
-                                        ft.replace(R.id.fragment1, reaverFragment);
-                                        break;
-                                    case FRAGMENT_CRACK:
-                                        ft.replace(R.id.fragment1, crackFragment);
-                                        break;
-                                    case FRAGMENT_CUSTOM:
-                                        ft.replace(R.id.fragment1, customActionFragment);
-                                        break;
-                                    case FRAGMENT_SETTINGS:
-                                        ft.replace(R.id.fragment1, new SettingsFragment());
-                                        break;
-                                }
-                                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                                ft.addToBackStack(null);
-                                ft.commitAllowingStateLoss();
-                                mFragmentManager.executePendingTransactions();
+                        final int id = menuItem.getItemId();
+                        if (currentFragment != id) {
+                            FragmentTransaction ft = mFragmentManager.beginTransaction();
+                            if (id == FRAGMENT_AIRODUMP) {
+                                ft.replace(R.id.fragment1, is_ap==null ? new MyListFragment() : new IsolatedFragment());
+                            } else if (id == FRAGMENT_MDK) {
+                                ft.replace(R.id.fragment1, new MDKFragment());
+                            } else if (id == FRAGMENT_REAVER) {
+                                ft.replace(R.id.fragment1, reaverFragment);
+                            } else if (id == FRAGMENT_CRACK) {
+                                ft.replace(R.id.fragment1, crackFragment);
+                            } else if (id == FRAGMENT_CUSTOM) {
+                                ft.replace(R.id.fragment1, customActionFragment);
+                            } else if (id == FRAGMENT_SETTINGS) {
+                                ft.replace(R.id.fragment1, new SettingsFragment());
                             }
-
-                            actionBar.setTitle(navTitlesMap.get(currentFragment));
-
-                            return true;
+                            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                            ft.addToBackStack(null);
+                            ft.commitAllowingStateLoss();
+                            mFragmentManager.executePendingTransactions();
                         }
+
+                        actionBar.setTitle(navTitlesMap.get(currentFragment));
+
+                        return true;
                     });
 
             //Initialize toolbar
@@ -301,8 +320,7 @@ public class MainActivity extends AppCompatActivity{
                 Log.e("HIJACKER/SetupPreEx", "actionbar is null");
             }
         }
-        @Override
-        protected Boolean doInBackground(Void... params){
+        protected Boolean doInBackground(Void... params) {
             Looper.prepare();
 
             //Wait for disclaimer to be accepted
@@ -311,19 +329,14 @@ public class MainActivity extends AppCompatActivity{
             }
 
             //Initialize managers
-            publishProgress(getString(R.string.init_managers));
-            clipboard = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
-            mNotificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-            mFragmentManager = getFragmentManager();
-
-            //Load device information
-            publishProgress(getString(R.string.loading_device_information));
+            postProgress(getString(R.string.loading_device_information));
             PackageManager manager = MainActivity.this.getPackageManager();
             PackageInfo info = null;
             try{
                 info = manager.getPackageInfo(MainActivity.this.getPackageName(), 0);
                 versionName = info.versionName.replace(" ", "_");
-                versionCode = info.versionCode;
+                // Use PackageInfoCompat to obtain the versionCode in a forward-compatible way
+                versionCode = (int) PackageInfoCompat.getLongVersionCode(info);
             }catch(PackageManager.NameNotFoundException e){
                 Log.e("HIJACKER/SetupTask", e.toString());
             }
@@ -334,23 +347,23 @@ public class MainActivity extends AppCompatActivity{
             arch = System.getProperty("os.arch");
 
             //Find views
-            publishProgress(getString(R.string.init_views));
+            postProgress(getString(R.string.init_views));
             ap_count = findViewById(R.id.ap_count);
             st_count = findViewById(R.id.st_count);
             progress = findViewById(R.id.progressBar);
             rootView = findViewById(R.id.fragment1);
-            overflow[0] = getDrawable(R.drawable.overflow0);
-            overflow[1] = getDrawable(R.drawable.overflow1);
-            overflow[2] = getDrawable(R.drawable.overflow2);
-            overflow[3] = getDrawable(R.drawable.overflow3);
-            overflow[4] = getDrawable(R.drawable.overflow4);
-            overflow[5] = getDrawable(R.drawable.overflow5);
-            overflow[6] = getDrawable(R.drawable.overflow6);
-            overflow[7] = getDrawable(R.drawable.overflow7);
+            overflow[0] = AppCompatResources.getDrawable(MainActivity.this, R.drawable.overflow0);
+            overflow[1] = AppCompatResources.getDrawable(MainActivity.this, R.drawable.overflow1);
+            overflow[2] = AppCompatResources.getDrawable(MainActivity.this, R.drawable.overflow2);
+            overflow[3] = AppCompatResources.getDrawable(MainActivity.this, R.drawable.overflow3);
+            overflow[4] = AppCompatResources.getDrawable(MainActivity.this, R.drawable.overflow4);
+            overflow[5] = AppCompatResources.getDrawable(MainActivity.this, R.drawable.overflow5);
+            overflow[6] = AppCompatResources.getDrawable(MainActivity.this, R.drawable.overflow6);
+            overflow[7] = AppCompatResources.getDrawable(MainActivity.this, R.drawable.overflow7);
             actionBar = getSupportActionBar();
 
             //Load defaults
-            publishProgress(getString(R.string.loading_defaults));
+            postProgress(getString(R.string.loading_defaults));
             iface = getString(R.string.iface);
             prefix = getString(R.string.prefix);
             enable_monMode = getString(R.string.enable_monMode);
@@ -373,11 +386,11 @@ public class MainActivity extends AppCompatActivity{
             show_client_count = Boolean.parseBoolean(getString(R.string.show_client_count));
 
             //Load preferences
-            publishProgress(getString(R.string.loading_preferences));
+            postProgress(getString(R.string.loading_preferences));
             loadPreferences();
 
             //Initialize paths
-            publishProgress(getString(R.string.init_files));
+            postProgress(getString(R.string.init_files));
             path = getFilesDir().getAbsolutePath();
             cap_tmp_path = path + "/cap_tmp";
             data_path = Environment.getExternalStorageDirectory() + "/Hijacker";
@@ -415,7 +428,7 @@ public class MainActivity extends AppCompatActivity{
                     File[] files = old_dir.listFiles();
                     if(files!=null){
                         Toast.makeText(MainActivity.this, "Moving cap files from " + old_dir.getAbsolutePath() + " to " + cap_path, Toast.LENGTH_LONG).show();
-                        for(File f : old_dir.listFiles()){
+                        for(File f : Objects.requireNonNull(old_dir.listFiles())){
                             //Move all the files to the new directory
                             f.renameTo(new File(cap_path, f.getName()));
                         }
@@ -425,13 +438,13 @@ public class MainActivity extends AppCompatActivity{
             }
 
             //Initialize notifications
-            publishProgress(getString(R.string.init_notifications));
+            postProgress(getString(R.string.init_notifications));
                 //Create intents
             Intent cancel_intent = new Intent(MainActivity.this, DismissReceiver.class);
             Intent stop_intent = new Intent(MainActivity.this, StopReceiver.class);
             Intent notificationIntent = new Intent(MainActivity.this, MainActivity.class);
             notificationIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            PendingIntent click_intent = PendingIntent.getActivity(MainActivity.this, 0, notificationIntent, 0);
+            PendingIntent click_intent = PendingIntent.getActivity(MainActivity.this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
                 // Get a channel ID
             String channelID;
@@ -441,20 +454,20 @@ public class MainActivity extends AppCompatActivity{
                 channelID = getString(R.string.DEFAULT_CHANNEL_ID);
             }
 
-                //Create 'running' notification
-            notif = new NotificationCompat.Builder(MainActivity.this, channelID);
+             //Create 'running' notification
+             notif = new NotificationCompat.Builder(MainActivity.this.getApplicationContext(), channelID);
             notif.setContentTitle(getString(R.string.notification_title));
             notif.setContentText(" ");
             notif.setSmallIcon(R.drawable.ic_notification);
             if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
                 notif.setColor(getColor(R.color.colorAccent));
             }
-            notif.setDeleteIntent(PendingIntent.getBroadcast(MainActivity.this.getApplicationContext(), 0, cancel_intent, 0));
-            notif.addAction(R.drawable.stop_drawable, getString(R.string.stop_attacks), PendingIntent.getBroadcast(MainActivity.this.getApplicationContext(), 0, stop_intent, 0));
+            notif.setDeleteIntent(PendingIntent.getBroadcast(MainActivity.this.getApplicationContext(), 0, cancel_intent, PendingIntent.FLAG_IMMUTABLE));
+            notif.addAction(R.drawable.stop_drawable, getString(R.string.stop_attacks), PendingIntent.getBroadcast(MainActivity.this.getApplicationContext(), 0, stop_intent, PendingIntent.FLAG_IMMUTABLE));
             notif.setContentIntent(click_intent);
 
                 //Create 'error' notification (used by watchdog)
-            error_notif = new NotificationCompat.Builder(MainActivity.this, channelID);
+            error_notif = new NotificationCompat.Builder(MainActivity.this.getApplicationContext(), channelID);
             error_notif.setSmallIcon(R.drawable.ic_notification);
             if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
                 error_notif.setColor(getColor(android.R.color.holo_red_dark));
@@ -463,7 +476,7 @@ public class MainActivity extends AppCompatActivity{
             error_notif.setVibrate(new long[]{500, 500});
 
                 //Create 'handshake captured' notification (used by wpa_thread)
-            handshake_notif = new NotificationCompat.Builder(MainActivity.this, channelID);
+            handshake_notif = new NotificationCompat.Builder(MainActivity.this.getApplicationContext(), channelID);
             handshake_notif.setContentTitle(getString(R.string.handshake_captured));
             if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
                 handshake_notif.setColor(getColor(android.R.color.holo_green_dark));
@@ -473,29 +486,29 @@ public class MainActivity extends AppCompatActivity{
             handshake_notif.setVibrate(new long[]{500, 500});
 
             //Load strings for when they cannot be retrieved with getString or R.string
-            publishProgress(getString(R.string.loading_strings));
+            postProgress(getString(R.string.loading_strings));
             ST.not_connected = getString(R.string.not_connected);
             ST.paired = getString(R.string.paired) + ' ';
 
             //Check permissions
-            publishProgress(getString(R.string.checking_permissions));
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{
-                    Manifest.permission.CHANGE_WIFI_STATE,
-                    Manifest.permission.ACCESS_WIFI_STATE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.ACCESS_NETWORK_STATE,
-                    Manifest.permission.INTERNET
-            }, 0);
-            //Wait for permission request to be completed
+            postProgress(getString(R.string.checking_permissions));
+            // Request only the dangerous runtime permissions using the centralized helper.
+            final String[] perms = PermissionUtils.getDangerousPermissions();
+            runOnUiThread(() -> PermissionUtils.requestMissingPermissions(MainActivity.this, perms, 0));
+            // Also request notification permission on Android 13+
+            final String notifPerm = PermissionUtils.getNotificationPermission();
+            if(notifPerm!=null){
+                runOnUiThread(() -> PermissionUtils.requestMissingPermissions(MainActivity.this, new String[]{notifPerm}, 1));
+            }
+            // Wait briefly for user to respond to permission dialogs but do not block indefinitely.
             try{
                 synchronized(MainActivity.this){
-                    MainActivity.this.wait();
+                    MainActivity.this.wait(5000);
                 }
             }catch(InterruptedException ignored){}
 
             //Check for su
-            publishProgress(getString(R.string.checking_su));
+            postProgress(getString(R.string.checking_su));
             int exitCode = 1;
             try{
                 Process su_proc = Runtime.getRuntime().exec("which su");
@@ -506,13 +519,13 @@ public class MainActivity extends AppCompatActivity{
             }
             if(exitCode != 0){
                 Log.e("HIJACKER/Setup", "'which su' failed with code " + exitCode);
-                publishProgress(null, getString(R.string.su_notfound), getString(R.string.su_notfound_title));
+                postProgress(null, getString(R.string.su_notfound), getString(R.string.su_notfound_title));
                 errorDialog._wait();
                 return false;
             }
 
             //Check for root access
-            publishProgress(getString(R.string.requesting_root_access));
+            postProgress(getString(R.string.requesting_root_access));
             exitCode = 1;
             try{
                 Process su_proc = Runtime.getRuntime().exec("su -c id");
@@ -523,13 +536,14 @@ public class MainActivity extends AppCompatActivity{
             }
             if(exitCode != 0){
                 Log.e("HIJACKER/Setup", "'su -c id' failed with code " + exitCode);
-                publishProgress(null, getString(R.string.no_root_access), getString(R.string.no_root_access_title));
+                postProgress(null, getString(R.string.no_root_access), getString(R.string.no_root_access_title));
                 errorDialog._wait();
                 return false;
             }
 
             //Setup tools (requires root)
-            publishProgress(getString(R.string.setting_up_tools));
+            Log.d("HIJACKER/SetupTask", "Entering tools installation block");
+            postProgress(getString(R.string.setting_up_tools));
             if(arch.equals("armv7l") || arch.equals("aarch64")) {
                 String tools_location = path + "/bin/";
                 String lib_location = path + "/lib/";
@@ -539,27 +553,30 @@ public class MainActivity extends AppCompatActivity{
                 File lib = new File(path + "/lib");
                 if(!bin.exists()){
                     if(!bin.mkdir()){
-                        publishProgress(null, getString(R.string.bin_not_created));
+                        postProgress(null, getString(R.string.bin_not_created));
                         errorDialog._wait();
                         return false;
                     }
                 }
                 if(!lib.exists()){
                     if(!lib.mkdir()){
-                        publishProgress(null, getString(R.string.lib_not_created));
+                        postProgress(null, getString(R.string.lib_not_created));
                         errorDialog._wait();
                         return false;
                     }
                 }
 
-                //Extract busybox
-                extract("busybox", tools_location, true);
+                //Extract busybox (use extractWithLog so we can time out if it blocks)
+                Log.d("HIJACKER/SetupTask", "About to extract busybox");
+                extractWithLog("busybox", tools_location);
+                Log.d("HIJACKER/SetupTask", "Finished extracting busybox, continuing setup");
                 busybox = path + "/bin/busybox";
 
                 //Extract tools
                 boolean install = true;
-                if(bin.list().length==21 && lib.list().length==2 && info!=null){
-                    if(info.versionCode==pref.getInt("tools_version", 0)){
+                if(Objects.requireNonNull(bin.list()).length==21 && Objects.requireNonNull(lib.list()).length==2 && info!=null){
+                    // Compare long version codes for accuracy on modern platforms
+                    if(PackageInfoCompat.getLongVersionCode(info) == pref.getLong("tools_version", 0L)){
                         if(debug) Log.d("HIJACKER/SetupTask", "Tools already installed");
                         install = false;
                     }else{
@@ -568,38 +585,41 @@ public class MainActivity extends AppCompatActivity{
                     }
                 }
                 if(install){
-                    extract("airbase-ng", tools_location, true);
-                    extract("aircrack-ng", tools_location, true);
-                    extract("aireplay-ng", tools_location, true);
-                    extract("airodump-ng", tools_location, true);
-                    extract("besside-ng", tools_location, true);
-                    extract("ivstools", tools_location, true);
-                    extract("iw", tools_location, true);
-                    extract("iwconfig", tools_location, true);
-                    extract("iwlist", tools_location, true);
-                    extract("iwpriv", tools_location, true);
-                    extract("kstats", tools_location, true);
-                    extract("makeivs-ng", tools_location, true);
-                    extract("mdk3", tools_location, true);
-                    extract("nc", tools_location, true);
-                    extract("packetforge-ng", tools_location, true);
-                    extract("reaver", tools_location, true);
-                    extract("reaver-wash", tools_location, true);
-                    extract("wesside-ng", tools_location, true);
-                    extract("wpaclean", tools_location, true);
-                    extract("libfakeioctl.so", lib_location, true);
-                    extract("libnexmon.so", lib_location, true);
+                    Log.d("HIJACKER/SetupTask", "Starting extraction of tools (install=true)");
+                    extractWithLog("airbase-ng", tools_location);
+                    extractWithLog("aircrack-ng", tools_location);
+                    extractWithLog("aireplay-ng", tools_location);
+                    extractWithLog("airodump-ng", tools_location);
+                    extractWithLog("besside-ng", tools_location);
+                    extractWithLog("ivstools", tools_location);
+                    extractWithLog("iw", tools_location);
+                    extractWithLog("iwconfig", tools_location);
+                    extractWithLog("iwlist", tools_location);
+                    extractWithLog("iwpriv", tools_location);
+                    extractWithLog("kstats", tools_location);
+                    extractWithLog("makeivs-ng", tools_location);
+                    extractWithLog("mdk3", tools_location);
+                    extractWithLog("nc", tools_location);
+                    extractWithLog("packetforge-ng", tools_location);
+                    extractWithLog("reaver", tools_location);
+                    extractWithLog("reaver-wash", tools_location);
+                    extractWithLog("wesside-ng", tools_location);
+                    extractWithLog("wpaclean", tools_location);
+                    extractWithLog("libfakeioctl.so", lib_location);
+                    extractWithLog("libnexmon.so", lib_location);
 
                     runOne("cd " + path + "/bin; mv mdk3 mdk3bf; cp mdk3bf mdk3dos");
 
                     if(info!=null){
-                        pref_edit.putInt("tools_version", info.versionCode);
+                        pref_edit.putLong("tools_version", PackageInfoCompat.getLongVersionCode(info));
                         pref_edit.apply();
                     }
+                    Log.d("HIJACKER/SetupTask", "Tool extraction complete");
                 }
 
                 //Detect device chipset
-                publishProgress(getString(R.string.detecting_device_chipset));
+                postProgress(getString(R.string.detecting_device_chipset));
+                Log.d("HIJACKER/SetupTask", "Detecting device chipset - starting shell operations");
                 Shell shell = getFreeShell();
 
                 String firmwarePath = findFirmwarePath(shell);
@@ -613,6 +633,7 @@ public class MainActivity extends AppCompatActivity{
                     }
                 }
                 Log.i("HIJACKER/DetectDev", "devChipset is " + devChipset);
+                Log.d("HIJACKER/SetupTask", "Device chipset detection complete: " + devChipset);
                 shell.done();
 
                 //Set directories
@@ -640,10 +661,10 @@ public class MainActivity extends AppCompatActivity{
                 mdk3bf_dir = path + "/bin/mdk3bf";
                 mdk3dos_dir = path + "/bin/mdk3dos";
                 reaver_dir = path + "/bin/reaver";
-            }else{
+            } else {
                 Log.e("HIJACKER/onCreate", "Device not armv7l or aarch64, can't install tools");
                 busybox = "busybox";
-                publishProgress(null, getString(R.string.not_arm));
+                postProgress(null, getString(R.string.not_arm));
                 errorDialog._wait();
 
                 prefix = pref.getString("prefix", prefix);
@@ -656,146 +677,132 @@ public class MainActivity extends AppCompatActivity{
             }
 
             //Initialize RootFile (requires root) and Airodump
-            publishProgress(getString(R.string.init_rootFile_airodump));
+            postProgress(getString(R.string.init_rootFile_airodump));
             RootFile.init();
-            Airodump.capFileObserver = new Airodump.CapFileObserver(cap_tmp_path, FileObserver.CREATE | FileObserver.MODIFY);
+            // Use new API-21-safe CapFileObserver implementation
+            Airodump.capFileObserver = new AirodumpCapFileObserver(cap_tmp_path, 0);
+            Log.d("HIJACKER/SetupTask", "RootFile and Airodump initialized");
 
             //Initialize threads
-            publishProgress(getString(R.string.init_threads));
-            wpa_runnable = new Runnable(){
-                @Override
-                public void run(){
-                    if(debug) Log.d("HIJACKER/wpa_thread", "Started wpa_thread");
+            postProgress(getString(R.string.init_threads));
+            wpa_runnable = () -> {
+                if(debug) Log.d("HIJACKER/wpa_thread", "Started wpa_thread");
 
-                    Thread counter_thread = new Thread(new Runnable(){
-                        @Override
-                        public void run(){
-                            if(debug) Log.d("HIJACKER/wpa_subthread", "wpa_subthread started");
-                            try{
-                                progress_int = 0;
-                                while(progress_int<=deauthWait && wpacheckcont){
-                                    Thread.sleep(1000);
-                                    progress_int++;
-                                    runInHandler(new Runnable(){
-                                        @Override
-                                        public void run(){
-                                            progress.setProgress(progress_int);
-                                        }
-                                    });
-                                }
-                                if(wpacheckcont){
-                                    runInHandler(new Runnable(){
-                                        @Override
-                                        public void run(){
-                                            if(!background) Snackbar.make(findViewById(R.id.fragment1), getString(R.string.stopped_to_capture), Snackbar.LENGTH_SHORT).show();
-                                            else Toast.makeText(MainActivity.this, getString(R.string.stopped_to_capture), Toast.LENGTH_SHORT).show();
-                                            progress.setProgress(deauthWait);
-                                            progress.setIndeterminate(true);
-                                        }
-                                    });
-                                }
-                            }catch(InterruptedException e){
-                                Log.e("HIJACKER/Exception", "Caught Exception in wpa_subthread: " + e.toString());
-                                runInHandler(new Runnable(){
-                                    @Override
-                                    public void run(){
-                                        progress.setIndeterminate(false);
-                                        progress.setProgress(deauthWait);
-                                    }
-                                });
-                            }finally{
-                                stop(PROCESS_AIREPLAY);
-                            }
-                            if(debug) Log.d("HIJACKER/wpa_subthread", "wpa_subthread finished");
-                        }
-                    });
-
-                    boolean handshake_captured = false;
-                    final String capfile = Airodump.getCapFile();
-                    Shell shell = getFreeShell();
+                Thread counter_thread = new Thread(() -> {
+                    if(debug) Log.d("HIJACKER/wpa_subthread", "wpa_subthread started");
                     try{
-                        if(capfile==null){
-                            if(debug) Log.d("HIJACKER/wpa_thread", "cap file not found, airodump is probably not running...");
-                        }else{
-                            if(debug) Log.d("HIJACKER/wpa_thread", capfile);
-                            wpacheckcont = true;
-                            counter_thread.start();
+                        progress_int = 0;
+                        while(progress_int<=deauthWait && wpacheckcont){
+                            Thread.sleep(1000);
+                            progress_int++;
+                            runInHandler(() -> progress.setProgress(progress_int));
+                        }
+                        if(wpacheckcont){
+                            runInHandler(() -> {
+                                if(!background) Snackbar.make(findViewById(R.id.fragment1), getString(R.string.stopped_to_capture), Snackbar.LENGTH_SHORT).show();
+                                else Toast.makeText(MainActivity.this, getString(R.string.stopped_to_capture), Toast.LENGTH_SHORT).show();
+                                progress.setProgress(deauthWait);
+                                progress.setIndeterminate(true);
+                            });
+                        }
+                    }catch(InterruptedException e){
+                        Log.e("HIJACKER/Exception", "Caught Exception in wpa_subthread: " + e);
+                        runInHandler(() -> {
+                            progress.setIndeterminate(false);
+                            progress.setProgress(deauthWait);
+                        });
+                    }finally{
+                        stop(PROCESS_AIREPLAY);
+                    }
+                    if(debug) Log.d("HIJACKER/wpa_subthread", "wpa_subthread finished");
+                });
 
-                            BufferedReader out = shell.getShell_out();
-                            String buffer;
-                            while(!handshake_captured && wpacheckcont){
-                                //Check loop
-                                if(debug) Log.d("HIJACKER/wpa_thread", "Checking cap file...");
-                                shell.run(aircrack_dir + " " + capfile + "; echo ENDOFAIR");
-                                buffer = out.readLine();
-                                if(buffer==null) break;
-                                else{
-                                    while(!buffer.equals("ENDOFAIR")){
-                                        if(buffer.length()>=56){
-                                            if(buffer.charAt(56)=='1' || buffer.charAt(56)=='2' || buffer.charAt(56)=='3'){
-                                                handshake_captured = true;
-                                                break;
-                                            }
+                boolean handshake_captured = false;
+                final String capfile = Airodump.getCapFile();
+                Shell shell = getFreeShell();
+                try{
+                    if(capfile==null){
+                        if(debug) Log.d("HIJACKER/wpa_thread", "cap file not found, airodump is probably not running...");
+                    }else{
+                        if(debug) Log.d("HIJACKER/wpa_thread", capfile);
+                        wpacheckcont = true;
+                        counter_thread.start();
+
+                        BufferedReader out = shell.getShell_out();
+                        String buffer;
+                        while(!handshake_captured && wpacheckcont) {
+                            //Check loop
+                            if(debug) Log.d("HIJACKER/wpa_thread", "Checking cap file...");
+                            shell.run(aircrack_dir + " " + capfile + "; echo ENDOFAIR");
+                            buffer = out.readLine();
+                            if(buffer==null) break;
+                            else{
+                                while(!buffer.equals("ENDOFAIR")){
+                                    if(buffer.length()>=56){
+                                        if(buffer.charAt(56)=='1' || buffer.charAt(56)=='2' || buffer.charAt(56)=='3') {
+                                            handshake_captured = true;
+                                            break;
                                         }
-                                        buffer = out.readLine();
                                     }
-                                    Thread.sleep(700);
+                                    buffer = out.readLine();
                                 }
+                                Thread.sleep(700);
                             }
                         }
-                    }catch(IOException | InterruptedException e){
-                        Log.e("HIJACKER/Exception", "Caught Exception in wpa_thread: " + e.toString());
-                    }finally{
-                        wpacheckcont = false;
-                        counter_thread.interrupt();
-                        shell.done();
-                        final boolean found = handshake_captured;
-                        if(found) Airodump.startClean(is_ap);
-                        runInHandler(new Runnable(){
-                            @Override
-                            public void run(){
-                                Button crack_btn = findViewById(R.id.crack);
-                                if(crack_btn!=null){
-                                    //We are in IsolatedFragment
-                                    crack_btn.setText(getString(R.string.crack));
-                                }
-
-                                if(found){
-                                    if(!background){
-                                        Snackbar s = Snackbar.make(findViewById(R.id.fragment1), getString(R.string.handshake_captured) + ' ' + capfile, Snackbar.LENGTH_LONG);
-                                        s.setAction(R.string.crack, new View.OnClickListener(){
-                                            @Override
-                                            public void onClick(View v){
-                                                CrackFragment.capfile_text = capfile;
-                                                FragmentTransaction ft = mFragmentManager.beginTransaction();
-                                                ft.replace(R.id.fragment1, MainActivity.this.crackFragment);
-                                                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                                                ft.addToBackStack(null);
-                                                ft.commitAllowingStateLoss();
-                                            }
-                                        });
-                                        s.show();
-                                    }else{
-                                        handshake_notif.setContentText(getString(R.string.saved_in_file) + ' ' + capfile);
-                                        mNotificationManager.notify(2, handshake_notif.build());
-                                    }
-                                    progress.setIndeterminate(false);
-                                }
-                                if(debug) Log.d("HIJACKER/wpa_thread", "wpa_thread finished");
-                            }
-                        });
                     }
+                } catch (IOException | InterruptedException e) {
+                    Log.e("HIJACKER/Exception", "Caught Exception in wpa_thread: " + e);
+                } finally {
+                    wpacheckcont = false;
+                    counter_thread.interrupt();
+                    shell.done();
+                    final boolean found = handshake_captured;
+                    if(found) Airodump.startClean(is_ap);
+                    runInHandler(() -> {
+                        Button crack_btn = findViewById(R.id.crack);
+                        if(crack_btn!=null){
+                            //We are in IsolatedFragment
+                            crack_btn.setText(getString(R.string.crack));
+                        }
+
+                        if(found){
+                            if(!background){
+                                Snackbar s = Snackbar.make(findViewById(R.id.fragment1), getString(R.string.handshake_captured) + ' ' + capfile, Snackbar.LENGTH_LONG);
+                                s.setAction(R.string.crack, v -> {
+                                    CrackFragment.capfile_text = capfile;
+                                    FragmentTransaction ft = mFragmentManager.beginTransaction();
+                                    ft.replace(R.id.fragment1, MainActivity.this.crackFragment);
+                                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                                    ft.addToBackStack(null);
+                                    ft.commitAllowingStateLoss();
+                                });
+                                s.show();
+                            } else {
+                                // Build transient notification for handshake captured
+                                NotificationCompat.Builder nb = new NotificationCompat.Builder(appContext, NotificationChannel.DEFAULT_CHANNEL_ID)
+                                        .setContentTitle(getString(R.string.handshake_captured))
+                                        .setContentText(getString(R.string.saved_in_file) + ' ' + capfile)
+                                        .setSmallIcon(R.drawable.ic_notification)
+                                        .setAutoCancel(true)
+                                        .setPriority(NotificationCompat.PRIORITY_HIGH);
+
+                                if (mNotificationManager != null) mNotificationManager.notify(2, nb.build());
+                            }
+                            progress.setIndeterminate(false);
+                        }
+                        if(debug) Log.d("HIJACKER/wpa_thread", "wpa_thread finished");
+                    });
                 }
             };
             wpa_thread = new Thread(wpa_runnable);
             watchdogTask = new WatchdogTask(MainActivity.this);
 
             //Start background service so the app won't get killed if it goes to the background
-            publishProgress(getString(R.string.starting_pers_service));
+            postProgress(getString(R.string.starting_pers_service));
             startService(new Intent(MainActivity.this, PersistenceService.class));
 
             //Load manufacturer HashMap
-            publishProgress(getString(R.string.loading_manuf_db));
+            postProgress(getString(R.string.loading_manuf_db));
             manufHashMap = new HashMap<>();
             File db = new File(manufDBFile);
             if(!db.exists()){
@@ -806,7 +813,7 @@ public class MainActivity extends AppCompatActivity{
                         Log.e("HIJACKER/SetupTask", "Error creating database file");
                     }else{
                         if(debug) Log.d("HIJACKER/SetupTask", "Creating manufacturer database...");
-                        publishProgress(getString(R.string.building_manuf_db));
+                        postProgress(getString(R.string.building_manuf_db));
                         BufferedReader out = new BufferedReader(new InputStreamReader(getResources().getAssets().open("oui.txt")));
                         FileWriter in = new FileWriter(db);
 
@@ -866,137 +873,210 @@ public class MainActivity extends AppCompatActivity{
 
             //Load custom actions and aliases (requires storage access)
             if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED){
-                publishProgress(getString(R.string.loading_custom_actions));
+                postProgress(getString(R.string.loading_custom_actions));
                 CustomAction.load();
 
-                publishProgress(getString(R.string.loading_aliases));
+                postProgress(getString(R.string.loading_aliases));
                 loadAliases();
             }
 
             //Check for updates
             if(update_on_startup){
                 if(internetAvailable()){
-                    publishProgress(getString(R.string.checking_for_updates));
+                    postProgress(getString(R.string.checking_for_updates));
                     checkForUpdate(false);
-                }else{
+                } else {
                     //Spawn new thread to wait for internet connection
                     //This should be changed to a broadcast receiver
-                    new Thread(new Runnable(){
-                        @Override
-                        public void run(){
-                            try{
-                                while(!internetAvailable()){
-                                    Thread.sleep(1000);
-                                }
-                                checkForUpdate(false);
-                            }catch(InterruptedException ignored){}
-                        }
+                    new Thread(() -> {
+                        try{
+                            while(!internetAvailable()) {
+                                Thread.sleep(1000);
+                            }
+                            checkForUpdate(false);
+                        } catch (InterruptedException ignored) { }
                     }).start();
                 }
             }
 
             //Delete old report, it's not needed if no exception is thrown up to this point (requires storage access)
-            publishProgress(getString(R.string.deleting_bug_report));
+            postProgress(getString(R.string.deleting_bug_report));
             File report = new File(Environment.getExternalStorageDirectory() + "/report.txt");
-            if(report.exists()) report.delete();
+            if (report.exists()) report.delete();
 
             //Show FirstRunDialog
-            if(customDialog!=null){
+            if (customDialog!=null) {
                 FirstRunDialog frDialog = new FirstRunDialog();
-                frDialog.show(getFragmentManager(), "FirstRunDialog");
+                frDialog.show(mFragmentManager, "FirstRunDialog");
+                Log.d("HIJACKER/SetupTask", "FirstRunDialog shown; continuing without waiting");
                 frDialog._wait();
             }
 
+            Log.d("HIJACKER/SetupTask", "doInBackground reached end - returning true");
+
             return true;
         }
-        @Override
-        protected void onProgressUpdate(String... progress){
-            if(progress[0]!=null){
-                //Update loading dialog with progress[0]
-                loadingDialog.setText(progress[0]);
-            }else if(progress[1]!=null){
-                //Show error message with progress[1]
-                errorDialog.setMessage(progress[1]);
-                errorDialog.setTitle(progress.length == 3 ? progress[2] : null);
-                errorDialog.show(getFragmentManager(), "ErrorDialog");
-
-                // The _wait call will be done from doInBackground to run on a separate thread
-            }
-        }
-        @Override
         protected void onPostExecute(final Boolean success){
-            if(!success){
-                // Initialization incomplete, can't continue!!!
-                System.exit(1);
+            Log.d("HIJACKER/SetupTask", "onPostExecute entered (success=" + success + ")");
+            try{
+                if(!success){
+                    // Initialization incomplete, can't continue!!!
+                    Log.e("HIJACKER/SetupTask", "SetupTask reported failure in doInBackground");
+                    System.exit(1);
+                }
+
+                if(loadingDialog!=null){
+                    loadingDialog.setText(getString(R.string.starting_hijacker));
+                }else{
+                    Log.w("HIJACKER/SetupTask", "loadingDialog is null in onPostExecute");
+                }
+
+                if(watchdog){
+                    watchdogTask.start();
+                }
+
+                //Load default fragment (airodump)
+                try{
+                    Log.d("HIJACKER/SetupTask", "Attempting to load default fragment");
+                    if(mFragmentManager.getBackStackEntryCount()==0){
+                        FragmentTransaction ft = mFragmentManager.beginTransaction();
+                        ft.replace(R.id.fragment1, new MyListFragment());
+                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                        ft.addToBackStack(null);
+                        ft.commitAllowingStateLoss();
+                        Log.d("HIJACKER/SetupTask", "Default fragment transaction committed");
+                    }
+                }catch(Exception e){
+                    Log.e("HIJACKER/SetupTask", "Exception while loading default fragment", e);
+                    // Show error dialog if possible
+                    postProgress(null, getString(R.string.unknown_error), e.toString());
+                }
+
+                try{
+                    if(loadingDialog!=null) loadingDialog.dismissAllowingStateLoss();
+                }catch(Exception e){
+                    Log.e("HIJACKER/SetupTask", "Exception while dismissing loading dialog", e);
+                }
+
+                if(customDialog!=null){
+                    try{
+                        mDrawerLayout.openDrawer(GravityCompat.START);
+                    }catch(Exception e){
+                        Log.e("HIJACKER/SetupTask", "Exception opening drawer", e);
+                    }
+                }
+
+                //Start process cleanup/initial state
+                try{
+                    runOne(enable_monMode);
+                    stop(PROCESS_AIRODUMP);
+                    stop(PROCESS_AIREPLAY);
+                    stop(PROCESS_MDK_BF);
+                    stop(PROCESS_MDK_DOS);
+                    stop(PROCESS_AIRCRACK);
+                    stop(PROCESS_REAVER);
+                    if(airOnStartup) Airodump.startClean();
+                }catch(Exception e){
+                    Log.e("HIJACKER/SetupTask", "Exception during post-setup start/stop operations", e);
+                }
+                Log.d("HIJACKER/SetupTask", "onPostExecute completed successfully");
+            }catch(Throwable t){
+                Log.e("HIJACKER/SetupTask", "Unhandled exception in onPostExecute", t);
+                try{ if(loadingDialog!=null) loadingDialog.dismissAllowingStateLoss(); }catch(Exception ignored){}
             }
-            loadingDialog.setText(getString(R.string.starting_hijacker));
+         }
 
-            if(watchdog){
-                watchdogTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        // Start the setup: run onPreExecute on main thread, then doInBackground in background,
+        // post onPostExecute back on main thread. A watchdog ensures we don't hang forever.
+        void start(){
+            if(executor!=null) return;
+            executor = java.util.concurrent.Executors.newSingleThreadExecutor(r -> new Thread(r, "SetupTaskThread"));
+            final java.util.concurrent.atomic.AtomicBoolean finished = new java.util.concurrent.atomic.AtomicBoolean(false);
+
+            // Ensure onPreExecute runs on main thread before background work starts.
+            final Runnable startWork = () -> executor.submit(() -> {
+                Boolean result = doInBackground((Void)null);
+                finished.set(true);
+                mainHandler.post(() -> onPostExecute(result));
+                return null;
+            });
+
+            if(Looper.myLooper() == Looper.getMainLooper()){
+                onPreExecute();
+                startWork.run();
+            }else{
+                final java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(1);
+                mainHandler.post(() -> { try{ onPreExecute(); } finally { latch.countDown(); } });
+                executor.submit(() -> {
+                    try{ latch.await(); }catch(InterruptedException ignored){}
+                    Boolean result = doInBackground((Void)null);
+                    finished.set(true);
+                    mainHandler.post(() -> onPostExecute(result));
+                    return null;
+                });
             }
 
-            //Load default fragment (airodump)
-            if(mFragmentManager.getBackStackEntryCount()==0){
-                FragmentTransaction ft = mFragmentManager.beginTransaction();
-                ft.replace(R.id.fragment1, new MyListFragment());
-                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                ft.addToBackStack(null);
-                ft.commitAllowingStateLoss();
-            }
-
-            loadingDialog.dismissAllowingStateLoss();
-
-            if(customDialog!=null)
-                mDrawerLayout.openDrawer(GravityCompat.START);
-
-            //Start
-            runOne(enable_monMode);
-            stop(PROCESS_AIRODUMP);
-            stop(PROCESS_AIREPLAY);
-            stop(PROCESS_MDK_BF);
-            stop(PROCESS_MDK_DOS);
-            stop(PROCESS_AIRCRACK);
-            stop(PROCESS_REAVER);
-            if(airOnStartup) Airodump.startClean();
+            // Watchdog: fail-safe if setup hangs for more than 2 minutes
+            mainHandler.postDelayed(() -> {
+                if(!finished.get()){
+                    Log.e("HIJACKER/SetupTask", "SetupTask watchdog triggered: forcing onPostExecute(false)");
+                    try{ executor.shutdownNow(); }catch(Exception ignored){}
+                    finished.set(true);
+                    mainHandler.post(() -> onPostExecute(false));
+                }
+            }, 120_000);
         }
     }
 
-    void extract(String filename, String out_dir, boolean chmod){
-        File f = new File(out_dir, filename);
-        if(f.exists()) f.delete();          //Delete file in case it's outdated
+    void extract(String filename, String out_dir){
+         File f = new File(out_dir, filename);
+         if(f.exists()) f.delete();          //Delete file in case it's outdated
+         try{
+             InputStream in = getResources().getAssets().open(filename);
+             FileOutputStream out = new FileOutputStream(f);
+
+             byte[] buf = new byte[BUFFER_SIZE];
+             int len;
+             while((len = in.read(buf))>0){
+                 out.write(buf, 0, len);
+             }
+             in.close();
+             out.close();
+             runOne("chmod 755 " + out_dir + "/" + filename);
+         }catch(IOException e){
+             Log.e("HIJACKER/FileProvider", "Exception copying from assets", e);
+         }
+     }
+
+    // Wrapper to log start and end of asset extraction; useful to trace long/blocked extractions
+    void extractWithLog(String filename, String out_dir){
+        Log.d("HIJACKER/SetupTask", "extractWithLog: starting " + filename);
+        java.util.concurrent.ExecutorService exec = java.util.concurrent.Executors.newSingleThreadExecutor(r -> new Thread(r, "extract-" + filename));
+        Future<?> fut = exec.submit(() -> extract(filename, out_dir));
         try{
-            InputStream in = getResources().getAssets().open(filename);
-            FileOutputStream out = new FileOutputStream(f);
-
-            byte[] buf = new byte[BUFFER_SIZE];
-            int len;
-            while((len = in.read(buf))>0){
-                out.write(buf, 0, len);
-            }
-            in.close();
-            out.close();
-            if(chmod){
-                runOne("chmod 755 " + out_dir + "/" + filename);
-            }
-        }catch(IOException e){
-            Log.e("HIJACKER/FileProvider", "Exception copying from assets", e);
+            fut.get(20, TimeUnit.SECONDS);
+            Log.d("HIJACKER/SetupTask", "extractWithLog: finished " + filename);
+        }catch(java.util.concurrent.TimeoutException te){
+            Log.e("HIJACKER/SetupTask", "extractWithLog: timeout while extracting " + filename);
+            fut.cancel(true);
+        }catch(Exception e){
+            Log.e("HIJACKER/SetupTask", "extractWithLog failed for " + filename, e);
+        }finally{
+            try{ exec.shutdownNow(); }catch(Exception ignored){}
         }
     }
 
-    public static void _startAireplay(final String str){
+     public static void _startAireplay(final String str){
         try{
             String cmd = "su -c " + prefix + " " + aireplay_dir + " -D --ignore-negative-one " + str + " " + iface;
             if(debug) Log.d("HIJACKER/_startAireplay", cmd);
             Runtime.getRuntime().exec(cmd);
             last_action = System.currentTimeMillis();
-        }catch(IOException e){ Log.e("HIJACKER/Exception", "Caught Exception in _startAireplay() start block: " + e.toString()); }
-        runInHandler(new Runnable(){
-            @Override
-            public void run(){
-                menu.getItem(3).setEnabled(true);       //Enable 'Stop aireplay' button
-                refreshState();
-                notification();
-            }
+        }catch(IOException e){ Log.e("HIJACKER/Exception", "Caught Exception in _startAireplay() start block: " + e); }
+        runInHandler(() -> {
+            menu.getItem(3).setEnabled(true);       //Enable 'Stop aireplay' button
+            refreshState();
+            notification();
         });
     }
     public static void startAireplay(String mac){
@@ -1013,8 +1093,6 @@ public class MainActivity extends AppCompatActivity{
         //Increase IV generation from ap mac to crack a wep network
         aireplay_running = AIREPLAY_WEP;
         _startAireplay("--fakeauth 0 -a " + ap.mac + (ap.isHidden() ? "" : " -e " + ap.getESSID()));
-        //_startAireplay("--arpreplay -b " + ap.mac);       //Aireplay tries to open a file at a read-only system
-        //_startAireplay("--caffe-latte -b " + ap.mac);     //don't know where
     }
 
     //There are 2 mdk3 binaries with different names, so the app can easily stop each one separately
@@ -1027,17 +1105,14 @@ public class MainActivity extends AppCompatActivity{
             Runtime.getRuntime().exec(cmd);
         }catch(IOException e){ Log.e("HIJACKER/startBF", e.toString()); }
         last_action = System.currentTimeMillis();
-        bf = true;
+        MDKFragment.bf = true;
 
-        runInHandler(new Runnable(){
-            @Override
-            public void run(){
-                refreshState();
-                notification();
-            }
+        runInHandler(() -> {
+            refreshState();
+            notification();
         });
     }
-    public static void startAdos(String str){
+    public static void startAdos(String str) {
         try{
             String cmd = "su -c " + prefix + " " + mdk3dos_dir + " " + iface + " a -m";
             cmd += str==null ? "" : " -i " + str;
@@ -1046,18 +1121,15 @@ public class MainActivity extends AppCompatActivity{
             Runtime.getRuntime().exec(cmd);
         }catch(IOException e){ Log.e("HIJACKER/startAdos", e.toString()); }
         last_action = System.currentTimeMillis();
-        ados = true;
+        MDKFragment.ados = true;
 
-        runInHandler(new Runnable(){
-            @Override
-            public void run(){
-                refreshState();
-                notification();
-            }
+        runInHandler(() -> {
+            refreshState();
+            notification();
         });
     }
 
-    public static ArrayList<Integer> getPIDs(String process_name){
+    public static ArrayList<Integer> getPIDs(String process_name) {
         if(process_name==null) return null;
 
         Shell shell = getFreeShell();
@@ -1074,18 +1146,18 @@ public class MainActivity extends AppCompatActivity{
                         list.add(Integer.parseInt(tmp));
                     }
                 }catch(NumberFormatException e){
-                    Log.e("HIJACKER/getPIDs", "Exception: " + e.toString());
+                    Log.e("HIJACKER/getPIDs", "Exception: " + e);
                 }
                 buffer = out.readLine();
             }
         }catch(IOException e){
-            Log.e("HIJACKER/getPIDs", "Exception: " + e.toString());
+            Log.e("HIJACKER/getPIDs", "Exception: " + e);
             list = null;
         }
         shell.done();
         return list;
     }
-    public static ArrayList<Integer> getPIDs(int pr){
+    public static ArrayList<Integer> getPIDs(int pr) {
         switch(pr){
             case PROCESS_AIRODUMP:
                 return getPIDs("airodump-ng");
@@ -1112,11 +1184,8 @@ public class MainActivity extends AppCompatActivity{
                 Airodump.stop();
                 return;
             case PROCESS_AIREPLAY:
-                runInHandler(new Runnable(){
-                    @Override
-                    public void run(){
-                        if(menu!=null) menu.getItem(3).setEnabled(false);
-                    }
+                runInHandler(() -> {
+                    if(menu!=null) menu.getItem(3).setEnabled(false);
                 });
                 progress_int = deauthWait;
                 runOne(busybox + " kill $(" + busybox + " pidof aireplay-ng)");
@@ -1129,28 +1198,18 @@ public class MainActivity extends AppCompatActivity{
                 break;
             case PROCESS_MDK_BF:
                 if(currentFragment==FRAGMENT_MDK){
-                    runInHandler(new Runnable(){
-                        @Override
-                        public void run(){
-                            MDKFragment.bf_switch.setChecked(false);
-                        }
-                    });
+                    runInHandler(() -> MDKFragment.bf_switch.setChecked(false));
                 }
 
-                bf = false;
+                MDKFragment.bf = false;
                 runOne(busybox + " kill $(" + busybox + " pidof mdk3bf)");
                 break;
             case PROCESS_MDK_DOS:
                 if(currentFragment==FRAGMENT_MDK){
-                    runInHandler(new Runnable(){
-                        @Override
-                        public void run(){
-                            MDKFragment.ados_switch.setChecked(false);
-                        }
-                    });
+                    runInHandler(() -> MDKFragment.ados_switch.setChecked(false));
                 }
 
-                ados = false;
+                MDKFragment.ados = false;
                 runOne(busybox + " kill $(" + busybox + " pidof mdk3dos)");
             case PROCESS_AIRCRACK:
                 CrackFragment.stopCracking();
@@ -1164,12 +1223,9 @@ public class MainActivity extends AppCompatActivity{
                 runOne(busybox + " kill " + pr);
                 break;
         }
-        runInHandler(new Runnable(){
-            @Override
-            public void run(){
-                refreshState();
-                notification();
-            }
+        runInHandler(() -> {
+            refreshState();
+            notification();
         });
     }
     public static void stopWPA(){
@@ -1177,17 +1233,51 @@ public class MainActivity extends AppCompatActivity{
         if(wpa_thread!=null) wpa_thread.interrupt();
     }
 
-    public static Handler handler = new Handler();
+    public static Handler handler = new Handler(Looper.getMainLooper());
     public static void runInHandler(Runnable runnable){
         handler.post(runnable);
     }
 
-    static void loadPreferences(){
+    // UI-safe helper methods to avoid exposing Activity views as public static fields.
+    // Callers should use these to update UI elements from other classes.
+    public static void setProgressIndeterminate(final boolean ind){
+        final MainActivity inst = instance;
+        if(inst==null) return;
+        inst.runOnUiThread(() -> {
+            if(inst.progress!=null) inst.progress.setIndeterminate(ind);
+        });
+    }
+
+    public static void setProgressValue(final int value){
+        final MainActivity inst = instance;
+        if(inst==null) return;
+        inst.runOnUiThread(() -> {
+            if(inst.progress!=null) inst.progress.setProgress(value);
+        });
+    }
+
+    public static void setProgressMax(final int max) {
+        final MainActivity inst = instance;
+        if(inst==null) return;
+        inst.runOnUiThread(() -> {
+            if(inst.progress!=null) inst.progress.setMax(max);
+        });
+    }
+
+    public static void updateCounts() {
+        final MainActivity inst = instance;
+        if(inst==null) return;
+        inst.runOnUiThread(() -> {
+            if(inst.ap_count!=null) inst.ap_count.setText(String.format(Locale.getDefault(), "%d", is_ap==null ? Tile.i : 1));
+            if(inst.st_count!=null) inst.st_count.setText(String.format(Locale.getDefault(), "%d", Tile.tiles.size() - Tile.i));
+        });
+    }
+    static void loadPreferences() {
         //Load Preferences
         Log.d("HIJACKER/load", "Loading preferences...");
 
         iface = pref.getString("iface", iface);
-        if(!isArchValid()){
+        if(!isArchValid()) {
             prefix = pref.getString("prefix", prefix);
         }
         deauthWait = Integer.parseInt(pref.getString("deauthWait", Integer.toString(deauthWait)));
@@ -1214,13 +1304,14 @@ public class MainActivity extends AppCompatActivity{
         band = Integer.parseInt(pref.getString("band", Integer.toString(band)));
         show_client_count = pref.getBoolean("show_client_count", show_client_count);
 
-        progress.setMax(deauthWait);
-        progress.setProgress(deauthWait);
+        // Use UI-safe helpers
+        setProgressMax(deauthWait);
+        setProgressValue(deauthWait);
     }
-    static void loadAliases(){
+    static void loadAliases() {
         aliases_file = new File(data_path + "/aliases.txt");
         try{
-            if(!aliases_file.exists()){
+            if(!aliases_file.exists()) {
                 aliases_file.createNewFile();
             }else{
                 if(debug) Log.d("HIJACKER/loadAliases", "Reading aliases file...");
@@ -1251,57 +1342,50 @@ public class MainActivity extends AppCompatActivity{
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch(item.getItemId()){
-            case android.R.id.home:
-                mDrawerLayout.openDrawer(GravityCompat.START);
-                return true;
-
-            case R.id.reset:
-                boolean flag = Airodump.isRunning();
-                if(flag) stop(PROCESS_AIRODUMP);
-                Tile.clear();
-                Tile.onCountsChanged();
-                if(flag) Airodump.start();
-                return true;
-
-            case R.id.stop_run:
-                if(Airodump.isRunning()) stop(PROCESS_AIRODUMP);
-                else Airodump.start();
-                return true;
-
-            case R.id.stop_aireplay:
-                stop(PROCESS_AIREPLAY);
-                return true;
-
-            case R.id.filter:
-                new FiltersDialog().show(mFragmentManager, "FiltersDialog");
-                return true;
-
-            case R.id.settings:
-                if(currentFragment!=FRAGMENT_SETTINGS){
-                    FragmentTransaction ft = mFragmentManager.beginTransaction();
-                    ft.replace(R.id.fragment1, new SettingsFragment());
-                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                    ft.addToBackStack(null);
-                    ft.commitAllowingStateLoss();
-                }
-                return true;
-
-            case R.id.export:
-                new ExportDialog().show(mFragmentManager, "ExportDialog");
-                return true;
-
-            case R.id.copy_airodump:
-                if(last_airodump==null){
-                    Toast.makeText(this, getString(R.string.no_last_command_available), Toast.LENGTH_SHORT).show();
-                }else{
-                    copy(last_airodump, rootView);
-                }
-
-            default:
-                return super.onOptionsItemSelected(item);
+    public boolean onOptionsItemSelected(@NonNull MenuItem item){
+        int id = item.getItemId();
+        if(id == android.R.id.home){
+            mDrawerLayout.openDrawer(GravityCompat.START);
+            return true;
+        }else if(id == R.id.reset){
+            boolean flag = Airodump.isRunning();
+            if(flag) stop(PROCESS_AIRODUMP);
+            Tile.clear();
+            Tile.onCountsChanged();
+            if(flag) Airodump.start();
+            return true;
+        }else if(id == R.id.stop_run){
+            if(Airodump.isRunning()) stop(PROCESS_AIRODUMP);
+            else Airodump.start();
+            return true;
+        }else if(id == R.id.stop_aireplay){
+            stop(PROCESS_AIREPLAY);
+            return true;
+        }else if(id == R.id.filter){
+            new FiltersDialog().show(mFragmentManager, "FiltersDialog");
+            return true;
+        }else if(id == R.id.settings){
+            if(currentFragment!=FRAGMENT_SETTINGS){
+                FragmentTransaction ft = mFragmentManager.beginTransaction();
+                ft.replace(R.id.fragment1, new SettingsFragment());
+                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                ft.addToBackStack(null);
+                ft.commitAllowingStateLoss();
+            }
+            return true;
+        }else if(id == R.id.export){
+            new ExportDialog().show(mFragmentManager, "ExportDialog");
+            return true;
+        }else if(id == R.id.copy_airodump){
+            if(last_airodump==null){
+                Toast.makeText(this, getString(R.string.no_last_command_available), Toast.LENGTH_SHORT).show();
+            }else{
+                copy(last_airodump, rootView);
+            }
+            return true;
         }
+
+        return super.onOptionsItemSelected(item);
     }
     @Override
     protected void onResume(){
@@ -1326,26 +1410,26 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onDestroy(){
         notif_on = false;
-        mNotificationManager.cancelAll();
-        CustomAction.save();
-        if(watchdogTask!=null) watchdogTask.cancel(true);
-        try{
-            stop(PROCESS_AIRODUMP);
-            stop(PROCESS_AIREPLAY);
-            stop(PROCESS_MDK_BF);
-            stop(PROCESS_MDK_DOS);
-            stop(PROCESS_AIRCRACK);
-            stop(PROCESS_REAVER);
-            runOne(disable_monMode);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        RootFile.finish();
-        Shell.exitAll();
-        stopService(new Intent(this, PersistenceService.class));
-        super.onDestroy();
-        System.exit(0);
-    }
+        if(mNotificationManager!=null) mNotificationManager.cancelAll();
+         CustomAction.save();
+         if(watchdogTask!=null) watchdogTask.requestStop();
+         try{
+             stop(PROCESS_AIRODUMP);
+             stop(PROCESS_AIREPLAY);
+             stop(PROCESS_MDK_BF);
+             stop(PROCESS_MDK_DOS);
+             stop(PROCESS_AIRCRACK);
+             stop(PROCESS_REAVER);
+             runOne(disable_monMode);
+         }catch(Exception e){
+             e.printStackTrace();
+         }
+         RootFile.finish();
+         Shell.exitAll();
+         stopService(new Intent(this, PersistenceService.class));
+         super.onDestroy();
+         System.exit(0);
+     }
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event){
         if(keyCode==KeyEvent.KEYCODE_BACK){
@@ -1357,15 +1441,12 @@ public class MainActivity extends AppCompatActivity{
                 CustomDialog customDialog = new CustomDialog();
                 customDialog.setTitle(getString(R.string.exit_dialog_title));
                 customDialog.setMessage(getString(R.string.exit_dialog_message));
-                customDialog.setPositiveButton(getString(R.string.exit), new Runnable(){
-                    @Override
-                    public void run(){
-                        show_notif = false;
-                        finish();
-                    }
+                customDialog.setPositiveButton(getString(R.string.exit), () -> {
+                    show_notif = false;
+                    finish();
                 });
                 customDialog.setNegativeButton(getString(R.string.cancel), null);
-                customDialog.show(getFragmentManager(), "CustomDialog for exit");
+                customDialog.show(mFragmentManager, "CustomDialog for exit");
             }
             return true;
         }
@@ -1384,30 +1465,47 @@ public class MainActivity extends AppCompatActivity{
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(requestCode==0){
             //The one and only request this app sends
             synchronized(this){
                 this.notify();
             }
+        }else if(requestCode==1){
+            // Notification permission request
+            boolean granted = false;
+            for(int result : grantResults){
+                if(result == PackageManager.PERMISSION_GRANTED){
+                    granted = true;
+                    break;
+                }
+            }
+            if(granted){
+                // Permission granted, you can show a message or take action if needed
+                Log.i("HIJACKER/Permissions", "Notification permission granted");
+            }else{
+                // Permission denied, handle accordingly
+                Log.i("HIJACKER/Permissions", "Notification permission denied");
+            }
         }
     }
     @SuppressLint("MissingSuperCall")
     @Override
-    protected void onSaveInstanceState(Bundle outState){
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         //No call for super(), avoid IllegalStateException on FragmentManagerImpl.checkStateLoss.
     }
 
-    class MyListAdapter extends ArrayAdapter<Tile>{
-        MyListAdapter(){
+    class MyListAdapter extends ArrayAdapter<Tile> {
+        MyListAdapter() {
             super(MainActivity.this, R.layout.listitem);
         }
 
         @NonNull
         @Override
-        public View getView(int position, View convertView, @NonNull ViewGroup parent){
+        public View getView(int position, View convertView, @NonNull ViewGroup parent) {
             // get a view to work with
             View itemview = convertView;
-            if(itemview==null){
+            if(itemview==null) {
                 itemview = getLayoutInflater().inflate(R.layout.listitem, parent, false);
             }
 
@@ -1430,17 +1528,17 @@ public class MainActivity extends AppCompatActivity{
             //Image and count views
             ImageView iv = itemview.findViewById(R.id.iv);
             TextView icon_count_view = itemview.findViewById(R.id.icon_count_view);
-            if(current.device instanceof AP){
-                if(((AP)current.device).isHidden) iv.setImageResource(R.drawable.ap_hidden);
+            if (current.device instanceof AP) {
+                if (((AP)current.device).isHidden) iv.setImageResource(R.drawable.ap_hidden);
                 else iv.setImageResource(R.drawable.ap2);
 
-                if(show_client_count){
-                    icon_count_view.setText(Integer.toString(((AP) (current.device)).clients.size()));
+                if (show_client_count) {
+                    icon_count_view.setText(String.format(Locale.getDefault(), "%d", ((AP) (current.device)).clients.size()));
                     icon_count_view.setVisibility(View.VISIBLE);
-                }else{
+                } else {
                     icon_count_view.setVisibility(View.GONE);
                 }
-            }else{
+            } else {
                 iv.setImageResource(R.drawable.st2);
 
                 icon_count_view.setVisibility(View.GONE);
@@ -1559,10 +1657,10 @@ public class MainActivity extends AppCompatActivity{
     }
     public void onDos(View v){
         //Clicked dos with isolated ap
-        if(ados){
+        if(MDKFragment.ados){
             ((TextView)v).setText(R.string.dos);
             stop(PROCESS_MDK_DOS);
-            ados = false;
+            MDKFragment.ados = false;
         }else{
             ((TextView)v).setText(R.string.stop);
             startAdos(is_ap.mac);
@@ -1588,20 +1686,20 @@ public class MainActivity extends AppCompatActivity{
                 if(wpa_thread!=null){
                     if(wpa_thread.isAlive()) str += " | WPA cracking...";
                 }
-                if(bf) str += " | MDK3 Beacon Flooding...";
-                if(ados) str += " | MDK3 Authentication DoS...";
+                if(MDKFragment.bf) str += " | MDK3 Beacon Flooding...";
+                if(MDKFragment.ados) str += " | MDK3 Authentication DoS...";
                 if(ReaverFragment.isRunning()) str += " | Reaver running...";
                 if(CrackFragment.isRunning()) str += " | Cracking .cap file...";
                 if(CustomActionFragment.isRunning()) str += " | Running action " + CustomActionFragment.selectedAction.getTitle() + "...";
 
                 notif.setContentText(str);
             }else notif.setContentText(null);
-            mNotificationManager.notify(0, notif.build());
+            if (mNotificationManager != null) mNotificationManager.notify(0, notif.build());
         }else{
-            mNotificationManager.cancel(0);
+            if (mNotificationManager != null) mNotificationManager.cancel(0);
         }
     }
-    static void isolate(String mac){
+    static void isolate(String mac) {
         is_ap = getAPByMac(mac);
         if(is_ap!=null){
             IsolatedFragment.exit_on = mFragmentManager.getBackStackEntryCount();
@@ -1617,17 +1715,22 @@ public class MainActivity extends AppCompatActivity{
             else Log.d("HIJACKER/Main", "AP with MAC " + mac + " isolated");
         }
     }
-    static void refreshState(){
+    static void refreshState() {
         //refresh overflow icon to show what is running
-        int state = Airodump.isRunning() ? 1 : 0;
-        if(aireplay_running!=0) state += 2;
-        if(bf || ados) state += 4;
-        toolbar.setOverflowIcon(overflow[state]);
-
-        if(!(ReaverFragment.isRunning() || CrackFragment.isRunning() || wpa_thread.isAlive())){
-            progress.setIndeterminate(false);
-            progress.setProgress(deauthWait);
-        }
+        final int state = (Airodump.isRunning() ? 1 : 0)
+                + (aireplay_running!=0 ? 2 : 0)
+                + ((MDKFragment.bf || MDKFragment.ados) ? 4 : 0);
+        final MainActivity inst = instance;
+        if(inst==null) return;
+        inst.runOnUiThread(() -> {
+            if(inst.toolbar!=null) inst.toolbar.setOverflowIcon(overflow[state]);
+            if(!(ReaverFragment.isRunning() || CrackFragment.isRunning() || (inst.wpa_thread!=null && inst.wpa_thread.isAlive()))){
+                if(inst.progress!=null){
+                    inst.progress.setIndeterminate(false);
+                    inst.progress.setProgress(deauthWait);
+                }
+            }
+        });
     }
     void refreshDrawer(){
         navigationView.getMenu().findItem(currentFragment).setChecked(true);
@@ -1670,7 +1773,7 @@ public class MainActivity extends AppCompatActivity{
         str += "ago";
         return str;
     }
-    static String getFixed(String text, int size){
+   static String getFixed(String text, int size){
         /*Returns a string of fixed length (size) that contains spaces followed by a text
            <--  size  -->
           |     ...  text|
@@ -1700,8 +1803,8 @@ public class MainActivity extends AppCompatActivity{
                 break;
             }
         }
-        if(!bin){
-            if(new RootFile(NETHUNTER_BOOTKALI_BASH).exists()){
+        if(!bin) {
+            if(new RootFile(NETHUNTER_BOOTKALI_BASH).exists()) {
                 bin = true;
                 bootkali_init_bin = NETHUNTER_BOOTKALI_BASH;
             }
@@ -1714,15 +1817,10 @@ public class MainActivity extends AppCompatActivity{
         else if(dir) return CHROOT_BIN_MISSING;
         else return CHROOT_DIR_MISSING;
     }
-    void checkForUpdate(final boolean showMessages){
+    void checkForUpdate(final boolean showMessages) {
         //Can be called from any thread, blocks until the job is finished
         if(showMessages){
-            runInHandler(new Runnable(){
-                @Override
-                public void run(){
-                    progress.setIndeterminate(true);
-                }
-            });
+            runInHandler(() -> progress.setIndeterminate(true));
         }
 
         try{
@@ -1732,7 +1830,7 @@ public class MainActivity extends AppCompatActivity{
 
             JsonReader reader = new JsonReader(new InputStreamReader(connection.getInputStream()));
             reader.beginArray();
-            if(!reader.hasNext()){
+            if(!reader.hasNext()) {
                 //No releases
                 Log.e("HIJACKER/UpdateCheck", "No releases found");
                 throw new Exception();
@@ -1742,15 +1840,15 @@ public class MainActivity extends AppCompatActivity{
 
             reader.beginObject();
             //Run through all the names in the release array
-            while(reader.hasNext()){
+            while (reader.hasNext()) {
                 String field = reader.nextName();
-                switch(field){
+                switch (field) {
                     case "tag_name":
                         latestName = reader.nextString();
                         break;
                     case "body":
                         latestBody = reader.nextString();
-                        if(latestBody.equals(""))
+                        if (latestBody.isEmpty())
                             latestBody = null;
                         break;
                     case "assets":
@@ -1758,11 +1856,11 @@ public class MainActivity extends AppCompatActivity{
                         reader.beginArray();
                         reader.beginObject();
                         //Run through all the names in the 'assets' array
-                        while(reader.hasNext()){
+                        while (reader.hasNext()) {
                             field = reader.nextName();
-                            if(field.equals("browser_download_url")){
+                            if (field.equals("browser_download_url")) {
                                 latestLink = reader.nextString();
-                            }else{
+                            } else {
                                 reader.skipValue();
                             }
                         }
@@ -1776,11 +1874,11 @@ public class MainActivity extends AppCompatActivity{
             }
             reader.close();
 
-            if(!versionName.equals(latestName) && latestLink!=null){
+            if (!versionName.equals(latestName) && latestLink!=null) {
                 String text = getString(R.string.update_text) + "\n\n";
                 text += getString(R.string.latest_version) + " " + latestName + "\n";
                 text += getString(R.string.current_version) + " " + versionName + "\n";
-                if(latestBody!=null){
+                if (latestBody!=null) {
                     text += "\nExtra Information:\n" + latestBody;
                 }
                 final String link = latestLink;
@@ -1795,7 +1893,8 @@ public class MainActivity extends AppCompatActivity{
 
                         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(link));
                         request.setTitle(filename);
-                        request.allowScanningByMediaScanner();
+                        // allowScanningByMediaScanner is deprecated; call it only on older Android versions to retain behavior
+                        allowScanningByMediaScannerIfNeeded(request);
                         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
 
@@ -1805,142 +1904,160 @@ public class MainActivity extends AppCompatActivity{
                 });
                 customDialog.setNeutralButton(getString(R.string.cancel), null);
 
-                runInHandler(new Runnable(){
-                    @Override
-                    public void run(){
-                        customDialog.show(getFragmentManager(), "CustomDialog for update");
-                    }
-                });
-            }else{
-                if(showMessages) Snackbar.make(rootView, getString(R.string.already_on_latest), Snackbar.LENGTH_SHORT).show();
+                runInHandler(() -> customDialog.show(mFragmentManager, "CustomDialog for update"));
+            } else {
+                if (showMessages) Snackbar.make(rootView, getString(R.string.already_on_latest), Snackbar.LENGTH_SHORT).show();
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.e("HIJACKER/update", e.toString());
             if(showMessages) Snackbar.make(rootView, getString(R.string.unknown_error), Snackbar.LENGTH_SHORT).show();
-        }finally{
-            if(showMessages) runInHandler(new Runnable(){
-                @Override
-                public void run(){
-                    progress.setIndeterminate(false);
-                }
-            });
+        } finally {
+            if (showMessages) runInHandler(() -> progress.setIndeterminate(false));
         }
     }
-    boolean internetAvailable(){
+    boolean internetAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        return connectivityManager.getNetworkInfo(1).getState()==NetworkInfo.State.CONNECTED || connectivityManager.getNetworkInfo(0).getState()==NetworkInfo.State.CONNECTED;
-    }
-    static boolean createReport(File out, String filesDir, String stackTrace, Process shell){
-        if(!out.exists()){
-            try{
-                if(!out.createNewFile()) return false;
-            }catch(IOException e){
-                Log.e("HIJACKER/createReport", e.toString());
-                return false;
-            }
-        }
-        String busybox_tmp = filesDir + "/bin/busybox";
-        PrintWriter shell_in = new PrintWriter(shell.getOutputStream());
-        BufferedReader shell_out = new BufferedReader(new InputStreamReader(shell.getInputStream()));
-
-        FileWriter writer = null;
-        try{
-            writer = new FileWriter(out, true);
-            writer.write("\n--------------------------------------------------------------------------------\n");
-            writer.write("Hijacker report - " + new Date().toString() + "\n\n");
-            writer.write("Android version: " +  Build.VERSION.SDK_INT + '\n');
-            writer.write("Device: " + deviceModel + '\n');
-            writer.write("App version: " + versionName + " (" + versionCode + ")\n");
-            writer.write("App data path: " + filesDir + '\n');
-            if(stackTrace!=null) writer.write("\nStack trace:\n" + stackTrace + '\n');
-
-            String cmd = "echo pref_file--------------------------------------; cat /data/data/com.hijacker/shared_prefs/com.hijacker_preferences.xml;";
-            cmd += " echo aliases file-----------------------------------; " + busybox_tmp + " cat " + Environment.getExternalStorageDirectory() + "/Hijacker/aliases.txt;";
-            cmd += " echo app directory----------------------------------; " + busybox_tmp + " ls -lR " + filesDir + ';';
-            cmd += " echo fw_bcmdhd--------------------------------------; strings /vendor/firmware/fw_bcmdhd.bin | grep \"FWID:\";";
-            cmd += " echo ps---------------------------------------------; ps | " + busybox_tmp + " grep -e air -e mdk -e reaver;";
-            cmd += " echo busybox----------------------------------------; " + busybox_tmp + ";";
-            cmd += " echo logcat-----------------------------------------; logcat -d -v time | " + busybox_tmp + " grep HIJACKER;";
-            cmd += " exit\n";
-            Log.d("HIJACKER/createReport", cmd);
-            shell_in.print(cmd);
-            shell_in.flush();
-
-            String buffer = shell_out.readLine();
-            while(buffer!=null){
-                writer.write(buffer + '\n');
-                buffer = shell_out.readLine();
-            }
-
-            writer.close();
-        }catch(IOException e){
-            if(writer != null){
-                try{
-                    writer.close();
-                }catch(IOException ignored){}
+        if(connectivityManager==null) return false;
+        // Use modern APIs on API 23+; fall back to older method on older devices.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Network activeNetwork = connectivityManager.getActiveNetwork();
+            if (activeNetwork == null) return false;
+            NetworkCapabilities caps = connectivityManager.getNetworkCapabilities(activeNetwork);
+            return caps != null && caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+        } else {
+            // Deprecated on newer APIs but necessary for older devices (minSdk 21).
+            @SuppressWarnings("deprecation")
+            Network[] networks = connectivityManager.getAllNetworks();
+            for (Network n : networks) {
+                NetworkCapabilities caps = connectivityManager.getNetworkCapabilities(n);
+                if (caps != null && caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) return true;
             }
             return false;
         }
-        return true;
     }
 
-    static String findFirmwarePath(Shell shell){
-        //Blocking function, don't run on main thread
-        boolean flag = false;
-        if(shell==null){
-            flag = true;
+    @SuppressWarnings("deprecation")
+    private static void allowScanningByMediaScannerIfNeeded(DownloadManager.Request request) {
+        // allowScanningByMediaScanner() is deprecated on newer SDKs. Only call it on older SDKs
+        // where the behavior (making the downloaded file visible to MediaStore) was done via this call.
+        if (request == null) return;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q ){
+            request.allowScanningByMediaScanner();
+        }
+    }
+
+    static String findFirmwarePath(Shell shell) {
+        // Blocking function, don't run on main thread. Returns the first matching firmware path or null.
+        boolean createdShell = false;
+        if (shell==null) {
+            createdShell = true;
             shell = getFreeShell();
         }
 
-        String[] dirs = {
-                "/system",
-                "/vendor",
-                "/system/etc"
-        };
-        String[] fw_names = {
-                "fw_bcmdhd.bin",
-                "bcmdhd_sta.bin"
-        };
+        String[] dirs = {"/system", "/vendor", "/system/etc"};
+        String[] fw_names = {"fw_bcmdhd.bin", "bcmdhd_sta.bin"};
 
         String firmware = null;
-        int i = 0;
-        while(firmware==null && i<dirs.length){
-
-            for(String fw_name : fw_names){
+        for (int i=0;i<dirs.length && firmware==null;i++) {
+            for (String fw_name : fw_names) {
                 shell.run(busybox + " find " + dirs[i] + " -type f -name \"" + fw_name + "\"; echo ENDOFFIND");
                 BufferedReader out = shell.getShell_out();
-                try{
+                try {
                     String result = out.readLine();
-                    while(result!=null){
-                        if(result.equals("ENDOFFIND"))
-                            break;
-                        if(!result.contains("/bac/") && !result.contains("backup"))
+                    while (result!=null) {
+                        if (result.equals("ENDOFFIND")) break;
+                        // Skip obvious backup paths
+                        if (!result.contains("/bac/") && !result.contains("backup")) {
                             firmware = result;
-
+                            break;
+                        }
                         result = out.readLine();
                     }
-                }catch(IOException e){
-                    e.printStackTrace();
+                } catch(IOException e) {
+                    Log.e("HIJACKER/FFPATH", "Exception while searching for firmware", e);
                 }
-
-                if(firmware!=null) break;
+                if (firmware!=null) break;
             }
-
-            i++;
         }
 
-        if(flag){
-            //Release the shell only if it was obtained by this function
+        if (createdShell) {
             shell.done();
         }
-
         return firmware;
     }
-    static boolean isArchValid(){
+
+    static boolean isArchValid() {
+        // arch is set earlier from System.getProperty("os.arch").
+        if (arch==null) return false;
         return arch.matches("(.*)arm(.*)") || arch.matches("aarch64");
     }
 
-    static{
+    static {
         System.loadLibrary("native-lib");
+    }
+
+    static boolean createReport(File report, String filesPath, String stackTrace, Process shell){
+        // Create a simple text report containing app/device info, optional stack trace, a directory listing
+        // and a short logcat dump. Returns true on success.
+        if(report == null) return false;
+        try (PrintWriter pw = new PrintWriter(new FileWriter(report))){
+            pw.println("Hijacker report - " + new Date().toString());
+            pw.println("Version: " + (versionName == null ? "unknown" : versionName) + " (" + versionCode + ")");
+            pw.println("Device: " + (deviceModel == null ? "unknown" : deviceModel));
+            pw.println("Arch: " + (arch == null ? "unknown" : arch));
+            pw.println("Busybox: " + (busybox == null ? "unknown" : busybox));
+            pw.println();
+
+            if(stackTrace != null){
+                pw.println("---- Stack trace ----");
+                pw.println(stackTrace);
+                pw.println();
+            }
+
+            if(filesPath != null){
+                pw.println("---- Files in: " + filesPath + " ----");
+                try{
+                    File dir = new File(filesPath);
+                    if(dir.exists() && dir.isDirectory()){
+                        String[] list = dir.list();
+                        if(list!=null){
+                            for(String f : list){
+                                pw.println(f);
+                            }
+                        }else{
+                            pw.println("(empty)");
+                        }
+                    }else{
+                        pw.println("(path not found)");
+                    }
+                }catch(Exception e){
+                    pw.println("(error listing files: " + e.toString() + ")");
+                }
+                pw.println();
+            }
+
+            pw.println("---- Recent logcat (truncated) ----");
+            try{
+                Process p = Runtime.getRuntime().exec(new String[]{"logcat", "-d", "-v", "time"});
+                BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                String line;
+                int lines = 0;
+                // limit the amount of logcat written to keep report reasonable
+                while((line = br.readLine())!=null && lines < 1000){
+                    pw.println(line);
+                    lines++;
+                }
+                br.close();
+                p.destroy();
+            }catch(Exception e){
+                pw.println("(failed to collect logcat: " + e.toString() + ")");
+            }
+
+            pw.flush();
+            return true;
+        }catch(IOException e){
+            Log.e("HIJACKER/createReport", "Exception creating report", e);
+            return false;
+        }
     }
 }

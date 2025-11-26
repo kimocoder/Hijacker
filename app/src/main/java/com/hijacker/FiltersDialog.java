@@ -2,6 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
+    Copyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,13 +19,13 @@ package com.hijacker;
  */
 
 import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.FragmentManager;
-import android.content.DialogInterface;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 import android.os.Bundle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
@@ -52,7 +53,7 @@ import static com.hijacker.MainActivity.wep;
 import static com.hijacker.MainActivity.wpa;
 
 public class FiltersDialog extends DialogFragment {
-    String sort_texts[];
+    String[] sort_texts;
     View view;
     EditText manufView;
     TextView pwrTv;
@@ -61,10 +62,11 @@ public class FiltersDialog extends DialogFragment {
     CheckBox[] channelCb = new CheckBox[15];
     SeekBar seek;
     int temp_sort;
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState){
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        view = getActivity().getLayoutInflater().inflate(R.layout.filters, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        view = requireActivity().getLayoutInflater().inflate(R.layout.filters, null);
 
         sort_texts = new String[]{
                 getString(R.string.sort_nosort),
@@ -104,7 +106,7 @@ public class FiltersDialog extends DialogFragment {
         seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                pwrTv.setText("-" + progress);
+                pwrTv.setText(getString(R.string.power_value, progress));
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -112,44 +114,28 @@ public class FiltersDialog extends DialogFragment {
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
-        manufView.setOnEditorActionListener(new TextView.OnEditorActionListener(){
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event){
-                if(actionId == EditorInfo.IME_ACTION_DONE){
-                    apply();
-                    dismissAllowingStateLoss();
-                    return true;
-                }
-                return false;
+        manufView.setOnEditorActionListener((v, actionId, event) -> {
+            if(actionId == EditorInfo.IME_ACTION_DONE){
+                apply();
+                dismissAllowingStateLoss();
+                return true;
             }
+            return false;
         });
 
-        sortSelectBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                showSortingPopup(v);
-            }
-        });
+        sortSelectBtn.setOnClickListener(this::showSortingPopup);
 
         builder.setView(view);
         builder.setTitle(R.string.filters);
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //close
-            }
+        builder.setNegativeButton(R.string.cancel, (dialog, which) -> {
+            //close
         });
-        builder.setPositiveButton(R.string.apply, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                apply();
-            }
-        });
+        builder.setPositiveButton(R.string.apply, (dialog, which) -> apply());
 
         return builder.create();
     }
     @Override
-    public void show(FragmentManager fragmentManager, String tag){
+    public void show(@NonNull FragmentManager fragmentManager, String tag){
         if(!background) super.show(fragmentManager, tag);
     }
     @Override
@@ -166,7 +152,7 @@ public class FiltersDialog extends DialogFragment {
         wepCb.setChecked(wep);
         opnCb.setChecked(opn);
         seek.setProgress(pwr_filter);
-        pwrTv.setText("-" + pwr_filter);
+        pwrTv.setText(getString(R.string.power_value, pwr_filter));
         manufView.setText(manuf_filter);
         sortSelectBtn.setText(sort_texts[sort]);
         sortReverseCb.setChecked(sort_reverse);
@@ -194,7 +180,7 @@ public class FiltersDialog extends DialogFragment {
         Tile.filter();
     }
     void showSortingPopup(View v){
-        PopupMenu popup = new PopupMenu(getActivity(), v);
+        PopupMenu popup = new PopupMenu(requireActivity(), v);
 
         popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
         popup.getMenu().add(0, SORT_NOSORT, 0, sort_texts[SORT_NOSORT]);
@@ -202,12 +188,10 @@ public class FiltersDialog extends DialogFragment {
         popup.getMenu().add(0, SORT_BEACONS_FRAMES, 2, sort_texts[SORT_BEACONS_FRAMES]);
         popup.getMenu().add(0, SORT_DATA_FRAMES, 3, sort_texts[SORT_DATA_FRAMES]);
         popup.getMenu().add(0, SORT_PWR, 4, sort_texts[SORT_PWR]);
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(android.view.MenuItem item) {
-                temp_sort = item.getItemId();
-                sortSelectBtn.setText(sort_texts[temp_sort]);
-                return true;
-            }
+        popup.setOnMenuItemClickListener(item -> {
+            temp_sort = item.getItemId();
+            sortSelectBtn.setText(sort_texts[temp_sort]);
+            return true;
         });
         popup.show();
     }

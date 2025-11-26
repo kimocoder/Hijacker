@@ -2,6 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
+    Copyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,12 +24,11 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import androidx.annotation.NonNull;
+import androidx.core.content.pm.PackageInfoCompat;
 import com.google.android.material.snackbar.Snackbar;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -45,25 +45,26 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.hijacker.MainActivity.createReport;
 import static com.hijacker.MainActivity.deviceModel;
 import static com.hijacker.MainActivity.versionCode;
 import static com.hijacker.MainActivity.versionName;
 
-public class SendLogActivity extends AppCompatActivity{
+public class SendLogActivity extends AppCompatActivity {
     static String busybox;
     View rootView;
     View sendEmailBtn, progressBar;
     TextView console;
-
     File report;
     String stackTrace;
     Process shell;
     PrintWriter shell_in;
     BufferedReader shell_out;
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setFinishOnTouchOutside(false);
@@ -76,6 +77,7 @@ public class SendLogActivity extends AppCompatActivity{
 
         busybox = getFilesDir().getAbsolutePath() + "/bin/busybox";
         stackTrace = getIntent().getStringExtra("exception");
+        assert stackTrace != null;
         Log.e("HIJACKER/SendLog", stackTrace);
 
         //Load device info
@@ -84,7 +86,8 @@ public class SendLogActivity extends AppCompatActivity{
         try{
             info = manager.getPackageInfo(getPackageName(), 0);
             versionName = info.versionName.replace(" ", "_");
-            versionCode = info.versionCode;
+            // versionCode is deprecated; use PackageInfoCompat.getLongVersionCode for compatibility
+            versionCode = (int) PackageInfoCompat.getLongVersionCode(info);
         }catch(PackageManager.NameNotFoundException e){
             Log.e("HIJACKER/SendLog", e.toString());
         }
@@ -92,79 +95,82 @@ public class SendLogActivity extends AppCompatActivity{
         if(!deviceModel.startsWith(Build.MANUFACTURER)) deviceModel = Build.MANUFACTURER + " " + deviceModel;
         deviceModel = deviceModel.replace(" ", "_");
 
-        new SetupTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        new SetupTask().start();
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         boolean writeGranted = grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED;
         if(shell==null){
             progressBar.setVisibility(View.GONE);
             console.setText(getString(R.string.cant_open_shell));
         }else if(writeGranted){
-            new ReportTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            new ReportTask().start();
         }else{
             progressBar.setVisibility(View.GONE);
             console.setText(getString(R.string.cant_create_report));
         }
     }
-    private class SetupTask extends AsyncTask<Void, String, Boolean>{
-        @Override
-        protected Boolean doInBackground(Void... params){
-            //Start su shell
-            try{
-                shell = Runtime.getRuntime().exec("su");
-                shell_in = new PrintWriter(shell.getOutputStream());
-                shell_out = new BufferedReader(new InputStreamReader(shell.getInputStream()));
+    private class SetupTask {
+        private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "SendLogSetupThread"));
+        void start(){
+            executor.submit(() -> {
+                //Start su shell
+                try{
+                    shell = Runtime.getRuntime().exec("su");
+                    shell_in = new PrintWriter(shell.getOutputStream());
+                    shell_out = new BufferedReader(new InputStreamReader(shell.getInputStream()));
 
-                stopAll();
-            }catch(IOException e){
-                Log.e("HIJACKER/onCreate", "Caught Exception in shell start: " + e.toString());
-                Snackbar.make(rootView, "Couldn't start su shell to stop any remaining processes", Snackbar.LENGTH_LONG).show();
-            }
+                    stopAll();
+                }catch(IOException e){
+                    Log.e("HIJACKER/onCreate", "Caught Exception in shell start: " + e);
+                    Snackbar.make(rootView, "Couldn't start su shell to stop any remaining processes", Snackbar.LENGTH_LONG).show();
+                }
 
-            ActivityCompat.requestPermissions(SendLogActivity.this, new String[]{
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.INTERNET,
-                    Manifest.permission.ACCESS_WIFI_STATE,
-                    Manifest.permission.ACCESS_NETWORK_STATE
-            }, 0);
+                // Request only the missing dangerous permissions on the UI thread.
+                runOnUiThread(() -> PermissionUtils.requestMissingPermissions(SendLogActivity.this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE}, 0));
 
-            return true;
+                return null;
+            });
         }
     }
-    private class ReportTask extends AsyncTask<Void, String, Boolean>{
-        StringBuilder bugReport = new StringBuilder();
-        @Override
-        protected Boolean doInBackground(Void... params){
-            report = new File(Environment.getExternalStorageDirectory() + "/report.txt");
-            boolean result = createReport(report, getFilesDir().getAbsolutePath(), stackTrace, shell);
-            if(result){
-                try{
-                    BufferedReader br = new BufferedReader(new FileReader(report));
-                    String buffer;
-                    while((buffer = br.readLine())!=null){
-                        bugReport.append(buffer);
-                        bugReport.append('\n');
+    private class ReportTask {
+        private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "SendLogReportThread"));
+        private final StringBuilder bugReport = new StringBuilder();
+        void start(){
+            progressBar.setVisibility(View.VISIBLE);
+            executor.submit(() -> {
+                report = new File(Environment.getExternalStorageDirectory() + "/report.txt");
+                boolean result = createReport(report, getFilesDir().getAbsolutePath(), stackTrace, shell);
+                if(result){
+                    try{
+                        BufferedReader br = new BufferedReader(new FileReader(report));
+                        String buffer;
+                        while((buffer = br.readLine())!=null){
+                            bugReport.append(buffer);
+                            bugReport.append('\n');
+                        }
+                    }catch(IOException ignored){
+                        result = false;
                     }
-                }catch(IOException ignored){
-                    return false;
                 }
-            }
-            return result;
-        }
-        @Override
-        protected void onPostExecute(final Boolean success){
-            progressBar.setVisibility(View.GONE);
+                final boolean res = result;
+                runOnUiThread(() -> {
+                    progressBar.setVisibility(View.GONE);
 
-            if(success){
-                //Show bug report
-                console.setMovementMethod(ScrollingMovementMethod.getInstance());
-                console.setText(bugReport);
+                    if(res){
+                        //Show bug report
+                        console.setMovementMethod(ScrollingMovementMethod.getInstance());
+                        console.setText(bugReport);
 
-                sendEmailBtn.setEnabled(true);
-            }else{
-                console.setText(getString(R.string.report_not_created));
-            }
+                        sendEmailBtn.setEnabled(true);
+                    }else{
+                        console.setText(getString(R.string.report_not_created));
+                    }
+                });
+                return null;
+            });
         }
     }
     public void onUseEmail(View v){
@@ -209,12 +215,12 @@ public class SendLogActivity extends AppCompatActivity{
                         pids.add(Integer.parseInt(tmp));
                     }
                 }catch(NumberFormatException e){
-                    Log.e("HIJACKER/SendLog", "Exception: " + e.toString());
+                    Log.e("HIJACKER/SendLog", "Exception: " + e);
                 }
                 buffer = shell_out.readLine();
             }
         }catch(IOException e){
-            Log.e("HIJACKER/SendLog", "Exception: " + e.toString());
+            Log.e("HIJACKER/SendLog", "Exception: " + e);
         }
         if(pids.isEmpty()) Log.d("HIJACKER/stopAll", "Nothing found");
         else{
