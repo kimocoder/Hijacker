@@ -6,14 +6,16 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 android {
+    //noinspection GradleDependency
     compileSdkVersion 34
     defaultConfig {
         applicationId "com.hijacker"
         minSdkVersion 21
+        //noinspection OldTargetApi
         targetSdk 34
-        versionCode 36
+        versionCode 40
         android.buildFeatures.buildConfig = true
-        versionName "v1.5-beta.12"
+        versionName 'v2.0'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
