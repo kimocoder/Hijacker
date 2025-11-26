@@ -7,19 +7,19 @@ tasks.withType(JavaCompile).configureEach {
 
 android {
     //noinspection GradleDependency
-    compileSdkVersion 34
+    compileSdk = 34
     defaultConfig {
-        applicationId "com.hijacker"
-        minSdkVersion 21
+        applicationId = "com.hijacker"
+        minSdk = 21
         //noinspection OldTargetApi
-        targetSdk 34
-        versionCode 40
+        targetSdk = 34
+        versionCode = 40
         android.buildFeatures.buildConfig = true
-        versionName 'v2.0'
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        versionName = 'v2.0'
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                cppFlags ""
+                cppFlags = []
             }
         }
     }
@@ -31,14 +31,14 @@ android {
     }
     externalNativeBuild {
         cmake {
-            path "CMakeLists.txt"
+            path = "CMakeLists.txt"
         }
     }
     ndkVersion = '21.0.6113669'
-    namespace 'com.hijacker'
+    namespace = 'com.hijacker'
     packagingOptions {
         jniLibs {
-            useLegacyPackaging false
+            useLegacyPackaging = false
         }
     }
 }
