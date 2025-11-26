@@ -1,6 +1,6 @@
 # Hijacker
 
-Hijacker is a Graphical User Interface for the penetration testing tools [Aircrack-ng, Airodump-ng](https://www.aircrack-ng.org/), [MDK3](https://tools.kali.org/wireless-attacks/mdk3) and [Reaver](https://tools.kali.org/wireless-attacks/reaver). It offers a simple and easy UI to use these tools without typing commands in a console and copy&pasting MAC addresses.
+Hijacker is a Graphical User Interface for the penetration testing tools [Aircrack-ng, Airodump-ng](https://www.aircrack-ng.org/), [MDK4](https://tools.kali.org/wireless-attacks/mdk4) and [Reaver](https://tools.kali.org/wireless-attacks/reaver). It offers a simple and easy UI to use these tools without typing commands in a console and copy&pasting MAC addresses.
 
 This application requires an **ARM** android device with an internal wireless adapter that supports **Monitor Mode**. A few android devices do, but none of them natively. This means that you will need a custom firmware. Any device that uses the BCM4339 chipset (MSM8974, such as Nexus 5, Xperia Z1/Z2, LG G2, LG G Flex, Samsung Galaxy Note 3) will work with [Nexmon](https://github.com/seemoo-lab/nexmon) (which also supports some other chipsets). Devices that use BCM4330 can use [bcmon](http://bcmon.blogspot.gr/).
 
@@ -27,8 +27,8 @@ The app has been discontinued since a completely new iteration is currently unde
 ### Attacks
 * **Deauthenticate** all the clients of a network (either targeting each one (effective) or without specific target)
 * Deauthenticate a specific client from the network it's connected
-* MDK3 **Beacon Flooding** with custom options and SSID list
-* MDK3 **Authentication DoS** for a specific network or to every nearby AP
+* MDK4 **Beacon Flooding** with custom options and SSID list
+* MDK4 **Authentication DoS** for a specific network or to every nearby AP
 * Capture a **WPA handshake** or gather **IVs** to crack a WEP network
 * **Reaver WPS** cracking (pixie-dust attack using NetHunter chroot and external adapter)
 
@@ -76,7 +76,7 @@ This means that the app failed to create the 'bin' or 'lib' directories in its o
 
 #### The architecture of this device is not ARM.
 
-This app is designed and tested for ARM devices. All the included binaries and libraries are compiled for that architecture and will not work on anything else. If you get this message, you have to install them manually ([busybox](https://play.google.com/store/apps/details?id=stericson.busybox&hl=el), aircrack-ng suite, mdk3, reaver, [wireless tools](https://hewlettpackard.github.io/wireless-tools/Tools.html), [libfakeioctl.so](https://github.com/seemoo-lab/nexmon/tree/master/utilities/libfakeioctl) library) **in a PATH accessible directory** and set the 'Prefix' option for the tools to preload the library they need: `LD_PRELOAD=/path/to/libfakeioctl.so`.
+This app is designed and tested for ARM devices. All the included binaries and libraries are compiled for that architecture and will not work on anything else. If you get this message, you have to install them manually ([busybox](https://play.google.com/store/apps/details?id=stericson.busybox&hl=el), aircrack-ng suite, mdk4, reaver, [wireless tools](https://hewlettpackard.github.io/wireless-tools/Tools.html), [libfakeioctl.so](https://github.com/seemoo-lab/nexmon/tree/master/utilities/libfakeioctl) library) **in a PATH accessible directory** and set the 'Prefix' option for the tools to preload the library they need: `LD_PRELOAD=/path/to/libfakeioctl.so`.
 
 #### Hijacker watchdog detected a problem
 

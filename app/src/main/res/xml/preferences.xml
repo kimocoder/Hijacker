@@ -105,7 +105,7 @@
             android:key="disable_monMode"
             android:defaultValue="@string/disable_monMode" />
         <SwitchPreference
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:key="enable_on_airodump"
             android:summary="@string/enable_on_airodump_sum"
             android:title="@string/enable_on_airodump_title" />

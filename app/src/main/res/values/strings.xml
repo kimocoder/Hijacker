@@ -37,7 +37,7 @@
 
     <!-- Navigation Drawer -->
     <string name="nav_airodump">Airodump</string>
-    <string name="nav_mdk3">MDK3</string>
+    <string name="nav_mdk4">mdk4</string>
     <string name="nav_reaver">Reaver</string>
     <string name="nav_crack">Crack .cap file</string>
     <string name="nav_custom_actions">Custom Actions</string>
@@ -99,7 +99,7 @@
     <string name="action_exists">An action with this name already exists</string>
     <!-- (xml) -->
     <string name="custom_action_editor_message">You can use the following variables:\n
-        $IFACE, $AIRODUMP_DIR, $AIREPLAY_DIR, $MDK3_DIR, $REAVER_DIR\n
+        $IFACE, $AIRODUMP_DIR, $AIREPLAY_DIR, $mdk4_DIR, $REAVER_DIR\n
         AP: $MAC, $ESSID, $CH, $ENC, $CIPHER, $AUTH\n
         ST: $MAC, $BSSID\n
         The start command will be ran when you run the action and the stop will be ran ONLY when you want to interrupt it.
@@ -164,7 +164,7 @@
 
     <!-- FirstRunDialog -->
     <string name="first_run_title">Welcome</string>
-    <string name="first_run">This application is a Graphical User Interface for the wireless auditing tools airodump-ng, aireplay-ng, aircrack-ng, mdk3 and reaver, and requires a Monitor Mode enabled WiFi interface.
+    <string name="first_run">This application is a Graphical User Interface for the wireless auditing tools airodump-ng, aireplay-ng, aircrack-ng, mdk4 and reaver, and requires a Monitor Mode enabled WiFi interface.
         Only some android devices support this but none of them natively.
         You need to use a custom firmware (bcmon, Nexmon) so that your wireless adapter can be used in Monitor Mode. External adapters can also be used.
         You can configure your interface\'s name in Settings. This app requires root privileges to run the tools.
@@ -206,8 +206,8 @@
     <string name="airodump_not_running">Airodump is not running!</string>
     <string name="aireplay_still_running">Aireplay is still running!</string>
     <string name="aireplay_not_running">Aireplay is not running!</string>
-    <string name="mdk_still_running">MDK3 is still running!</string>
-    <string name="mdk_not_running">MDK3 is not running!</string>
+    <string name="mdk_still_running">mdk4 is still running!</string>
+    <string name="mdk_not_running">mdk4 is not running!</string>
     <string name="su_notfound_title">SU binary not found!</string>
     <string name="su_notfound">Hijacker could not detect a SU binary in a PATH accessible directory.\n\nThe app will exit.</string>
     <string name="no_root_access_title">No root access</string>
@@ -215,7 +215,7 @@
     <string name="bin_not_created">Directory \'bin\' could not be created</string>
     <string name="lib_not_created">Directory \'lib\' could not be created</string>
     <string name="not_arm">The architecture of this device is not ARM. The included tools cannot be used.
-        You will have to install the tools manually in a PATH accessible directory: aircrack-ng suite, busybox, mdk3, reaver, wireless-tools and libfakeioctl.so, and adjust the prefix for the library.</string>
+        You will have to install the tools manually in a PATH accessible directory: aircrack-ng suite, busybox, mdk4, reaver, wireless-tools and libfakeioctl.so, and adjust the prefix for the library.</string>
         <!-- Notification -->
         <string name="notification_title">Hijacker is running in the background</string>
         <string name="watchdog_notif_title">Hijacker watchdog detected a problem</string>
@@ -309,6 +309,11 @@
 
     <!-- TestDialog -->
     <string name="testing">Testing tools…</string>
+    <string name="mon_status_already">%1$s (already)</string>
+    <string name="mon_status_enabled">%1$s (enabled)</string>
+    <string name="mon_status_not_confirmed">%1$s (not confirmed)</string>
+    <string name="mon_status_enabling">Enabling: %1$s</string>
+    <string name="retry_enable">Retry Enable</string>
     <string name="checking_chroot">Checking chroot…</string>
     <string name="done">Done</string>
 
@@ -325,22 +330,22 @@
 
     <!-- Default Preferences -->
     <string name="iface" translatable="false">wlan0</string>
-    <string name="prefix" translatable="false">LD_PRELOAD=/vendor/lib/libfakeioctl.so</string>
-    <string name="chroot_dir" translatable="false">/data/local/nhsystem/kali-armhf</string>
+    <string name="prefix" translatable="false"></string>
+    <string name="chroot_dir" translatable="false">/data/local/nhsystem/kalifs</string>
     <string name="monstart" translatable="false">false</string>
-    <string name="enable_monMode" translatable="false">nexutil -m true</string>
-    <string name="disable_monMode" translatable="false">nexutil -m false</string>
-    <string name="enable_on_airodump" translatable="false">true</string>
+    <string name="enable_monMode" translatable="false"> </string>
+    <string name="disable_monMode" translatable="false"> </string>
+    <string name="enable_on_airodump" translatable="false">false</string>
     <string name="deauthWait" translatable="false">20</string>
     <string name="show_notif" translatable="false">true</string>
     <string name="show_details" translatable="false">true</string>
-    <string name="airOnStartup" translatable="false">true</string>
-    <string name="debug" translatable="false">true</string>
+    <string name="airOnStartup" translatable="false">false</string>
+    <string name="debug" translatable="false">false</string>
     <string name="always_cap" translatable="false">false</string>
     <string name="cont_on_fail" translatable="false">false</string>
-    <string name="watchdog" translatable="false">true</string>
+    <string name="watchdog" translatable="false">false</string>
     <string name="target_deauth" translatable="false">false</string>
-    <string name="auto_update" translatable="false">true</string>
+    <string name="auto_update" translatable="false">false</string>
     <string name="band" translatable="false">1</string>
     <string name="show_client_count" translatable="false">true</string>
 

@@ -34,7 +34,7 @@ android {
             path = "CMakeLists.txt"
         }
     }
-    ndkVersion = '21.0.6113669'
+    ndkVersion = '29.0.14206865'
     namespace = 'com.hijacker'
     packagingOptions {
         jniLibs {
@@ -55,6 +55,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.13.0'
     testImplementation 'junit:junit:4.13.2'
     implementation 'androidx.cardview:cardview:1.0.0'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 }
 
 repositories {

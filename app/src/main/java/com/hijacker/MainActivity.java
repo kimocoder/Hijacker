@@ -102,10 +102,9 @@ public class MainActivity extends AppCompatActivity{
     static final String RELEASES_LINK = "https://api.github.com/repos/chrisk44/Hijacker/releases";
     static final String WORDLISTS_LINK = "https://api.github.com/repos/chrisk44/Hijacker/contents/wordlists";
     static final int BUFFER_SIZE = 1048576;
-    static final int MAX_READLINE_SIZE = 10000;
     static final int AIREPLAY_DEAUTH = 1, AIREPLAY_WEP = 2;
     static final int BAND_2 = 1, BAND_5 = 2, BAND_BOTH = 3;
-    static final int FRAGMENT_AIRODUMP = R.id.nav_airodump, FRAGMENT_MDK = R.id.nav_mdk3, FRAGMENT_CRACK = R.id.nav_crack,
+    static final int FRAGMENT_AIRODUMP = R.id.nav_airodump, FRAGMENT_MDK = R.id.nav_mdk4, FRAGMENT_CRACK = R.id.nav_crack,
             FRAGMENT_REAVER = R.id.nav_reaver, FRAGMENT_CUSTOM = R.id.nav_custom_actions, FRAGMENT_SETTINGS = R.id.nav_settings;
     static final int PROCESS_AIRODUMP=0, PROCESS_AIREPLAY=1, PROCESS_MDK_BF=2, PROCESS_MDK_DOS=3, PROCESS_AIRCRACK=4, PROCESS_REAVER=5;
     static final int SORT_NOSORT = 0, SORT_ESSID = 1, SORT_BEACONS_FRAMES = 2, SORT_DATA_FRAMES = 3, SORT_PWR = 4;
@@ -114,7 +113,7 @@ public class MainActivity extends AppCompatActivity{
     static boolean wpacheckcont = false;
     static boolean notif_on = false, background = false;    //notif_on: notification should be shown, background: the app is running in the background
     static int aireplay_running = 0, currentFragment = FRAGMENT_AIRODUMP;         //Set currentFragment in onResume of each Fragment
-    static String last_airodump = null, last_aireplay = null, last_mdk = null, last_reaver = null;
+    static String last_airodump = null, last_mdk = null, last_reaver = null;
     //Filters
     static boolean show_ap = true, show_st = true, show_na_st = true, wpa = true, wep = true, opn = true;
     static boolean[] show_ch = {true, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
@@ -139,9 +138,9 @@ public class MainActivity extends AppCompatActivity{
     static MainActivity instance;
     static NotificationManager mNotificationManager;
     // Notification builders cached (constructed with application context in setup)
-    static NotificationCompat.Builder notif;
-    static NotificationCompat.Builder error_notif;
-    static NotificationCompat.Builder handshake_notif;
+    NotificationCompat.Builder notif;
+    NotificationCompat.Builder error_notif;
+    NotificationCompat.Builder handshake_notif;
     static FragmentManager mFragmentManager;
     static String path, cap_tmp_path, data_path, actions_path, wl_path, cap_path, reaver_sess_path, firm_backup_file, manufDBFile, arch, busybox;             //path: App files path (ends with .../files)
     // Restored static globals used across the codebase
@@ -162,6 +161,9 @@ public class MainActivity extends AppCompatActivity{
     static FileWriter aliases_in;
     static final HashMap<String, String> aliases = new HashMap<>();
     static HashMap<String, String> manufHashMap;
+    // When true, Airodump should not reset the kernel driver's con_mode sysfs value.
+    // Used by TestDialog when running an end-to-end tools test that manages con_mode itself.
+    public static volatile boolean preventConModeReset = false;
     //App and device info
     static String versionName, deviceModel;
     static int versionCode;
@@ -169,7 +171,7 @@ public class MainActivity extends AppCompatActivity{
     static ActionBar actionBar;
     static String bootkali_init_bin = "bootkali_init";
     //Preferences - Defaults are in strings.xml
-    static String iface, prefix, airodump_dir, aireplay_dir, aircrack_dir, mdk3bf_dir, mdk3dos_dir, reaver_dir, chroot_dir,
+    static String iface, prefix, airodump_dir, aireplay_dir, aircrack_dir, mdk4bf_dir, mdk4dos_dir, reaver_dir, chroot_dir,
             enable_monMode, disable_monMode, custom_chroot_cmd;
     static int deauthWait, band;
     static boolean show_notif, show_details, airOnStartup, debug, show_client_count,
@@ -187,7 +189,7 @@ public class MainActivity extends AppCompatActivity{
         instance = this;
         appContext = getApplicationContext();
         Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
-            throwable.printStackTrace();
+            Log.e("HIJACKER/Uncaught", "Uncaught exception: " + throwable);
             StringBuilder stackTrace = new StringBuilder();
             stackTrace.append(throwable.getMessage()).append('\n');
             for(int i=0;i<throwable.getStackTrace().length;i++){
@@ -338,7 +340,7 @@ public class MainActivity extends AppCompatActivity{
                 // Use PackageInfoCompat to obtain the versionCode in a forward-compatible way
                 versionCode = (int) PackageInfoCompat.getLongVersionCode(info);
             }catch(PackageManager.NameNotFoundException e){
-                Log.e("HIJACKER/SetupTask", e.toString());
+                Log.e("HIJACKER/SetupTask", "PackageInfo error", e);
             }
             deviceModel = Build.MODEL;
             if(!deviceModel.startsWith(Build.MANUFACTURER)) deviceModel = Build.MANUFACTURER + " " + deviceModel;
@@ -365,10 +367,11 @@ public class MainActivity extends AppCompatActivity{
             //Load defaults
             postProgress(getString(R.string.loading_defaults));
             iface = getString(R.string.iface);
-            prefix = getString(R.string.prefix);
-            enable_monMode = getString(R.string.enable_monMode);
-            disable_monMode = getString(R.string.disable_monMode);
-            enable_on_airodump = Boolean.parseBoolean(getString(R.string.enable_on_airodump));
+            // Default to empty prefix — do not LD_PRELOAD unless user explicitly configures it
+            prefix = "";
+             enable_monMode = getString(R.string.enable_monMode);
+             disable_monMode = getString(R.string.disable_monMode);
+             enable_on_airodump = Boolean.parseBoolean(getString(R.string.enable_on_airodump));
             deauthWait = Integer.parseInt(getString(R.string.deauthWait));
             show_notif = Boolean.parseBoolean(getString(R.string.show_notif));
             show_details = Boolean.parseBoolean(getString(R.string.show_details));
@@ -515,7 +518,7 @@ public class MainActivity extends AppCompatActivity{
                 su_proc.waitFor();
                 exitCode = su_proc.exitValue();
             }catch(IOException | InterruptedException e){
-                e.printStackTrace();
+                Log.e("HIJACKER/Setup", "which su failed", e);
             }
             if(exitCode != 0){
                 Log.e("HIJACKER/Setup", "'which su' failed with code " + exitCode);
@@ -532,7 +535,7 @@ public class MainActivity extends AppCompatActivity{
                 su_proc.waitFor();
                 exitCode = su_proc.exitValue();
             }catch(IOException | InterruptedException e){
-                e.printStackTrace();
+                Log.e("HIJACKER/Setup", "su -c id failed", e);
             }
             if(exitCode != 0){
                 Log.e("HIJACKER/Setup", "'su -c id' failed with code " + exitCode);
@@ -598,7 +601,7 @@ public class MainActivity extends AppCompatActivity{
                     extractWithLog("iwpriv", tools_location);
                     extractWithLog("kstats", tools_location);
                     extractWithLog("makeivs-ng", tools_location);
-                    extractWithLog("mdk3", tools_location);
+                    extractWithLog("mdk4", tools_location);
                     extractWithLog("nc", tools_location);
                     extractWithLog("packetforge-ng", tools_location);
                     extractWithLog("reaver", tools_location);
@@ -608,7 +611,11 @@ public class MainActivity extends AppCompatActivity{
                     extractWithLog("libfakeioctl.so", lib_location);
                     extractWithLog("libnexmon.so", lib_location);
 
-                    runOne("cd " + path + "/bin; mv mdk3 mdk3bf; cp mdk3bf mdk3dos");
+                    runOne("cd " + path + "/bin; mv mdk4 mdk4bf; cp mdk4bf mdk4dos");
+                    // NOTE: ABI check for mdk4 removed — always use extracted packaged binaries.
+                    Log.d("HIJACKER/SetupTask", "Skipping ABI check for extracted mdk4bf; using packaged binaries.");
+                    mdk4bf_dir = path + "/bin/mdk4bf";
+                    mdk4dos_dir = path + "/bin/mdk4dos";
 
                     if(info!=null){
                         pref_edit.putLong("tools_version", PackageInfoCompat.getLongVersionCode(info));
@@ -636,30 +643,22 @@ public class MainActivity extends AppCompatActivity{
                 Log.d("HIJACKER/SetupTask", "Device chipset detection complete: " + devChipset);
                 shell.done();
 
-                //Set directories
-                prefix = "LD_PRELOAD=" + path + "/lib/";
-                if(devChipset.startsWith("4339")) {
-                    //BCM4339
-                    prefix += "libfakeioctl.so";
-                }else if(devChipset.startsWith("4358")){
-                    //BCM4358
-                    prefix += "libnexmon.so";
-                }else{
-                    //Default (detected but not included)
-                    SettingsFragment.allow_prefix = true;       //Allow user to change the prefix
-                    prefix = pref.getString("prefix", null);    //Use user-set prefix
-
-                    if(prefix==null){
-                        //No user-set prefix, use default
-                        prefix = "LD_PRELOAD=" + path + "/lib/libfakeioctl.so";
-                    }
+                // Set directories
+                // Respect explicit user-configured prefix if present (including an explicit empty string to disable LD_PRELOAD).
+                if(pref.contains("prefix")){
+                    prefix = pref.getString("prefix", "");
+                    Log.d("HIJACKER/SetupTask", "Using user-configured prefix from preferences: '" + prefix + "'");
+                } else {
+                    // No user-configured prefix: do NOT enable LD_PRELOAD automatically. Leave prefix empty.
+                    prefix = "";
+                    Log.d("HIJACKER/SetupTask", "No user prefix configured; leaving prefix empty (no LD_PRELOAD)");
                 }
 
                 airodump_dir = path + "/bin/airodump-ng";
                 aireplay_dir = path + "/bin/aireplay-ng";
                 aircrack_dir = path + "/bin/aircrack-ng";
-                mdk3bf_dir = path + "/bin/mdk3bf";
-                mdk3dos_dir = path + "/bin/mdk3dos";
+                mdk4bf_dir = path + "/bin/mdk4bf";
+                mdk4dos_dir = path + "/bin/mdk4dos";
                 reaver_dir = path + "/bin/reaver";
             } else {
                 Log.e("HIJACKER/onCreate", "Device not armv7l or aarch64, can't install tools");
@@ -667,13 +666,15 @@ public class MainActivity extends AppCompatActivity{
                 postProgress(null, getString(R.string.not_arm));
                 errorDialog._wait();
 
-                prefix = pref.getString("prefix", prefix);
-                airodump_dir = "airodump-ng";
-                aireplay_dir = "aireplay-ng";
-                aircrack_dir = "aircrack-ng";
-                mdk3bf_dir = "mdk3";
-                mdk3dos_dir = "mdk3";
-                reaver_dir = "reaver";
+                // Respect explicit user-configured prefix even on non-ARM devices; otherwise leave empty
+                if(pref.contains("prefix")) prefix = pref.getString("prefix", "");
+                else prefix = "";
+                 airodump_dir = "airodump-ng";
+                 aireplay_dir = "aireplay-ng";
+                 aircrack_dir = "aircrack-ng";
+                 mdk4bf_dir = "mdk4";
+                 mdk4dos_dir = "mdk4";
+                 reaver_dir = "reaver";
             }
 
             //Initialize RootFile (requires root) and Airodump
@@ -751,7 +752,7 @@ public class MainActivity extends AppCompatActivity{
                         }
                     }
                 } catch (IOException | InterruptedException e) {
-                    Log.e("HIJACKER/Exception", "Caught Exception in wpa_thread: " + e);
+                    Log.e("HIJACKER/Exception", "Caught Exception in wpa_thread", e);
                 } finally {
                     wpacheckcont = false;
                     counter_thread.interrupt();
@@ -779,7 +780,8 @@ public class MainActivity extends AppCompatActivity{
                                 s.show();
                             } else {
                                 // Build transient notification for handshake captured
-                                NotificationCompat.Builder nb = new NotificationCompat.Builder(appContext, NotificationChannel.DEFAULT_CHANNEL_ID)
+                                String notifChannel = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? NotificationChannel.DEFAULT_CHANNEL_ID : MainActivity.this.getString(R.string.DEFAULT_CHANNEL_ID);
+                                NotificationCompat.Builder nb = new NotificationCompat.Builder(appContext, notifChannel)
                                         .setContentTitle(getString(R.string.handshake_captured))
                                         .setContentText(getString(R.string.saved_in_file) + ' ' + capfile)
                                         .setSmallIcon(R.drawable.ic_notification)
@@ -840,7 +842,7 @@ public class MainActivity extends AppCompatActivity{
                         if(debug) Log.d("HIJACKER/SetupTask", "Manufacturer database built");
                     }
                 }catch(IOException e){
-                    Log.e("HIJACKER/SetupTask", e.toString());
+                    Log.e("HIJACKER/SetupTask", "Error creating manuf DB", e);
                     manufHashMap = null;
                 }
             }else{
@@ -858,14 +860,14 @@ public class MainActivity extends AppCompatActivity{
                         buffer = out.readLine();
                     }
                 }catch(IOException e){
-                    Log.e("HIJACKER/SetupTask", e.toString());
+                    Log.e("HIJACKER/SetupTask", "Error reading manuf DB", e);
                     manufHashMap = null;
                 }
             }
 
             //Load navigation titles to HashMap
             navTitlesMap.put(R.id.nav_airodump, getString(R.string.nav_airodump));
-            navTitlesMap.put(R.id.nav_mdk3, getString(R.string.nav_mdk3));
+            navTitlesMap.put(R.id.nav_mdk4, getString(R.string.nav_mdk4));
             navTitlesMap.put(R.id.nav_reaver, getString(R.string.nav_reaver));
             navTitlesMap.put(R.id.nav_crack, getString(R.string.nav_crack));
             navTitlesMap.put(R.id.nav_custom_actions, getString(R.string.nav_custom_actions));
@@ -1067,18 +1069,20 @@ public class MainActivity extends AppCompatActivity{
     }
 
      public static void _startAireplay(final String str){
-        try{
-            String cmd = "su -c " + prefix + " " + aireplay_dir + " -D --ignore-negative-one " + str + " " + iface;
-            if(debug) Log.d("HIJACKER/_startAireplay", cmd);
-            Runtime.getRuntime().exec(cmd);
-            last_action = System.currentTimeMillis();
-        }catch(IOException e){ Log.e("HIJACKER/Exception", "Caught Exception in _startAireplay() start block: " + e); }
-        runInHandler(() -> {
-            menu.getItem(3).setEnabled(true);       //Enable 'Stop aireplay' button
-            refreshState();
-            notification();
-        });
-    }
+         try{
+            String trimmedPrefix = (prefix==null) ? "" : prefix.trim();
+            String prefPart = trimmedPrefix.isEmpty() ? "" : (trimmedPrefix + " ");
+            String cmd = "su -c " + prefPart + aireplay_dir + " -D --ignore-negative-one " + str + " " + iface;
+             if(debug) Log.d("HIJACKER/_startAireplay", cmd);
+             Runtime.getRuntime().exec(cmd);
+             last_action = System.currentTimeMillis();
+         }catch(IOException e){ Log.e("HIJACKER/Exception", "Caught Exception in _startAireplay() start block: " + e); }
+         runInHandler(() -> {
+             menu.getItem(3).setEnabled(true);       //Enable 'Stop aireplay' button
+             refreshState();
+             notification();
+         });
+     }
     public static void startAireplay(String mac){
         //Disconnect all clients from mac
         aireplay_running = AIREPLAY_DEAUTH;
@@ -1095,68 +1099,232 @@ public class MainActivity extends AppCompatActivity{
         _startAireplay("--fakeauth 0 -a " + ap.mac + (ap.isHidden() ? "" : " -e " + ap.getESSID()));
     }
 
-    //There are 2 mdk3 binaries with different names, so the app can easily stop each one separately
+    //There are 2 mdk4 binaries with different names, so the app can easily stop each one separately
     public static void startBeaconFlooding(String str){
         try{
-            String cmd = "su -c " + prefix + " " + mdk3bf_dir + " " + iface + " b -m ";
-            if(str!=null) cmd += str;
-            if(debug) Log.d("HIJACKER/MDK3", cmd);
-            last_mdk = cmd;
-            Runtime.getRuntime().exec(cmd);
-        }catch(IOException e){ Log.e("HIJACKER/startBF", e.toString()); }
-        last_action = System.currentTimeMillis();
-        MDKFragment.bf = true;
+                 // No ABI preflight for packaged mdk4 binaries; use what was installed in setup.
+             try{}catch(Exception ignored){}
+             String trimmedPrefix = (prefix==null) ? "" : prefix.trim();
+             String prefPart = trimmedPrefix.isEmpty() ? "" : (trimmedPrefix + " ");
+             String cmd = "su -c " + prefPart + mdk4bf_dir + " " + iface + " b -m ";
+              if(str!=null) cmd += str;
+              if(debug) Log.d("HIJACKER/mdk4", cmd);
+              last_mdk = cmd;
+              // Build fallback command without LD_PRELOAD prefix
+             String bareCmd = "su -c " + mdk4bf_dir + " " + iface + " b -m " + (str==null?"":str);
+              runToolWithPrefixFallback(cmd, bareCmd, "mdk4bf");
+         }catch(Exception e){ Log.e("HIJACKER/startBF", e.toString()); }
+         last_action = System.currentTimeMillis();
+         MDKFragment.bf = true;
 
-        runInHandler(() -> {
-            refreshState();
-            notification();
-        });
-    }
-    public static void startAdos(String str) {
+         runInHandler(() -> {
+             refreshState();
+             notification();
+         });
+     }
+     public static void startAdos(String str) {
+         try{
+                // No ABI preflight for packaged mdk4dos binary; use what was installed in setup.
+            try{}catch(Exception ignored){}
+              String trimmedPrefix2 = (prefix==null) ? "" : prefix.trim();
+              String prefPart2 = trimmedPrefix2.isEmpty() ? "" : (trimmedPrefix2 + " ");
+              String cmd = "su -c " + prefPart2 + mdk4dos_dir + " " + iface + " a -m";
+               cmd += str==null ? "" : " -i " + str;
+               if(debug) Log.d("HIJACKER/MDK4", cmd);
+               last_mdk = cmd;
+               String bareCmd = "su -c " + mdk4dos_dir + " " + iface + " a -m" + (str==null?"":" -i " + str);
+               runToolWithPrefixFallback(cmd, bareCmd, "mdk4dos");
+           }catch(Exception e){ Log.e("HIJACKER/startAdos", e.toString()); }
+          last_action = System.currentTimeMillis();
+          MDKFragment.ados = true;
+
+          runInHandler(() -> {
+              refreshState();
+              notification();
+          });
+      }
+
+    // Run a tool command that is normally prefixed with LD_PRELOAD; if the prefixed run doesn't start (no PID), retry without the prefix.
+    public static Process runToolWithPrefixFallback(final String cmdWithPrefix, final String cmdWithoutPrefix, final String processName) {
+         try{
+             if(debug) Log.d("HIJACKER/RunTool", "Trying prefixed command: " + cmdWithPrefix);
+             Process p = Runtime.getRuntime().exec(cmdWithPrefix);
+             // Poll briefly (up to 1.5s) to see if the process appears and stays alive
+             final int maxWaitMs = 1500;
+             final int intervalMs = 200;
+             int waited = 0;
+             boolean started = false;
+             while(waited < maxWaitMs){
+                try{ Thread.sleep(intervalMs); }catch(InterruptedException ignored){}
+                waited += intervalMs;
+                ArrayList<Integer> pids = getPIDs(processName);
+                if(pids!=null && !pids.isEmpty()){
+                    started = true;
+                    break;
+                }
+             }
+             if(!started){
+                Log.e("HIJACKER/RunTool", "Prefixed command did not start process " + processName + " within " + maxWaitMs + "ms, retrying without prefix");
+                if(debug) Log.d("HIJACKER/RunTool", "Trying fallback command: " + cmdWithoutPrefix);
+                try{ p.destroy(); }catch(Exception ignored){}
+                p = Runtime.getRuntime().exec(cmdWithoutPrefix);
+                // No further fallback attempts
+             } else {
+                // Process appeared — wait a short while and verify it's still running (didn't crash immediately)
+                try{ Thread.sleep(300); }catch(InterruptedException ignored){}
+                ArrayList<Integer> pids2 = getPIDs(processName);
+                if(pids2==null || pids2.isEmpty()){
+                    // Process has exited quickly — assume crash when prefixed. Try without prefix.
+                    Log.e("HIJACKER/RunTool", "Prefixed process " + processName + " exited quickly; retrying without prefix");
+                    if(debug) Log.d("HIJACKER/RunTool", "Trying fallback command: " + cmdWithoutPrefix);
+                    try{ p.destroy(); }catch(Exception ignored){}
+                    p = Runtime.getRuntime().exec(cmdWithoutPrefix);
+                }
+             }
+             return p;
+         }catch(IOException e){
+             Log.e("HIJACKER/RunTool", "IOException running tool: " + e);
+             try{ return Runtime.getRuntime().exec(cmdWithoutPrefix); }catch(IOException ex){ Log.e("HIJACKER/RunTool", "Fallback exec failed: " + ex); return null; }
+         }
+     }
+
+    // Check whether a network interface is already in monitor mode.
+    // Tries app-bundled `iw`/`iwconfig` (path + "/bin/iw"), then falls back to system `iw`/`iwconfig` and looks for monitor/type indications.
+    public static boolean isInterfaceInMonitor(String ifaceName) {
+        if(ifaceName==null || ifaceName.isEmpty()) return false;
+        // Normalize ifaceName
+        ifaceName = ifaceName.trim();
+        String marker1 = "ENDOFIW" + System.currentTimeMillis();
+        String marker2 = "ENDOFIWCFG" + System.currentTimeMillis();
+        String[] iwCandidates;
+        String[] iwconfigCandidates;
+        if(path!=null && !path.isEmpty()){
+            iwCandidates = new String[]{path + "/bin/iw", "/system/bin/iw", "iw"};
+            iwconfigCandidates = new String[]{path + "/bin/iwconfig", "/system/bin/iwconfig", "iwconfig"};
+        }else{
+            iwCandidates = new String[]{"/system/bin/iw", "iw"};
+            iwconfigCandidates = new String[]{"/system/bin/iwconfig", "iwconfig"};
+        }
         try{
-            String cmd = "su -c " + prefix + " " + mdk3dos_dir + " " + iface + " a -m";
-            cmd += str==null ? "" : " -i " + str;
-            if(debug) Log.d("HIJACKER/MDK3", cmd);
-            last_mdk = cmd;
-            Runtime.getRuntime().exec(cmd);
-        }catch(IOException e){ Log.e("HIJACKER/startAdos", e.toString()); }
-        last_action = System.currentTimeMillis();
-        MDKFragment.ados = true;
+            for(String iwCmd : iwCandidates){
+                try{
+                    Shell sh = getFreeShell();
+                    // run: <iwCmd> dev iface info 2>&1; echo MARK
+                    sh.run(iwCmd + " dev " + ifaceName + " info 2>&1; echo " + marker1);
+                    String out = getLastLine(sh.getShell_out(), marker1);
+                    sh.done();
+                    if(out!=null){
+                        String o = out.toLowerCase();
+                        if(o.contains("type monitor") || o.contains("type\tmonitor") || o.contains("mode monitor")) return true;
+                        // sometimes iw prints 'Interface <iface>' followed by 'type monitor' on another line; check full output via contains
+                        if(o.contains("monitor")){
+                            // ensure it's not just the word 'monitor' in unrelated context by checking for 'type' or 'mode' nearby
+                            if(o.contains("type") || o.contains("mode")) return true;
+                        }
+                    }
+                }catch(Exception ignored){ /* try next candidate */ }
+            }
+            // Fallback to iwconfig candidates
+            for(String iwcfg : iwconfigCandidates){
+                try{
+                    Shell sh = getFreeShell();
+                    sh.run(iwcfg + " " + ifaceName + " 2>&1; echo " + marker2);
+                    String out = getLastLine(sh.getShell_out(), marker2);
+                    sh.done();
+                    if(out!=null){
+                        String o = out.toLowerCase();
+                        if(o.contains("mode:monitor") || o.contains("mode monitor") || o.contains("monitor")) return true;
+                    }
+                }catch(Exception ignored){ /* try next */ }
+            }
+        }catch(Exception e){
+            Log.e("HIJACKER/isMon", "Exception while checking interface mode: " + e);
+        }
+        return false;
+    }
 
-        runInHandler(() -> {
-            refreshState();
-            notification();
-        });
+    // Improved verifyBinaryAbi: try readelf (preferred) to get ELF 'Class' and 'Machine', fall back to 'file' if readelf missing.
+    boolean verifyBinaryAbi(String binPath){
+        try{
+            Shell shell = getFreeShell();
+            // Try readelf for detailed info
+            String markerClass = "ENDOFRECLASS" + System.currentTimeMillis();
+            try{
+                shell.run("readelf -h \"" + binPath + "\" | grep -E \"Class:|Machine:\" 2>&1; echo " + markerClass);
+                String classAndMachine = getLastLine(shell.getShell_out(), markerClass);
+                shell.done();
+                if(classAndMachine!=null){
+                    String lower = classAndMachine.toLowerCase();
+                    String deviceAbi = android.os.Build.SUPPORTED_ABIS != null && android.os.Build.SUPPORTED_ABIS.length>0 ? android.os.Build.SUPPORTED_ABIS[0] : android.os.Build.CPU_ABI;
+                    deviceAbi = deviceAbi.toLowerCase();
+                    if(deviceAbi.contains("arm64") || deviceAbi.contains("aarch64")){
+                        return lower.contains("aarch64") || lower.contains("arm64");
+                    }else if(deviceAbi.contains("armeabi") || deviceAbi.contains("armv7")){
+                        return lower.contains("arm") && !lower.contains("aarch64");
+                    }else if(deviceAbi.contains("x86_64") || deviceAbi.contains("x86")){
+                        return lower.contains("intel") || lower.contains("x86") || lower.contains("i386") || lower.contains("i686");
+                    }
+                }
+            }catch(Exception re){
+                // readelf might not be present — try 'file' as before
+                try{
+                    shell = getFreeShell();
+                    shell.run("file \"" + binPath + "\"; echo ENDOFABI");
+                    String info = getLastLine(shell.getShell_out(), "ENDOFABI");
+                    shell.done();
+                    if(info==null) return false;
+                    Log.d("HIJACKER/SetupTask", "Binary file output (fallback): " + info);
+                    String deviceAbi = android.os.Build.SUPPORTED_ABIS != null && android.os.Build.SUPPORTED_ABIS.length>0 ? android.os.Build.SUPPORTED_ABIS[0] : android.os.Build.CPU_ABI;
+                    deviceAbi = deviceAbi.toLowerCase();
+                    info = info.toLowerCase();
+                    if(deviceAbi.contains("arm64") || deviceAbi.contains("aarch64")){
+                        return info.contains("aarch64") || info.contains("arm64");
+                    }else if(deviceAbi.contains("armeabi") || deviceAbi.contains("armv7")){
+                        return info.contains("arm") && !info.contains("aarch64");
+                    }else if(deviceAbi.contains("x86_64") || deviceAbi.contains("x86")){
+                        return info.contains("intel") || info.contains("x86") || info.contains("elf 64-bit") || info.contains("elf 32-bit");
+                    }
+                    return true;
+                }catch(Exception fe){
+                    Log.e("HIJACKER/SetupTask", "Error verifying binary ABI with file: " + fe);
+                    return false;
+                }
+            }
+        }catch(Exception e){
+            Log.e("HIJACKER/SetupTask", "Error verifying binary ABI", e);
+            return false;
+        }
+        return false; // conservative default
     }
 
     public static ArrayList<Integer> getPIDs(String process_name) {
-        if(process_name==null) return null;
+         if(process_name==null) return null;
 
-        Shell shell = getFreeShell();
-        ArrayList<Integer> list = new ArrayList<>();
-        shell.run(busybox + " pidof " + process_name + "; echo ENDOFPIDOF");
-        BufferedReader out = shell.getShell_out();
-        String buffer = null;
-        try{
-            while(buffer==null) buffer = out.readLine();
-            while(!buffer.equals("ENDOFPIDOF")){
-                String[] temp = buffer.split(" ");
-                try{
-                    for(String tmp : temp){
-                        list.add(Integer.parseInt(tmp));
-                    }
-                }catch(NumberFormatException e){
-                    Log.e("HIJACKER/getPIDs", "Exception: " + e);
-                }
-                buffer = out.readLine();
-            }
-        }catch(IOException e){
-            Log.e("HIJACKER/getPIDs", "Exception: " + e);
-            list = null;
-        }
-        shell.done();
-        return list;
-    }
+         Shell shell = getFreeShell();
+         ArrayList<Integer> list = new ArrayList<>();
+         shell.run(busybox + " pidof " + process_name + "; echo ENDOFPIDOF");
+         BufferedReader out = shell.getShell_out();
+         String buffer = null;
+         try{
+             while(buffer==null) buffer = out.readLine();
+             while(!buffer.equals("ENDOFPIDOF")){
+                 String[] temp = buffer.split(" ");
+                 try{
+                     for(String tmp : temp){
+                         list.add(Integer.parseInt(tmp));
+                     }
+                 }catch(NumberFormatException e){
+                     Log.e("HIJACKER/getPIDs", "Exception: " + e);
+                 }
+                 buffer = out.readLine();
+             }
+         }catch(IOException e){
+             Log.e("HIJACKER/getPIDs", "Exception while reading pidof", e);
+             list = null;
+         }
+         shell.done();
+         return list;
+     }
     public static ArrayList<Integer> getPIDs(int pr) {
         switch(pr){
             case PROCESS_AIRODUMP:
@@ -1164,7 +1332,7 @@ public class MainActivity extends AppCompatActivity{
             case PROCESS_AIREPLAY:
                 return getPIDs("aireplay-ng");
             case PROCESS_MDK_BF:
-                return getPIDs("mdk3bf");
+                return getPIDs("mdk4bf");
             case PROCESS_MDK_DOS:
                 return getPIDs("mdk3dos");
             case PROCESS_AIRCRACK:
@@ -1277,9 +1445,8 @@ public class MainActivity extends AppCompatActivity{
         Log.d("HIJACKER/load", "Loading preferences...");
 
         iface = pref.getString("iface", iface);
-        if(!isArchValid()) {
-            prefix = pref.getString("prefix", prefix);
-        }
+        // Do NOT set `prefix` here — SetupTask will decide between user-configured value
+        // (pref.contains("prefix") == true) and auto-selected LD_PRELOAD based on chipset.
         deauthWait = Integer.parseInt(pref.getString("deauthWait", Integer.toString(deauthWait)));
         chroot_dir = pref.getString("chroot_dir", chroot_dir);
         monstart = pref.getBoolean("monstart", monstart);
@@ -1411,7 +1578,7 @@ public class MainActivity extends AppCompatActivity{
     protected void onDestroy(){
         notif_on = false;
         if(mNotificationManager!=null) mNotificationManager.cancelAll();
-         CustomAction.save();
+        CustomAction.save();
          if(watchdogTask!=null) watchdogTask.requestStop();
          try{
              stop(PROCESS_AIRODUMP);
@@ -1422,7 +1589,7 @@ public class MainActivity extends AppCompatActivity{
              stop(PROCESS_REAVER);
              runOne(disable_monMode);
          }catch(Exception e){
-             e.printStackTrace();
+             Log.e("HIJACKER/onDestroy", "Exception while stopping processes", e);
          }
          RootFile.finish();
          Shell.exitAll();
@@ -1670,12 +1837,33 @@ public class MainActivity extends AppCompatActivity{
         copy(((TextView)v).getText().toString(), v);
     }
     static void copy(String str, View view){
-        clipboard.setPrimaryClip(ClipData.newPlainText("label", str));
-        if(view!=null)
-            Toast.makeText(view.getContext(), view.getContext().getString(R.string.copied_to_clipboard), Toast.LENGTH_SHORT).show();
+        // Don't rely on the static clipboard field (may not be initialized yet).
+        Context ctx = null;
+        if(view!=null) ctx = view.getContext();
+        if(ctx==null) ctx = appContext;
+
+        if(ctx!=null){
+            ClipboardManager cm = (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+            if(cm!=null){
+                cm.setPrimaryClip(ClipData.newPlainText("label", str));
+                // cache for later use
+                clipboard = cm;
+                if(view!=null) Toast.makeText(ctx, ctx.getString(R.string.copied_to_clipboard), Toast.LENGTH_SHORT).show();
+            }else{
+                Log.e("HIJACKER/Copy", "ClipboardManager not available");
+                if(view!=null) Toast.makeText(ctx, ctx.getString(R.string.unknown_error), Toast.LENGTH_SHORT).show();
+            }
+        }else{
+            Log.e("HIJACKER/Copy", "No context available to access clipboard");
+        }
     }
     static void notification(){
-        if(notif_on && show_notif && notif!=null){
+        final MainActivity inst = instance;
+        if(inst==null){
+            if (mNotificationManager != null) mNotificationManager.cancel(0);
+            return;
+        }
+        if(notif_on && show_notif && inst.notif!=null){
             if(show_details){
                 String str;
                 if(is_ap==null) str = "APs: " + Tile.i + " | STs: " + (Tile.tiles.size() - Tile.i);
@@ -1692,9 +1880,9 @@ public class MainActivity extends AppCompatActivity{
                 if(CrackFragment.isRunning()) str += " | Cracking .cap file...";
                 if(CustomActionFragment.isRunning()) str += " | Running action " + CustomActionFragment.selectedAction.getTitle() + "...";
 
-                notif.setContentText(str);
-            }else notif.setContentText(null);
-            if (mNotificationManager != null) mNotificationManager.notify(0, notif.build());
+                inst.notif.setContentText(str);
+            }else inst.notif.setContentText(null);
+            if (mNotificationManager != null) mNotificationManager.notify(0, inst.notif.build());
         }else{
             if (mNotificationManager != null) mNotificationManager.cancel(0);
         }
@@ -1724,7 +1912,7 @@ public class MainActivity extends AppCompatActivity{
         if(inst==null) return;
         inst.runOnUiThread(() -> {
             if(inst.toolbar!=null) inst.toolbar.setOverflowIcon(overflow[state]);
-            if(!(ReaverFragment.isRunning() || CrackFragment.isRunning() || (inst.wpa_thread!=null && inst.wpa_thread.isAlive()))){
+            if(!(ReaverFragment.isRunning() || CrackFragment.isRunning() || (wpa_thread!=null && wpa_thread.isAlive()))){
                 if(inst.progress!=null){
                     inst.progress.setIndeterminate(false);
                     inst.progress.setProgress(deauthWait);
@@ -1757,7 +1945,7 @@ public class MainActivity extends AppCompatActivity{
 
         return lastline;
     }
-    static String getLastSeen(long lastseen){
+   static String getLastSeen(long lastseen){
         String str = "";
         long diff = System.currentTimeMillis() - lastseen;
         if(diff < 1000) return "Just now";
@@ -1886,21 +2074,18 @@ public class MainActivity extends AppCompatActivity{
                 final CustomDialog customDialog = new CustomDialog();
                 customDialog.setTitle(getString(R.string.update_title));
                 customDialog.setMessage(text);
-                customDialog.setPositiveButton(getString(R.string.download), new Runnable(){
-                    @Override
-                    public void run(){
-                        String filename = link.substring(link.lastIndexOf('/') + 1);
+                customDialog.setPositiveButton(getString(R.string.download), () -> {
+                    String filename = link.substring(link.lastIndexOf('/') + 1);
 
-                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(link));
-                        request.setTitle(filename);
-                        // allowScanningByMediaScanner is deprecated; call it only on older Android versions to retain behavior
-                        allowScanningByMediaScannerIfNeeded(request);
-                        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
+                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse(link));
+                    request.setTitle(filename);
+                    // allowScanningByMediaScanner is deprecated; call it only on older Android versions to retain behavior
+                    allowScanningByMediaScannerIfNeeded(request);
+                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
 
-                        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-                        if(manager!=null) manager.enqueue(request);
-                    }
+                    DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                    if(manager!=null) manager.enqueue(request);
                 });
                 customDialog.setNeutralButton(getString(R.string.cancel), null);
 
@@ -1996,12 +2181,12 @@ public class MainActivity extends AppCompatActivity{
         System.loadLibrary("native-lib");
     }
 
-    static boolean createReport(File report, String filesPath, String stackTrace, Process shell){
+    static boolean createReport(File report, String filesPath, String stackTrace){
         // Create a simple text report containing app/device info, optional stack trace, a directory listing
         // and a short logcat dump. Returns true on success.
         if(report == null) return false;
         try (PrintWriter pw = new PrintWriter(new FileWriter(report))){
-            pw.println("Hijacker report - " + new Date().toString());
+            pw.println("Hijacker report - " + new Date());
             pw.println("Version: " + (versionName == null ? "unknown" : versionName) + " (" + versionCode + ")");
             pw.println("Device: " + (deviceModel == null ? "unknown" : deviceModel));
             pw.println("Arch: " + (arch == null ? "unknown" : arch));
@@ -2031,7 +2216,7 @@ public class MainActivity extends AppCompatActivity{
                         pw.println("(path not found)");
                     }
                 }catch(Exception e){
-                    pw.println("(error listing files: " + e.toString() + ")");
+                    pw.println("(error listing files: " + e + ")");
                 }
                 pw.println();
             }
@@ -2050,14 +2235,14 @@ public class MainActivity extends AppCompatActivity{
                 br.close();
                 p.destroy();
             }catch(Exception e){
-                pw.println("(failed to collect logcat: " + e.toString() + ")");
+                pw.println("(failed to collect logcat: " + e + ")");
             }
 
             pw.flush();
             return true;
         }catch(IOException e){
-            Log.e("HIJACKER/createReport", "Exception creating report", e);
+            Log.e("HIJACKER/SetupTask", "Exception creating report", e);
             return false;
         }
     }
-}
+ }

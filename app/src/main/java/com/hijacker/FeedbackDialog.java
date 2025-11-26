@@ -94,7 +94,7 @@ public class FeedbackDialog extends DialogFragment{
             mainHandler.post(() -> progress.setIndeterminate(true));
             executor.submit(() -> {
                 report = new File(Environment.getExternalStorageDirectory() + "/report.txt");
-                boolean result = MainActivity.createReport(report, path, null, Shell.getFreeShell().getShell());
+                boolean result = MainActivity.createReport(report, path, null);
                 mainHandler.post(() -> {
                     progress.setIndeterminate(false);
                     if(!result){

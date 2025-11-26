@@ -142,7 +142,7 @@ public class SendLogActivity extends AppCompatActivity {
             progressBar.setVisibility(View.VISIBLE);
             executor.submit(() -> {
                 report = new File(Environment.getExternalStorageDirectory() + "/report.txt");
-                boolean result = createReport(report, getFilesDir().getAbsolutePath(), stackTrace, shell);
+                boolean result = createReport(report, getFilesDir().getAbsolutePath(), stackTrace);
                 if(result){
                     try{
                         BufferedReader br = new BufferedReader(new FileReader(report));
@@ -194,7 +194,7 @@ public class SendLogActivity extends AppCompatActivity {
                 "airodump-ng",
                 "aireplay-ng",
                 "aircrack-ng",
-                "mdk3",
+                "mdk4",
                 "reaver",
                 "reaver-wash"
         };

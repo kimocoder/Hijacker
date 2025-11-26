@@ -55,6 +55,7 @@ class RootFile{
 
         if(path.charAt(path.length()-1)=='/' && path.length()>1) path = path.substring(0, path.length()-1);
 
+        // Use shell (initialized via init()) to list the given path. We use -d -l to get one-line info.
         shell.run(busybox + " ls \"" + path + "\" -d -l; echo ENDOFLS");
         String buffer = getLastLine(out, "ENDOFLS");
 
@@ -87,10 +88,38 @@ class RootFile{
         if(temp[0].length()!=10){
             throw new IllegalFormatFlagsException(temp[0] + " is not how it should be\nbuffer: " + buffer + "\nbuffer before: " + before);
         }
-        if(temp[0].charAt(0)=='d'){
+
+        char typeChar = temp[0].charAt(0);
+        if(typeChar=='d'){
             this.isDirectory = true;
-        }else if(temp[0].charAt(0)=='-'){
+        }else if(typeChar=='-'){
             this.isFile = true;
+        }else if(typeChar=='l'){
+            // Symlink: resolve target and classify based on target type if possible
+            try{
+                Shell s2 = getFreeShell();
+                s2.run(busybox + " readlink -f \"" + path + "\"; echo ENDOFR");
+                BufferedReader out2 = s2.getShell_out();
+                String resolved = getLastLine(out2, "ENDOFR");
+                s2.done();
+                if(resolved!=null && !resolved.equals("ENDOFR") && !resolved.isEmpty()){
+                    try{
+                        RootFile resolvedRf = new RootFile(resolved);
+                        if(resolvedRf.isDirectory()) this.isDirectory = true;
+                        else if(resolvedRf.isFile()) this.isFile = true;
+                        this.length = resolvedRf.length();
+                    }catch(Exception e){
+                        // couldn't resolve target as a normal file - leave as unknown type but mark exists
+                        if(debug) Log.d("HIJACKER/RootFile", "Symlink target resolution failed: " + e);
+                        this.isUnknownType = false; // still exists
+                    }
+                }else{
+                    this.isUnknownType = true;
+                }
+            }catch(Exception e){
+                if(debug) Log.e("HIJACKER/RootFile", "Error resolving symlink: " + e);
+                this.isUnknownType = true;
+            }
         }else{
             this.isUnknownType = true;
         }
@@ -199,9 +228,15 @@ class RootFile{
                     if(full_name.charAt(full_name.length() - 1)==' '){
                         full_name = new StringBuilder(full_name.substring(0, full_name.length() - 1));
                     }
-                    if(!full_name.toString().contains(" -> ")){
-                        result.add(new RootFile(absolutePath + (absolutePath.length()==1 ? "" : '/') + full_name));
+
+                    String entryName = full_name.toString();
+                    // If this is a symlink, 'ls -l' outputs: "linkname -> target". Extract link name before ' -> '
+                    int arrowIdx = entryName.indexOf(" -> ");
+                    if(arrowIdx != -1){
+                        entryName = entryName.substring(0, arrowIdx);
                     }
+
+                    result.add(new RootFile(absolutePath + (absolutePath.length()==1 ? "" : '/') + entryName));
                 }
 
                 buffer = out2.readLine();

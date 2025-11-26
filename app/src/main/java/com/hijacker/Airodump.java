@@ -229,7 +229,8 @@ class Airodump{
     }
 
     private static String getString() {
-        String cmd = "su -c " + prefix + " " + airodump_dir + " --update 9999999 --write-interval 1 --band ";
+        String trimmedPrefix = (prefix==null) ? "" : prefix.trim();
+        String cmd = "su -c " + (trimmedPrefix.isEmpty() ? "" : (trimmedPrefix + " ")) + airodump_dir + " --update 9999999 --write-interval 1 --band ";
 
         if(band==BAND_5 || band==BAND_BOTH || channel>20) cmd += "a";
         if((band==BAND_2 || band==BAND_BOTH) && channel<=20) cmd += "bg";
@@ -270,64 +271,72 @@ class Airodump{
                 String probeResult = MainActivity.getLastLine(probeShell.getShell_out(), "ENDCHK");
                 probeShell.done();
                 if(probeResult != null && "EXISTS".equals(probeResult.trim())){
-                    boolean shouldReset = conModeToggled;
-                    if(!shouldReset){
-                        Shell checkShell = getFreeShell();
-                        Log.d(TAG, "Checking current con_mode value");
-                        checkShell.run("cat /sys/module/wlan/parameters/con_mode; echo ENDCHK");
-                        String val = MainActivity.getLastLine(checkShell.getShell_out(), "ENDCHK");
-                        checkShell.done();
-                        Log.d(TAG, "Current con_mode value: '" + val + "'");
-                        if(val != null && val.trim().matches("\\d+") && !"0".equals(val.trim())) shouldReset = true;
-                    }
-                    if(shouldReset){
-                        Log.d(TAG, "Resetting monitor mode via sysfs for wlan0 (shouldReset=" + shouldReset + ")");
-                        try{
-                            String suReset = "ip link set " + iface + " down; sh -c 'echo 0 > /sys/module/wlan/parameters/con_mode' 2>&1; cat /sys/module/wlan/parameters/con_mode; ip link set " + iface + " up";
-                            String outR = runSuAndCapture(suReset);
-                            if(debug) Log.d(TAG, "Direct su reset output: '" + outR + "'");
-                            String verifyValR = null;
-                            if(outR!=null){
-                                String[] lines = outR.split("\\r?\\n");
-                                for(int i=lines.length-1;i>=0;i--){
-                                    String l = lines[i].trim();
-                                    if(!l.isEmpty()){ verifyValR = l; break; }
-                                }
-                            }
+                    // If an external component requested that we don't reset con_mode (e.g. TestDialog managing the full test),
+                    // skip any reset attempts. This avoids races where Airodump would toggle con_mode while the external
+                    // test harness expects it to stay enabled.
+                    if(MainActivity.preventConModeReset){
+                        Log.d(TAG, "Skipping con_mode probe/reset flow because preventConModeReset is set");
+                        // Do not attempt to reset con_mode; continue with the rest of stop() cleanup.
+                    } else {
+                     boolean shouldReset = conModeToggled;
+                     if(!shouldReset){
+                         Shell checkShell = getFreeShell();
+                         Log.d(TAG, "Checking current con_mode value");
+                         checkShell.run("cat /sys/module/wlan/parameters/con_mode; echo ENDCHK");
+                         String val = MainActivity.getLastLine(checkShell.getShell_out(), "ENDCHK");
+                         checkShell.done();
+                         Log.d(TAG, "Current con_mode value: '" + val + "'");
+                         if(val != null && val.trim().matches("\\d+") && !"0".equals(val.trim())) shouldReset = true;
+                     }
+                     if(shouldReset){
+                         Log.d(TAG, "Resetting monitor mode via sysfs for wlan0 (shouldReset=" + true + ")");
+                         try{
+                             String suReset = "ip link set " + iface + " down; sh -c 'echo 0 > /sys/module/wlan/parameters/con_mode' 2>&1; cat /sys/module/wlan/parameters/con_mode; ip link set " + iface + " up";
+                             String outR = runSuAndCapture(suReset);
+                             if(debug) Log.d(TAG, "Direct su reset output: '" + outR + "'");
+                             String verifyValR = null;
+                             if(outR!=null){
+                                 String[] lines = outR.split("\\r?\\n");
+                                 for(int i=lines.length-1;i>=0;i--){
+                                     String l = lines[i].trim();
+                                     if(!l.isEmpty()){ verifyValR = l; break; }
+                                 }
+                             }
 
-                            if(verifyValR==null || !"0".equals(verifyValR.trim())){
-                                if(busybox!=null && !busybox.isEmpty()){
-                                    String suBusyR = "ip link set " + iface + " down; echo 0 | " + busybox + " tee /sys/module/wlan/parameters/con_mode 2>&1; cat /sys/module/wlan/parameters/con_mode; ip link set " + iface + " up";
-                                    String outR2 = runSuAndCapture(suBusyR);
-                                    if(debug) Log.d(TAG, "Direct busybox reset output: '" + outR2 + "'");
-                                    if(outR2!=null){
-                                        String[] lines = outR2.split("\\r?\\n");
-                                        for(int i=lines.length-1;i>=0;i--){
-                                            String l = lines[i].trim();
-                                            if(!l.isEmpty()){ verifyValR = l; break; }
-                                        }
-                                    }
-                                }
-                            }
+                             if(verifyValR==null || !"0".equals(verifyValR.trim())){
+                                 if(busybox!=null && !busybox.isEmpty()){
+                                     String suBusyR = "ip link set " + iface + " down; echo 0 | " + busybox + " tee /sys/module/wlan/parameters/con_mode 2>&1; cat /sys/module/wlan/parameters/con_mode; ip link set " + iface + " up";
+                                     String outR2 = runSuAndCapture(suBusyR);
+                                     if(debug) Log.d(TAG, "Direct busybox reset output: '" + outR2 + "'");
+                                     if(outR2!=null){
+                                         String[] lines = outR2.split("\\r?\\n");
+                                         for(int i=lines.length-1;i>=0;i--){
+                                             String l = lines[i].trim();
+                                             if(!l.isEmpty()){ verifyValR = l; break; }
+                                         }
+                                     }
+                                 }
+                             }
 
-                            if(verifyValR != null && "0".equals(verifyValR.trim())){
-                                conModeToggled = false;
-                                try{
-                                    String wifiOut = runSuAndCapture("svc wifi enable; sleep 2; echo WIFI_DONE");
-                                    Log.d(TAG, "svc wifi enable output: '" + wifiOut + "'");
-                                }catch(Exception ex){
-                                    Log.e(TAG, "Failed to run 'svc wifi enable': " + ex);
-                                }
-                            }else{
-                                Log.e(TAG, "Failed to reset con_mode to 0 (value='" + verifyValR + "')");
-                            }
-                        }catch(Exception w){
-                            Log.e(TAG, "Failed to reset con_mode via direct su: " + w);
-                        }
+                             if(verifyValR != null && "0".equals(verifyValR.trim())){
+                                 conModeToggled = false;
+                                 try{
+                                     String wifiOut = runSuAndCapture("svc wifi enable; sleep 2; echo WIFI_DONE");
+                                     Log.d(TAG, "svc wifi enable output: '" + wifiOut + "'");
+                                 }catch(Exception ex){
+                                     Log.e(TAG, "Failed to run 'svc wifi enable': " + ex);
+                                 }
+                             }else{
+                                 Log.e(TAG, "Failed to reset con_mode to 0 (value='" + verifyValR + "')");
+                             }
+                         }catch(Exception w){
+                             Log.e(TAG, "Failed to reset con_mode via direct su: " + w);
+                         }
                     }
-                }
-            }
-        }catch(Exception e){
+                    }
+                 }
+             }
+         }catch(Exception e){
             Log.e(TAG, "Failed to probe/reset con_mode: " + e);
         }
         AP.saveAll();

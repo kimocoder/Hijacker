@@ -26,10 +26,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
-import android.widget.Button;
-
-import static com.hijacker.MainActivity.isArchValid;
-import static com.hijacker.MainActivity.background;
 
 public class FirstRunDialog extends DialogFragment {
     @NonNull
@@ -39,7 +35,8 @@ public class FirstRunDialog extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         builder.setMessage(R.string.first_run);
         builder.setTitle(R.string.first_run_title);
-        builder.setPositiveButton(R.string.install_firmware, (dialog, id) -> {});
+        // Do not offer to install Nexmon automatically on first run — only show an OK button.
+        builder.setPositiveButton(android.R.string.ok, (dialog, id) -> {});
         builder.setNegativeButton(R.string.home, (dialog, id) -> {
             // Go to Home
             dismissAllowingStateLoss();
@@ -49,24 +46,14 @@ public class FirstRunDialog extends DialogFragment {
     }
     @Override
     public void show(@NonNull FragmentManager fragmentManager, String tag){
-        if(!background) super.show(fragmentManager, tag);
+        // Intentionally do not show the first-run dialog. Proceed directly to Home.
+        // Making this a no-op prevents the dialog from appearing on first run.
     }
     @Override
     public void onStart(){
         super.onStart();
-        // Disable "Install Nexmon" button if arch is not valid
-        AlertDialog d = (AlertDialog) getDialog();
-        if(d==null) return;
-
-        Button positiveButton = d.getButton(Dialog.BUTTON_POSITIVE);
-        if(!isArchValid()){
-            positiveButton.setEnabled(false);
-        }else{
-            positiveButton.setOnClickListener(v -> {
-                // Open InstallFirmwareDialog to install Nexmon
-                new InstallFirmwareDialog().show(requireActivity().getSupportFragmentManager(), "InstallFirmwareDialog");
-            });
-        }
+        // No-op: positive button is a simple 'OK' that dismisses the dialog. We intentionally
+        // do not open the InstallFirmwareDialog from the FirstRunDialog.
     }
     @Override
     public void onDismiss(@NonNull DialogInterface dialogInterface) {

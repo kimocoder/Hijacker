@@ -397,7 +397,9 @@ public class AP extends Device{
                                 break;
                             case 2:
                                 //Copy disconnect command
-                                String str2 = prefix + " " + aireplay_dir + " --deauth 0 -a " + AP.this.mac + " " + iface;
+                                String pfx = (prefix==null) ? "" : prefix.trim();
+                                String prefPart = pfx.isEmpty() ? "" : pfx + " ";
+                                String str2 = prefPart + aireplay_dir + " --deauth 0 -a " + AP.this.mac + " " + iface;
                                 copy(str2, v);
                                 break;
                             case 3:
@@ -418,9 +420,11 @@ public class AP extends Device{
                                 break;
                             case 5:
                                 //copy crack command
+                                String pfx2 = (prefix==null) ? "" : prefix.trim();
+                                String prefPart2 = pfx2.isEmpty() ? "" : pfx2 + " ";
                                 String str;
-                                if(AP.this.sec==WEP) str = prefix + " " + airodump_dir + " --channel " + AP.this.ch + " --bssid " + AP.this.mac + " --ivs -w " + cap_path + "/wep_ivs " + iface;
-                                else str = prefix + " " + airodump_dir + " --channel " + AP.this.ch + " --bssid " + AP.this.mac + " -w " + cap_path + "/handshake " + iface;
+                                if(AP.this.sec==WEP) str = prefPart2 + airodump_dir + " --channel " + AP.this.ch + " --bssid " + AP.this.mac + " --ivs -w " + cap_path + "/wep_ivs " + iface;
+                                else str = prefPart2 + airodump_dir + " --channel " + AP.this.ch + " --bssid " + AP.this.mac + " -w " + cap_path + "/handshake " + iface;
 
                                 copy(str, v);
                                 break;
