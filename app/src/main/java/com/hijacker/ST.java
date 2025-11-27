@@ -96,7 +96,7 @@ class ST extends Device{
                 if(connectedTo==null){
                     //Now not connected
                     connected--;
-                    runInHandler(() -> Tile.onCountsChanged());
+                    runInHandler(Tile::onCountsChanged);
                 }else{
                     connectedTo.addClient(this);
                 }
@@ -108,7 +108,7 @@ class ST extends Device{
                 //Now connected to known AP
                 connected++;
                 connectedTo.addClient(this);
-                runInHandler(() -> Tile.onCountsChanged());
+                runInHandler(Tile::onCountsChanged);
             }
         }
         if(frames!=this.frames || lost!=this.lost || this.lastseen==0){
@@ -254,54 +254,51 @@ class ST extends Device{
                     dialog.setTitle(activity.getString(R.string.set_alias));
                     dialog.setAllowEmpty();
                     dialog.setDefaultText(ST.this.alias);
-                    dialog.setRunnable(new Runnable(){
-                        @Override
-                        public void run(){
-                            if(dialog.result.isEmpty()) dialog.result = null;
-                            try{
-                                if(ST.this.alias==null ^ dialog.result==null){
-                                    //Need to remove previous alias
-                                    File temp_aliases = new File(data_path + "/temp_aliases");
-                                    if(temp_aliases.exists()) temp_aliases.delete();
-                                    temp_aliases.createNewFile();
-                                    PrintWriter temp_in = new PrintWriter(new FileWriter(temp_aliases));
+                    dialog.setRunnable(() -> {
+                        if(dialog.result.isEmpty()) dialog.result = null;
+                        try{
+                            if(ST.this.alias==null ^ dialog.result==null){
+                                //Need to remove previous alias
+                                File temp_aliases = new File(data_path + "/temp_aliases");
+                                if(temp_aliases.exists()) temp_aliases.delete();
+                                temp_aliases.createNewFile();
+                                PrintWriter temp_in = new PrintWriter(new FileWriter(temp_aliases));
 
-                                    BufferedReader aliases_out = new BufferedReader(new FileReader(aliases_file));
+                                BufferedReader aliases_out = new BufferedReader(new FileReader(aliases_file));
 
-                                    //Copy current aliases to temp file, except the one we are changing
-                                    String buffer = aliases_out.readLine();
-                                    while(buffer!=null){
-                                        //Line format: 00:11:22:33:44:55 Alias
-                                        if(buffer.charAt(17)==' ' && buffer.length()>18){
-                                            String mac = buffer.substring(0, 17);
-                                            String alias = buffer.substring(18);
-                                            if(!mac.equals(ST.this.mac)){
-                                                temp_in.println(mac + ' ' + alias);
-                                            }
-                                        }else{
-                                            Log.e("HIJACKER/setup", "Aliases file format error: " + buffer);
+                                //Copy current aliases to temp file, except the one we are changing
+                                String buffer = aliases_out.readLine();
+                                while(buffer!=null){
+                                    //Line format: 00:11:22:33:44:55 Alias
+                                    if(buffer.charAt(17)==' ' && buffer.length()>18){
+                                        String mac = buffer.substring(0, 17);
+                                        String alias = buffer.substring(18);
+                                        if(!mac.equals(ST.this.mac)){
+                                            temp_in.println(mac + ' ' + alias);
                                         }
-                                        buffer = aliases_out.readLine();
+                                    }else{
+                                        Log.e("HIJACKER/setup", "Aliases file format error: " + buffer);
                                     }
-                                    temp_in.flush();
-                                    temp_in.close();
-                                    aliases_out.close();
+                                    buffer = aliases_out.readLine();
+                                }
+                                temp_in.flush();
+                                temp_in.close();
+                                aliases_out.close();
 
-                                    aliases_file.delete();
-                                    temp_aliases.renameTo(aliases_file);
-                                    aliases_in = new FileWriter(aliases_file, true);
-                                }
-                                if(dialog.result!=null){
-                                    aliases_in.write(ST.this.mac + ' ' + dialog.result + '\n');
-                                    aliases_in.flush();
-                                }
-                            }catch(IOException e){
-                                Log.e("HIJACKER/MyListFrgm", e.toString());
+                                aliases_file.delete();
+                                temp_aliases.renameTo(aliases_file);
+                                aliases_in = new FileWriter(aliases_file, true);
                             }
-                            aliases.put(ST.this.mac, dialog.result);
-                            ST.this.alias = dialog.result;
-                            ST.this.update();
+                            if(dialog.result!=null){
+                                aliases_in.write(ST.this.mac + ' ' + dialog.result + '\n');
+                                aliases_in.flush();
+                            }
+                        }catch(IOException e){
+                            Log.e("HIJACKER/MyListFrgm", e.toString());
                         }
+                        aliases.put(ST.this.mac, dialog.result);
+                        ST.this.alias = dialog.result;
+                        ST.this.update();
                     });
                     dialog.show(activity.getSupportFragmentManager(), "EditTextDialog");
                  }
