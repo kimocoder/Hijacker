@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
@@ -27,6 +28,7 @@
                     android:id="@+id/capfile"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autofillHints=""
                     android:hint="@string/path_to_cap"
                     android:imeOptions="actionNext"
                     android:inputType="text"
@@ -57,10 +59,10 @@
                     android:id="@+id/wordlist"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autofillHints=""
                     android:hint="@string/path_to_wordlist"
                     android:inputType="text"
                     android:maxLines="1" />
-
             </com.google.android.material.textfield.TextInputLayout>
 
             <ImageButton
@@ -69,8 +71,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
+                android:contentDescription="TODO"
                 android:src="@android:drawable/stat_sys_download"
-                android:tint="@color/colorAccent" />
+                app:tint="@color/colorAccent" />
 
             <Button
                 android:id="@+id/wordlist_fe_btn"
@@ -182,7 +185,5 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/start" />
-
     </LinearLayout>
-
 </LinearLayout>
