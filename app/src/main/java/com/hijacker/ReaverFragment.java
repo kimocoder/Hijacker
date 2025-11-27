@@ -152,17 +152,14 @@ public class ReaverFragment extends Fragment{
                     }
                     select_button.setText(ap.toString());
                 }else{
-                    //Clcked custom
+                    //Clicked custom
                     final EditTextDialog dialog = new EditTextDialog();
                     dialog.setTitle(getString(R.string.custom_ap_title));
                     dialog.setHint(getString(R.string.mac_address));
-                    dialog.setRunnable(new Runnable(){
-                        @Override
-                        public void run(){
-                            ap = null;
-                            custom_mac = dialog.result;
-                            select_button.setText(dialog.result);
-                        }
+                    dialog.setRunnable(() -> {
+                        ap = null;
+                        custom_mac = dialog.result;
+                        select_button.setText(dialog.result);
                     });
                     dialog.show(mFragmentManager, "EditTextDialog");
                 }
@@ -415,7 +412,7 @@ public class ReaverFragment extends Fragment{
                 }
                 postProgress("Done");
             }catch(IOException e){
-                Log.e("HIJACKER/Exception", "Caught Exception in ReaverFragment: " + e.toString());
+                Log.e("HIJACKER/Exception", "Caught Exception in ReaverFragment: " + e);
             }
 
             return true;
