@@ -2,6 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
+    Copyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,8 +19,9 @@ package com.hijacker;
  */
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import android.view.View;
 import android.widget.TextView;
@@ -31,10 +33,11 @@ import static com.hijacker.MainActivity.getLastSeen;
 public class STDialog extends DeviceDialog {
     ST st;
     TextView[] views = {null, null, null, null, null, null, null, null};
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        View view = getActivity().getLayoutInflater().inflate(R.layout.st_info, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        View view = requireActivity().getLayoutInflater().inflate(R.layout.st_info, null);
 
         views[0] = view.findViewById(R.id.mac_st);
         views[1] = view.findViewById(R.id.bssid_st);
