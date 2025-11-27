@@ -24,6 +24,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.TextView;
 
 import java.util.Locale;
@@ -52,6 +53,16 @@ public class APDialog extends DeviceDialog {
         views[10] = view.findViewById(R.id.clients);
         views[11] = view.findViewById(R.id.manuf);
         views[12] = view.findViewById(R.id.lastseen);
+
+        // Explicitly wire click listeners instead of using android:onClick in XML
+        OnClickListener copyListener = v -> {
+            CharSequence text = null;
+            if (v instanceof TextView) text = ((TextView) v).getText();
+            if (text != null) MainActivity.copy(text.toString(), v);
+        };
+        view.findViewById(R.id.mac).setOnClickListener(copyListener);
+        view.findViewById(R.id.essid).setOnClickListener(copyListener);
+        view.findViewById(R.id.manuf).setOnClickListener(copyListener);
 
         builder.setView(view);
         builder.setTitle(ap.getESSID());

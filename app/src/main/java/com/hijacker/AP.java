@@ -420,11 +420,7 @@ public class AP extends Device{
                                 break;
                             case 5:
                                 //copy crack command
-                                String pfx2 = (prefix==null) ? "" : prefix.trim();
-                                String prefPart2 = pfx2.isEmpty() ? "" : pfx2 + " ";
-                                String str;
-                                if(AP.this.sec==WEP) str = prefPart2 + airodump_dir + " --channel " + AP.this.ch + " --bssid " + AP.this.mac + " --ivs -w " + cap_path + "/wep_ivs " + iface;
-                                else str = prefPart2 + airodump_dir + " --channel " + AP.this.ch + " --bssid " + AP.this.mac + " -w " + cap_path + "/handshake " + iface;
+                                String str = getString();
 
                                 copy(str, v);
                                 break;
@@ -498,5 +494,14 @@ public class AP extends Device{
             return true;
         });
         return popup;
+    }
+
+    private String getString() {
+        String pfx2 = (prefix==null) ? "" : prefix.trim();
+        String prefPart2 = pfx2.isEmpty() ? "" : pfx2 + " ";
+        String str;
+        if(AP.this.sec==WEP) str = prefPart2 + airodump_dir + " --channel " + AP.this.ch + " --bssid " + AP.this.mac + " --ivs -w " + cap_path + "/wep_ivs " + iface;
+        else str = prefPart2 + airodump_dir + " --channel " + AP.this.ch + " --bssid " + AP.this.mac + " -w " + cap_path + "/handshake " + iface;
+        return str;
     }
 }
