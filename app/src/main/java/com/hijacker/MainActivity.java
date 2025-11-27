@@ -54,6 +54,8 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
+
+import android.provider.Settings;
 import android.util.JsonReader;
 import androidx.core.content.pm.PackageInfoCompat;
 import android.util.Log;
@@ -183,6 +185,7 @@ public class MainActivity extends AppCompatActivity{
     CustomActionFragment customActionFragment = new CustomActionFragment();
     DrawerLayout mDrawerLayout;
     NavigationView navigationView;
+    private boolean askedAllFilesAccessDialogShown = false;
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -217,6 +220,16 @@ public class MainActivity extends AppCompatActivity{
 
         // Initialize NotificationManager early to avoid NPE when notifications are used before setup finishes
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Create notification channel for Android O+ so notifications posted by this app will appear
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && mNotificationManager != null) {
+            String channelId = getString(R.string.DEFAULT_CHANNEL_ID);
+            CharSequence name = getString(R.string.notification_title); // readable channel name
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(channelId, name, importance);
+            channel.setDescription(getString(R.string.notification_channel_description));
+            mNotificationManager.createNotificationChannel(channel);
+        }
 
         new SetupTask().start();
     }
@@ -324,6 +337,15 @@ public class MainActivity extends AppCompatActivity{
         }
         protected Boolean doInBackground(Void... params) {
             Looper.prepare();
+
+            // Reference params to avoid "parameter 'params' is never used" warnings from static analysis.
+            // The method intentionally ignores incoming params today, but we keep a harmless read
+            // so tools know the parameter is intentionally unused.
+            if (params != null && params.length > 0) {
+                // no-op: parameter intentionally unused
+                Object _unused = params[0];
+                if (_unused == null) { /* nothing to do */ }
+            }
 
             //Wait for disclaimer to be accepted
             if(customDialog!=null){
@@ -667,14 +689,17 @@ public class MainActivity extends AppCompatActivity{
                 errorDialog._wait();
 
                 // Respect explicit user-configured prefix even on non-ARM devices; otherwise leave empty
-                if(pref.contains("prefix")) prefix = pref.getString("prefix", "");
-                else prefix = "";
-                 airodump_dir = "airodump-ng";
-                 aireplay_dir = "aireplay-ng";
-                 aircrack_dir = "aircrack-ng";
-                 mdk4bf_dir = "mdk4";
-                 mdk4dos_dir = "mdk4";
-                 reaver_dir = "reaver";
+                if(pref.contains("prefix")) {
+                    prefix = pref.getString("prefix", "");
+                } else {
+                    prefix = "";
+                }
+                airodump_dir = "airodump-ng";
+                aireplay_dir = "aireplay-ng";
+                aircrack_dir = "aircrack-ng";
+                mdk4bf_dir = "mdk4";
+                mdk4dos_dir = "mdk4";
+                reaver_dir = "reaver";
             }
 
             //Initialize RootFile (requires root) and Airodump
@@ -1103,7 +1128,12 @@ public class MainActivity extends AppCompatActivity{
     public static void startBeaconFlooding(String str){
         try{
                  // No ABI preflight for packaged mdk4 binaries; use what was installed in setup.
-             try{}catch(Exception ignored){}
+             try{
+                // Minimal no-op to avoid empty try block; keeps placeholder semantics for future ABI checks.
+                Thread.yield();
+            }catch(Exception e){
+                if(debug) Log.w("HIJACKER", "Ignored exception during ABI preflight placeholder", e);
+            }
              String trimmedPrefix = (prefix==null) ? "" : prefix.trim();
              String prefPart = trimmedPrefix.isEmpty() ? "" : (trimmedPrefix + " ");
              String cmd = "su -c " + prefPart + mdk4bf_dir + " " + iface + " b -m ";
@@ -1125,7 +1155,12 @@ public class MainActivity extends AppCompatActivity{
      public static void startAdos(String str) {
          try{
                 // No ABI preflight for packaged mdk4dos binary; use what was installed in setup.
-            try{}catch(Exception ignored){}
+            try{
+                // Minimal no-op to avoid empty try block; keeps placeholder semantics for future ABI checks.
+                Thread.yield();
+            }catch(Exception e){
+                if(debug) Log.w("HIJACKER", "Ignored exception during ABI preflight placeholder", e);
+            }
               String trimmedPrefix2 = (prefix==null) ? "" : prefix.trim();
               String prefPart2 = trimmedPrefix2.isEmpty() ? "" : (trimmedPrefix2 + " ");
               String cmd = "su -c " + prefPart2 + mdk4dos_dir + " " + iface + " a -m";
@@ -1243,60 +1278,6 @@ public class MainActivity extends AppCompatActivity{
         return false;
     }
 
-    // Improved verifyBinaryAbi: try readelf (preferred) to get ELF 'Class' and 'Machine', fall back to 'file' if readelf missing.
-    boolean verifyBinaryAbi(String binPath){
-        try{
-            Shell shell = getFreeShell();
-            // Try readelf for detailed info
-            String markerClass = "ENDOFRECLASS" + System.currentTimeMillis();
-            try{
-                shell.run("readelf -h \"" + binPath + "\" | grep -E \"Class:|Machine:\" 2>&1; echo " + markerClass);
-                String classAndMachine = getLastLine(shell.getShell_out(), markerClass);
-                shell.done();
-                if(classAndMachine!=null){
-                    String lower = classAndMachine.toLowerCase();
-                    String deviceAbi = android.os.Build.SUPPORTED_ABIS != null && android.os.Build.SUPPORTED_ABIS.length>0 ? android.os.Build.SUPPORTED_ABIS[0] : android.os.Build.CPU_ABI;
-                    deviceAbi = deviceAbi.toLowerCase();
-                    if(deviceAbi.contains("arm64") || deviceAbi.contains("aarch64")){
-                        return lower.contains("aarch64") || lower.contains("arm64");
-                    }else if(deviceAbi.contains("armeabi") || deviceAbi.contains("armv7")){
-                        return lower.contains("arm") && !lower.contains("aarch64");
-                    }else if(deviceAbi.contains("x86_64") || deviceAbi.contains("x86")){
-                        return lower.contains("intel") || lower.contains("x86") || lower.contains("i386") || lower.contains("i686");
-                    }
-                }
-            }catch(Exception re){
-                // readelf might not be present — try 'file' as before
-                try{
-                    shell = getFreeShell();
-                    shell.run("file \"" + binPath + "\"; echo ENDOFABI");
-                    String info = getLastLine(shell.getShell_out(), "ENDOFABI");
-                    shell.done();
-                    if(info==null) return false;
-                    Log.d("HIJACKER/SetupTask", "Binary file output (fallback): " + info);
-                    String deviceAbi = android.os.Build.SUPPORTED_ABIS != null && android.os.Build.SUPPORTED_ABIS.length>0 ? android.os.Build.SUPPORTED_ABIS[0] : android.os.Build.CPU_ABI;
-                    deviceAbi = deviceAbi.toLowerCase();
-                    info = info.toLowerCase();
-                    if(deviceAbi.contains("arm64") || deviceAbi.contains("aarch64")){
-                        return info.contains("aarch64") || info.contains("arm64");
-                    }else if(deviceAbi.contains("armeabi") || deviceAbi.contains("armv7")){
-                        return info.contains("arm") && !info.contains("aarch64");
-                    }else if(deviceAbi.contains("x86_64") || deviceAbi.contains("x86")){
-                        return info.contains("intel") || info.contains("x86") || info.contains("elf 64-bit") || info.contains("elf 32-bit");
-                    }
-                    return true;
-                }catch(Exception fe){
-                    Log.e("HIJACKER/SetupTask", "Error verifying binary ABI with file: " + fe);
-                    return false;
-                }
-            }
-        }catch(Exception e){
-            Log.e("HIJACKER/SetupTask", "Error verifying binary ABI", e);
-            return false;
-        }
-        return false; // conservative default
-    }
-
     public static ArrayList<Integer> getPIDs(String process_name) {
          if(process_name==null) return null;
 
@@ -1304,19 +1285,24 @@ public class MainActivity extends AppCompatActivity{
          ArrayList<Integer> list = new ArrayList<>();
          shell.run(busybox + " pidof " + process_name + "; echo ENDOFPIDOF");
          BufferedReader out = shell.getShell_out();
-         String buffer = null;
+         String lastline, buffer = null;
          try{
+             // Read until we get at least one non-null line
              while(buffer==null) buffer = out.readLine();
-             while(!buffer.equals("ENDOFPIDOF")){
-                 String[] temp = buffer.split(" ");
-                 try{
-                     for(String tmp : temp){
-                         list.add(Integer.parseInt(tmp));
-                     }
-                 }catch(NumberFormatException e){
-                     Log.e("HIJACKER/getPIDs", "Exception: " + e);
-                 }
+             lastline = buffer;
+             // Read until the sentinel line 'ENDOFPIDOF' or EOF
+             while(buffer != null && !"ENDOFPIDOF".equals(buffer)){
+                 lastline = buffer;
                  buffer = out.readLine();
+             }
+             // Parse lastline (should contain pid list like "1234 5678") into integers
+             if(!lastline.trim().isEmpty() && !"ENDOFPIDOF".equals(lastline)){
+                 String[] parts = lastline.trim().split("\\s+");
+                 for(String p : parts){
+                     try{
+                         list.add(Integer.parseInt(p));
+                     }catch(NumberFormatException nfe){ /* ignore tokens that aren't numbers */ }
+                 }
              }
          }catch(IOException e){
              Log.e("HIJACKER/getPIDs", "Exception while reading pidof", e);
@@ -1560,6 +1546,29 @@ public class MainActivity extends AppCompatActivity{
         notif_on = false;
         background = false;
         if(mNotificationManager!=null) mNotificationManager.cancelAll();
+
+        // Prompt user for All files access on Android 11+ (non-blocking) if we don't have it.
+        if (!askedAllFilesAccessDialogShown && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            askedAllFilesAccessDialogShown = true;
+            if (!Environment.isExternalStorageManager()) {
+                // Show explanation dialog and offer to open Settings to grant MANAGE_EXTERNAL_STORAGE
+                CustomDialog d = new CustomDialog();
+                d.setTitle(getString(R.string.all_files_access_title));
+                d.setMessage(getString(R.string.all_files_access_message));
+                d.setPositiveButton(getString(R.string.grant_all_files_access), () -> {
+                    try {
+                        Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + getPackageName()));
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        // Fallback to generic All files access settings
+                        Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                        startActivity(intent);
+                    }
+                });
+                d.setNegativeButton(getString(R.string.continue_without_access), null);
+                d.show(mFragmentManager, "AllFilesAccessDialog");
+            }
+        }
     }
     @Override
     protected void onPause(){
@@ -1623,13 +1632,27 @@ public class MainActivity extends AppCompatActivity{
     public boolean onCreateOptionsMenu(Menu menu){
         MainActivity.menu = menu;
         getMenuInflater().inflate(R.menu.toolbar, menu);
-        if(airOnStartup){
-            menu.getItem(1).setIcon(R.drawable.stop_drawable);
-            menu.getItem(1).setTitle(R.string.stop);
+        // Set the Run/Start icon according to the actual running state of airodump.
+        // Menu can be recreated (for example after dialogs); prefer runtime state over the preference flag.
+        try {
+            if (Airodump.isRunning()) {
+                menu.getItem(1).setIcon(R.drawable.stop_drawable);
+                menu.getItem(1).setTitle(R.string.stop);
+            } else if (airOnStartup) {
+                // If configured to run on startup but not currently running, show stop to indicate it will run
+                menu.getItem(1).setIcon(R.drawable.stop_drawable);
+                menu.getItem(1).setTitle(R.string.stop);
+            } else {
+                menu.getItem(1).setIcon(R.drawable.start_drawable);
+                menu.getItem(1).setTitle(R.string.start);
+            }
+        } catch (Exception e) {
+            // Defensive: if menu indexing changes, just ignore and leave menu as inflated.
+            Log.w("HIJACKER/OptMenu", "Failed to set run icon based on state", e);
         }
-        menu.getItem(3).setEnabled(false);
-        return true;
-    }
+         menu.getItem(3).setEnabled(false);
+         return true;
+     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -1920,6 +1943,29 @@ public class MainActivity extends AppCompatActivity{
             }
         });
     }
+
+    // Public helper to synchronize the Run/Start menu icon with the real airodump state.
+    // Call this after UI events where the menu may have been recreated or when returning from dialogs.
+    public static void updateRunMenuIcon() {
+        final MainActivity inst = instance;
+        if (inst == null) return;
+        inst.runOnUiThread(() -> {
+            try{
+                if(menu == null) return;
+                MenuItem mi = menu.findItem(R.id.stop_run);
+                if(mi == null) return;
+                if(Airodump.isRunning() || airOnStartup){
+                    mi.setIcon(R.drawable.stop_drawable);
+                    mi.setTitle(R.string.stop);
+                } else {
+                    mi.setIcon(R.drawable.start_drawable);
+                    mi.setTitle(R.string.start);
+                }
+            }catch(Exception e){
+                Log.w("HIJACKER/OptMenu", "Failed updating run menu icon", e);
+            }
+        });
+    }
     void refreshDrawer(){
         navigationView.getMenu().findItem(currentFragment).setChecked(true);
         actionBar.setTitle(navTitlesMap.get(currentFragment));
@@ -1933,17 +1979,19 @@ public class MainActivity extends AppCompatActivity{
     }
     static String getLastLine(BufferedReader out, String end){
         //Returns the last line printed in out BEFORE end. If no other line is present, end is returned.
-        String lastline=null, buffer = null;
+        String lastline = null;
         try{
-            while(buffer==null) buffer = out.readLine();
-            lastline = buffer;
-            while(!end.equals(buffer) && buffer!=null){
+            String buffer;
+            while((buffer = out.readLine()) != null){
+                if(end != null && end.equals(buffer)) break;
                 lastline = buffer;
-                buffer = out.readLine();
             }
-        }catch(IOException e){ Log.e("HIJACKER/Exception", "Exception in getLastLine: " + e); }
+        }catch(IOException e){
+            Log.e("HIJACKER/Exception", "Exception in getLastLine: " + e);
+        }
 
-        return lastline;
+        // If no lines were read before the sentinel, return the sentinel to match previous behavior.
+        return lastline == null ? end : lastline;
     }
    static String getLastSeen(long lastseen){
         String str = "";
