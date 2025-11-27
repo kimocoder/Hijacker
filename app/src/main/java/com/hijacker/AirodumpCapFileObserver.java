@@ -23,7 +23,6 @@ class AirodumpCapFileObserver {
     private java.util.concurrent.ScheduledExecutorService scheduler = null;
     private volatile boolean watching = false;
     private final java.util.Map<String, Long> mtimes = new java.util.HashMap<>();
-
     public AirodumpCapFileObserver(String path, int mask) {
         master_path = path;
     }
@@ -141,7 +140,7 @@ class AirodumpCapFileObserver {
                     try{ if(fields.length>8) pwr = Integer.parseInt(fields[8].replace(" ", "")); }catch(Exception ignored){ }
                     try{ if(fields.length>9) beacons = Integer.parseInt(fields[9].replace(" ", "")); }catch(Exception ignored){ }
                     try{ if(fields.length>10) data = Integer.parseInt(fields[10].replace(" ", "")); }catch(Exception ignored){ }
-                    try{ if(fields.length>12) id_length = Integer.parseInt(fields[12].replace(" ", "")); }catch(Exception ignored){ id_length = 0; }
+                    try{ if(fields.length>12) id_length = Integer.parseInt(fields[12].replace(" ", "")); }catch(Exception ignored){ }
                     if(fields.length>5) enc = fields[5]; if(fields.length>6) cipher = fields[6]; if(fields.length>7) auth = fields[7];
                     String essid = null;
                     if(id_length > 0 && fields.length>13) essid = fields[13];
