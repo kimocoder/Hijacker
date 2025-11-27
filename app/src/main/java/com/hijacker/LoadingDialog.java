@@ -2,6 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
+    Copyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +19,8 @@ package com.hijacker;
  */
 
 import android.app.Dialog;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import android.os.Bundle;
@@ -31,11 +34,12 @@ public class LoadingDialog extends DialogFragment {
     String title = null;
     View dialogView;
     TextView loadingDescription;
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState){
         setCancelable(false);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        dialogView = getActivity().getLayoutInflater().inflate(R.layout.loading_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        dialogView = requireActivity().getLayoutInflater().inflate(R.layout.loading_dialog, null);
         loadingDescription = dialogView.findViewById(R.id.loadingDescription);
 
         if(title!=null) loadingDescription.setText(title);
@@ -44,7 +48,7 @@ public class LoadingDialog extends DialogFragment {
         return builder.create();
     }
     @Override
-    public void show(FragmentManager fragmentManager, String tag){
+    public void show(@NonNull FragmentManager fragmentManager, String tag){
         if(!background) super.show(fragmentManager, tag);
     }
     void setInitText(String str){
