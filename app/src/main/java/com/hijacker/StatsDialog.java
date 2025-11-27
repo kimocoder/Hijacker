@@ -2,6 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
+    Copyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,13 +19,16 @@ package com.hijacker;
  */
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import android.view.View;
 import android.widget.TextView;
+
+import java.util.Locale;
 
 import static com.hijacker.MainActivity.background;
 
@@ -32,10 +36,11 @@ public class StatsDialog extends DialogFragment {
     static boolean isResumed = false;
     TextView wpa_count, wpa2_count, wep_count, opn_count, hidden_count, connected_count;
     static Runnable runnable;
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        View view = getActivity().getLayoutInflater().inflate(R.layout.ap_stats, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        View view = requireActivity().getLayoutInflater().inflate(R.layout.ap_stats, null);
 
         if(wpa_count==null) {
             wpa_count = view.findViewById(R.id.wpa_count);
@@ -47,12 +52,12 @@ public class StatsDialog extends DialogFragment {
         }
 
         runnable = () -> {
-            wpa_count.setText(Integer.toString(AP.wpa));
-            wpa2_count.setText(Integer.toString(AP.wpa2));
-            wep_count.setText(Integer.toString(AP.wep));
-            opn_count.setText(Integer.toString(AP.opn));
-            hidden_count.setText(Integer.toString(AP.hidden));
-            connected_count.setText(Integer.toString(ST.connected) + '/' + ST.STs.size());
+            wpa_count.setText(String.format(Locale.getDefault(), "%d", AP.wpa));
+            wpa2_count.setText(String.format(Locale.getDefault(), "%d", AP.wpa2));
+            wep_count.setText(String.format(Locale.getDefault(), "%d", AP.wep));
+            opn_count.setText(String.format(Locale.getDefault(), "%d", AP.opn));
+            hidden_count.setText(String.format(Locale.getDefault(), "%d", AP.hidden));
+            connected_count.setText(String.format(Locale.getDefault(), "%d/%d", ST.connected, ST.STs.size()));
         };
         runnable.run();
 
@@ -64,7 +69,7 @@ public class StatsDialog extends DialogFragment {
         return builder.create();
     }
     @Override
-    public void show(FragmentManager fragmentManager, String tag){
+    public void show(@NonNull FragmentManager fragmentManager, String tag){
         if(!background) super.show(fragmentManager, tag);
     }
     @Override
@@ -76,5 +81,9 @@ public class StatsDialog extends DialogFragment {
     public void onPause(){
         super.onPause();
         isResumed = false;
+        // Ensure the activity toolbar reflects the true running state after the dialog closes
+        try{
+            MainActivity.updateRunMenuIcon();
+        }catch(Exception ignored){}
     }
 }
