@@ -2,6 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
+    Copyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -221,20 +222,7 @@ class RootFile{
                 String[] temp = buffer.split(" ");
                 if(temp.length>8){
                     //Reconstruct the full_name (it may contain spaces, so it's many arguments)
-                    StringBuilder full_name = new StringBuilder();
-                    for(int i = 8; i<temp.length; i++){
-                        full_name.append(temp[i]).append(' ');
-                    }
-                    if(full_name.charAt(full_name.length() - 1)==' '){
-                        full_name = new StringBuilder(full_name.substring(0, full_name.length() - 1));
-                    }
-
-                    String entryName = full_name.toString();
-                    // If this is a symlink, 'ls -l' outputs: "linkname -> target". Extract link name before ' -> '
-                    int arrowIdx = entryName.indexOf(" -> ");
-                    if(arrowIdx != -1){
-                        entryName = entryName.substring(0, arrowIdx);
-                    }
+                    String entryName = getString(temp);
 
                     result.add(new RootFile(absolutePath + (absolutePath.length()==1 ? "" : '/') + entryName));
                 }
@@ -250,6 +238,25 @@ class RootFile{
 
         return result;
     }
+
+    private static String getString(String[] temp) {
+        StringBuilder full_name = new StringBuilder();
+        for(int i = 8; i< temp.length; i++){
+            full_name.append(temp[i]).append(' ');
+        }
+        if(full_name.charAt(full_name.length() - 1)==' '){
+            full_name = new StringBuilder(full_name.substring(0, full_name.length() - 1));
+        }
+
+        String entryName = full_name.toString();
+        // If this is a symlink, 'ls -l' outputs: "linkname -> target". Extract link name before ' -> '
+        int arrowIdx = entryName.indexOf(" -> ");
+        if(arrowIdx != -1){
+            entryName = entryName.substring(0, arrowIdx);
+        }
+        return entryName;
+    }
+
     static void init(){
         shell = getFreeShell();
         out = shell.getShell_out();
