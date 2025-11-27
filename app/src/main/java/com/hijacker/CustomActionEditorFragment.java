@@ -2,6 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
+    Copyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,6 +18,7 @@ package com.hijacker;
     along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import android.os.Bundle;
 import com.google.android.material.snackbar.Snackbar;
@@ -25,7 +27,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -48,7 +49,7 @@ public class CustomActionEditorFragment extends Fragment {
     Button save_btn;
     CustomAction action;
     @Override
-    public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState){
+    public View onCreateView(@NonNull LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState){
         fragmentView = inflater.inflate(R.layout.custom_action_editor, container, false);
 
         titleView = fragmentView.findViewById(R.id.title);
@@ -81,13 +82,13 @@ public class CustomActionEditorFragment extends Fragment {
             String start_cmd = startCmdView.getText().toString();
             String stop_cmd = stopCmdView.getText().toString();
             String process_name = processNameView.getText().toString();
-            if(title.equals("")){
+            if(title.isEmpty()){
                 titleView.setError(getString(R.string.title_empty));
                 titleView.requestFocus();
             }else if(title.contains("\n")){
                 titleView.setError(getString(R.string.title_newline));
                 titleView.requestFocus();
-            }else if(start_cmd.equals("")){
+            }else if(start_cmd.isEmpty()){
                 startCmdView.setError(getString(R.string.start_cmd_empty));
                 startCmdView.requestFocus();
             }else if(start_cmd.contains("\n")){
@@ -99,7 +100,7 @@ public class CustomActionEditorFragment extends Fragment {
             }else if(process_name.contains("\n")){
                 processNameView.setError(getString(R.string.process_name_newline));
                 processNameView.requestFocus();
-            }else if(process_name.equals("") && has_process_name_cb.isChecked()){
+            }else if(process_name.isEmpty() && has_process_name_cb.isChecked()){
                 processNameView.setError(getString(R.string.process_name_empty));
                 processNameView.requestFocus();
             }else if(action!=null){
@@ -182,6 +183,6 @@ public class CustomActionEditorFragment extends Fragment {
             save_btn.setEnabled(true);
         }
 
-        ((MainActivity)getActivity()).refreshDrawer();
+        ((MainActivity) requireActivity()).refreshDrawer();
     }
 }
