@@ -8,6 +8,27 @@ tasks.withType(JavaCompile).configureEach {
 android {
     //noinspection GradleDependency
     compileSdk = 34
+    // Use Java 11 for compilation to match modern JDKs and suppress obsolete source/target warnings
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+    // Java toolchain configuration (keeps builds reproducible if you want Gradle to select a JDK)
+    // Note: AGP will still rely on compileOptions for Android Java compilation. Toolchain ensures other Java tasks use the correct JVM.
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(11)
+        }
+    }
+
+    // If Kotlin plugin is applied, set JVM target to 11 for Kotlin compilation
+    // This is a safe no-op if Kotlin is not used in the project
+    project.plugins.withId('org.jetbrains.kotlin.android') {
+        kotlin {
+            jvmTarget = "11"
+        }
+    }
+
     defaultConfig {
         applicationId = "com.hijacker"
         minSdk = 21
