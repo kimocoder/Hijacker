@@ -220,6 +220,7 @@
         <string name="notification_title">Hijacker is running in the background</string>
         <string name="watchdog_notif_title">Hijacker watchdog detected a problem</string>
         <string name="stop_attacks">Stop attacks</string>
+        <string name="notification_channel_description">Notifications from Hijacker (controls persistent/background notifications)</string>
         <!-- wpa_thread -->
         <string name="stopped_to_capture">Stopped aireplay to capture handshake…</string>
         <string name="handshake_captured">WPA handshake captured.</string>
@@ -330,7 +331,7 @@
 
     <!-- Default Preferences -->
     <string name="iface" translatable="false">wlan0</string>
-    <string name="prefix" translatable="false"></string>
+    <string name="prefix" translatable="false" />
     <string name="chroot_dir" translatable="false">/data/local/nhsystem/kalifs</string>
     <string name="monstart" translatable="false">false</string>
     <string name="enable_monMode" translatable="false"> </string>
@@ -443,4 +444,10 @@
     <string name="already_on_latest">You are running the latest version</string>
     <string name="github_title">Go to GitHub</string>
     <string name="version_title">Version</string>
+
+    <!-- MANAGE_EXTERNAL_STORAGE prompt dialog -->
+    <string name="all_files_access_title">Storage access</string>
+    <string name="all_files_access_message">Hijacker needs access to external storage to read and write captures, wordlists and config files. Grant "All files access" for full functionality, or continue without it.</string>
+    <string name="grant_all_files_access">Grant access</string>
+    <string name="continue_without_access">Continue without access</string>
 </resources>
