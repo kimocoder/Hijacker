@@ -24,7 +24,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1">
 
-                <EditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/capfile"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -33,7 +33,6 @@
                     android:imeOptions="actionNext"
                     android:inputType="text"
                     android:maxLines="1" />
-
             </com.google.android.material.textfield.TextInputLayout>
 
             <Button
@@ -42,7 +41,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="..." />
+                android:text="@string/browse" />
         </LinearLayout>
 
         <LinearLayout
@@ -55,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1">
 
-                <EditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/wordlist"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -71,7 +70,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:contentDescription="TODO"
+                android:contentDescription="@string/download_desc"
                 android:src="@android:drawable/stat_sys_download"
                 app:tint="@color/colorAccent" />
 
@@ -81,7 +80,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="..." />
+                android:text="@string/browse" />
         </LinearLayout>
 
         <RadioGroup
@@ -96,14 +95,14 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:checked="true"
-                android:text="WPA/WPA2" />
+                android:text="@string/wpa_label" />
 
             <RadioButton
                 android:id="@+id/wep_rb"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="WEP" />
+                android:text="@string/wep_label" />
         </RadioGroup>
 
         <RadioGroup
@@ -117,35 +116,35 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="64" />
+                android:text="@string/wep_64_label" />
 
             <RadioButton
                 android:id="@+id/wep_128"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="128" />
+                android:text="@string/wep_128_label" />
 
             <RadioButton
                 android:id="@+id/wep_152"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="152" />
+                android:text="@string/wep_152_label" />
 
             <RadioButton
                 android:id="@+id/wep_256"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="256" />
+                android:text="@string/wep_256_label" />
 
             <RadioButton
                 android:id="@+id/wep_512"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="512" />
+                android:text="@string/wep_512_label" />
         </RadioGroup>
     </LinearLayout>
 
@@ -154,7 +153,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@color/colorPrimary"
         android:padding="3dp">
 
         <TextView
@@ -162,7 +160,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="?android:attr/textColorPrimary"
-            android:textSize="10sp" />
+            android:textSize="11sp"
+            android:fontFamily="monospace" />
     </ScrollView>
 
     <LinearLayout

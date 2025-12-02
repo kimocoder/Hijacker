@@ -51,7 +51,7 @@
             android:layout_height="wrap_content">
 
             <CheckBox
-                android:text="OPN"
+                android:text="@string/opn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/opn"
@@ -59,7 +59,7 @@
                 android:checked="true"/>
 
             <CheckBox
-                android:text="WEP"
+                android:text="@string/wep"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/wep"
@@ -67,7 +67,7 @@
                 android:checked="true"/>
 
             <CheckBox
-                android:text="TKIP"
+                android:text="@string/tkip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/tkip"
@@ -75,13 +75,12 @@
                 android:checked="true"/>
 
             <CheckBox
-                android:text="AES"
+                android:text="@string/aes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/aes"
                 android:layout_weight="1"
                 android:checked="true"/>
-
         </LinearLayout>
 
         <LinearLayout
@@ -93,16 +92,17 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:paddingStart="5dp">
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp">
 
                 <EditText
                     android:id="@+id/ssid_file"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autofillHints=""
                     android:hint="@string/ssid_file_optional"
                     android:inputType="text"
                     android:maxLines="1"/>
-
             </com.google.android.material.textfield.TextInputLayout>
 
             <Button
@@ -111,9 +111,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="..."/>
+                android:text="@string/browse"/>
         </LinearLayout>
-
     </LinearLayout>
 
     <LinearLayout
@@ -140,8 +139,5 @@
             android:id="@+id/select_ap_ados"
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"/>
-
     </LinearLayout>
-
-
 </LinearLayout>

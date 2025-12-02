@@ -19,7 +19,6 @@ package com.hijacker;
  */
 
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -27,6 +26,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.Toast;
+import androidx.lifecycle.ViewModelProvider;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -59,7 +59,6 @@ import static com.hijacker.MainActivity.debug;
 import static com.hijacker.MainActivity.getFixed;
 import static com.hijacker.MainActivity.iface;
 import static com.hijacker.MainActivity.isolate;
-import static com.hijacker.MainActivity.mFragmentManager;
 import static com.hijacker.MainActivity.prefix;
 import static com.hijacker.MainActivity.runInHandler;
 import static com.hijacker.MainActivity.sort;
@@ -74,13 +73,16 @@ import static com.hijacker.MainActivity.wpa_thread;
 
 public class AP extends Device{
     static final int WPA=0, WPA2=1, WEP=2, OPN=3, UNKNOWN=4;
-    static int wpa=0, wpa2=0, wep=0, opn=0, hidden=0;
+    static int wpa=0, wpa2=0, wep=0, opn=0, wps_enabled=0, hidden=0;
     static final HashMap<String, AP> APsHM = new HashMap<>();
     static final ArrayList<AP> APs = new ArrayList<>();
     static final ArrayList<AP> marked = new ArrayList<>();
     static final ArrayList<AP> currentTargetDeauth = new ArrayList<>();
     boolean isHidden = false;
-    int ch, id, sec=UNKNOWN;
+    boolean wpsEnabled = false;  // Track if WPS is enabled on this AP
+    int ch;
+    final int id;
+    int sec=UNKNOWN;
     private int beacons, data, ivs, total_beacons=0, total_data=0, total_ivs=0;
     private String essid;
     String enc, cipher, auth;
@@ -194,6 +196,14 @@ public class AP extends Device{
             if(clients.get(i)==st) clients.remove(i);
         }
     }
+    void setWpsEnabled(){
+        if (!this.wpsEnabled) {
+            wps_enabled++;
+            this.wpsEnabled = true;
+            // Update display to show WPS status
+            update();
+        }
+    }
     void crack(){
         stop(PROCESS_AIRODUMP);
         stop(PROCESS_AIREPLAY);
@@ -222,16 +232,32 @@ public class AP extends Device{
         if(is_ap==null) isolate(this.mac);
     }
     void crackReaver(MainActivity activity){
-        FragmentManager fragmentManager = activity.getSupportFragmentManager();
-
-        ReaverFragment.ap = this;
-        FragmentTransaction ft = fragmentManager.beginTransaction();
-        ft.replace(R.id.fragment1, activity.reaverFragment.setAutostart());
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        ft.addToBackStack(null);
-        ft.commitAllowingStateLoss();
-        fragmentManager.executePendingTransactions();      //Wait for everything to be set up
-    }
+        // Save selected AP into ReaverViewModel so ReaverFragment can restore it
+        try{
+            ViewModelProvider vp = new ViewModelProvider(activity);
+            ReaverViewModel vm = vp.get(ReaverViewModel.class);
+            vm.setSelectedAp(this);
+            vm.setCustomMac(null);
+        }catch(Exception e){
+            Log.w("HIJACKER/AP", "Failed to set ReaverViewModel selected AP", e);
+        }
+         // Navigate via NavController to ensure consistent backstack behavior with Navigation component
+         try{
+             activity.runOnUiThread(() -> {
+                 try{
+                     if(activity.getNavController()!=null){
+                         activity.getNavController().navigate(R.id.nav_reaver);
+                     }else{
+                         Log.w("HIJACKER/Navigation", "NavController not available: cannot navigate to ReaverFragment");
+                     }
+                 }catch(Exception e){
+                     Log.w("HIJACKER/Navigation", "Failed to navigate to ReaverFragment", e);
+                 }
+             });
+         }catch(Exception ignored){
+             // ignore UI thread issues
+         }
+     }
     void disconnectAll(){
         if(Airodump.getChannel() != this.ch){
             if(debug) Log.d("HIJACKER/AP", "Starting airodump for channel " + this.ch);
@@ -265,6 +291,7 @@ public class AP extends Device{
         wpa2 = 0;
         wep = 0;
         opn = 0;
+        wps_enabled = 0;
         hidden = 0;
     }
     static void saveAll(){
@@ -372,7 +399,10 @@ public class AP extends Device{
                         popup2.getMenu().add(0, 4, 4, "Crack");
                         popup2.getMenu().add(0, 5, 5, "Copy crack command");
                     }
-                    popup2.getMenu().add(0, 6, 6, "Crack with Reaver");
+                    // Show Reaver option for WPS-enabled networks
+                    if(AP.this.wpsEnabled){
+                        popup2.getMenu().add(0, 6, 6, "Crack with Reaver (WPS)");
+                    }
 
                     popup2.setOnMenuItemClickListener(item1 -> {
                         switch(item1.getItemId()){
@@ -403,15 +433,22 @@ public class AP extends Device{
                                 copy(str2, v);
                                 break;
                             case 3:
-                                //DoS
+                                //DoS: navigate to MDK destination; fall back to fragment transaction if needed
                                 stop(PROCESS_MDK_DOS);
                                 MDKFragment.ados_ap = AP.this;
-                                FragmentTransaction ft = mFragmentManager.beginTransaction();
-                                ft.replace(R.id.fragment1, new MDKFragment());
-                                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                                ft.addToBackStack(null);
-                                ft.commitAllowingStateLoss();
-                                mFragmentManager.executePendingTransactions();
+                                try{
+                                    activity.runOnUiThread(() -> {
+                                        try{
+                                            if(activity.getNavController()!=null){
+                                                activity.getNavController().navigate(R.id.nav_mdk4);
+                                            }else{
+                                                Log.w("HIJACKER/Navigation", "NavController not available: cannot navigate to MDKFragment");
+                                            }
+                                        }catch(Exception e){
+                                            Log.w("HIJACKER/Navigation", "Exception while navigating to MDKFragment; NavController not available");
+                                         }
+                                     });
+                                 }catch(Exception ignored){}
                                 MDKFragment.ados_switch.setChecked(true);
                                 break;
                             case 4:

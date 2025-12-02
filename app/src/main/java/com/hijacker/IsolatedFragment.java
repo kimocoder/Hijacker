@@ -70,13 +70,23 @@ public class IsolatedFragment extends Fragment {
         numbers = fragmentView.findViewById(R.id.numbers);
         sec2 = fragmentView.findViewById(R.id.sec2);
 
+        // Set click listeners explicitly
+        View.OnClickListener copyListener = v -> ((MainActivity) requireActivity()).onCopy(v);
+        essid.setOnClickListener(copyListener);
+        mac.setOnClickListener(copyListener);
+
+        // Set button click listeners
+        fragmentView.findViewById(R.id.crack).setOnClickListener(v -> ((MainActivity) requireActivity()).onCrack(v));
+        fragmentView.findViewById(R.id.disconnect_all).setOnClickListener(v -> ((MainActivity) requireActivity()).onDisconnect(v));
+        fragmentView.findViewById(R.id.dos).setOnClickListener(v -> ((MainActivity) requireActivity()).onDos(v));
+
         ListView listview = fragmentView.findViewById(R.id.listview);
         listview.setAdapter(MainActivity.adapter);
         listview.setOnItemClickListener((adapterView, v, i, l) -> Tile.tiles.get(i).device.getPopupMenu((MainActivity)getActivity(), v).show());
 
         return fragmentView;
     }
-    Runnable refreshRunnable = new Runnable(){
+    final Runnable refreshRunnable = new Runnable(){
         @Override
         public void run(){
             if(cont && is_ap !=null){

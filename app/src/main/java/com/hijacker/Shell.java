@@ -39,6 +39,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static com.hijacker.MainActivity.debug;
 
@@ -97,6 +99,58 @@ class Shell{
         MainActivity.getLastLine(shell_out, term_str);
     }
     void setLog(boolean log){ this.log = log; }
+
+    /**
+     * Run a command with timeout support
+     * @param cmd Command to run
+     * @param timeoutSeconds Timeout in seconds
+     * @throws TimeoutException if command times out
+     * @throws InterruptedException if interrupted while waiting
+     */
+    void runWithTimeout(String cmd, long timeoutSeconds) throws TimeoutException, InterruptedException {
+        if(!valid){
+            throw new IllegalStateException("Shell is not valid");
+        }
+
+        // Run the command
+        run(cmd);
+
+        // Wait for process with timeout (note: this waits for shell process, not individual command)
+        // For individual command timeout, use a marker and wait for it
+        String marker = "CMD_DONE_" + System.currentTimeMillis();
+        run("echo " + marker);
+
+        long startTime = System.currentTimeMillis();
+        long timeoutMs = timeoutSeconds * 1000;
+
+        try {
+            String line;
+            while ((line = shell_out.readLine()) != null) {
+                if (line.contains(marker)) {
+                    break;
+                }
+
+                // Check timeout
+                if (System.currentTimeMillis() - startTime > timeoutMs) {
+                    throw new TimeoutException("Command timed out after " + timeoutSeconds + " seconds: " + cmd);
+                }
+            }
+        } catch (IOException e) {
+            Log.e("HIJACKER/Shell", "Error reading shell output", e);
+        }
+    }
+
+    /**
+     * Destroy the shell process forcibly
+     */
+    void destroyShell() {
+        if (shell != null && shell.isAlive()) {
+            shell.destroyForcibly();
+            if(debug) Log.d("HIJACKER/Shell", "Shell process destroyed forcibly");
+        }
+        valid = false;
+    }
+
     static synchronized Shell getFreeShell(){
         if(free.isEmpty()) return new Shell();
         else{
@@ -118,9 +172,25 @@ class Shell{
     static void exitAll(){
         total -= free.size();
         for(int i=0;i<free.size();i++){
-            free.get(i).valid = true;
-            free.get(i).run("exit");
-            free.get(i).shell.destroy();
+            Shell sh = free.get(i);
+            sh.valid = true;
+            try {
+                sh.run("exit");
+                // Give it a moment to exit gracefully
+                if (sh.shell != null) {
+                    boolean exited = sh.shell.waitFor(2, TimeUnit.SECONDS);
+                    if (!exited && sh.shell.isAlive()) {
+                        // Force kill if it didn't exit gracefully
+                        sh.shell.destroyForcibly();
+                    }
+                }
+            } catch (InterruptedException e) {
+                // If interrupted, force destroy
+                if (sh.shell != null && sh.shell.isAlive()) {
+                    sh.shell.destroyForcibly();
+                }
+            }
         }
+        free.clear();
     }
 }

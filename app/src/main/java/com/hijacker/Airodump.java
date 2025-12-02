@@ -230,7 +230,7 @@ class Airodump{
 
     private static String getString() {
         String trimmedPrefix = (prefix==null) ? "" : prefix.trim();
-        String cmd = "su -c " + (trimmedPrefix.isEmpty() ? "" : (trimmedPrefix + " ")) + airodump_dir + " --update 9999999 --write-interval 1 --band ";
+        String cmd = "su -c " + (trimmedPrefix.isEmpty() ? "" : (trimmedPrefix + " ")) + airodump_dir + " --update " + MainActivity.airodump_update_interval + " --write-interval 1 --wps --band ";
 
         if(band==BAND_5 || band==BAND_BOTH || channel>20) cmd += "a";
         if((band==BAND_2 || band==BAND_BOTH) && channel<=20) cmd += "bg";

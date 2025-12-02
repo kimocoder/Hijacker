@@ -25,6 +25,7 @@ import android.annotation.SuppressLint;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import android.os.Bundle;
 import com.google.android.material.snackbar.Snackbar;
 import android.util.Log;
@@ -61,8 +62,9 @@ import static com.hijacker.MainActivity.stop;
 import static com.hijacker.MainActivity.wl_path;
 
 public class CrackFragment extends Fragment{
-    static final int WPA = 2, WEP = 1;
+    // Use ViewModel constants instead of local ones
     static CrackTask task;
+    private CrackViewModel viewModel;
     View fragmentView, optionsContainer;
     Button startBtn, speedTestBtn, capFeBtn, wordlistFeBtn;
     ImageButton wordlistDownloadBtn;
@@ -73,12 +75,12 @@ public class CrackFragment extends Fragment{
     ScrollView consoleScrollView;
     //Dimensions to restore animated views
     int normalOptHeight = -1, normalTestBtnWidth = -1;
-    //User options
-    static String console_text = "", capfile_text = null, wordlist_text = null;
-    static int securityChecked = -1, wepChecked = -1;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState){
         fragmentView = inflater.inflate(R.layout.crack_fragment, container, false);
+
+        // Initialize ViewModel
+        viewModel = new ViewModelProvider(requireActivity()).get(CrackViewModel.class);
 
         optionsContainer = fragmentView.findViewById(R.id.options_container);
         consoleView = fragmentView.findViewById(R.id.console);
@@ -121,7 +123,7 @@ public class CrackFragment extends Fragment{
             if(!isRunning()){
                 attemptStart();
             }else{
-                task.cancel(true);
+                task.cancel();
             }
         });
         speedTestBtn.setOnClickListener(view -> startSpeedTest());
@@ -150,7 +152,8 @@ public class CrackFragment extends Fragment{
             dlg.show(requireActivity().getSupportFragmentManager(), "WordlistDownloadDialog");
         });
 
-        if(capfile_text==null){
+        // Use ViewModel to check if we need to find latest files
+        if(viewModel.getCapfileText() == null){
             //Retrieve the last captured handshake
             long latest = 0;
             File result = null;
@@ -171,7 +174,7 @@ public class CrackFragment extends Fragment{
             }
         }
 
-        if(wordlist_text==null){
+        if(viewModel.getWordlistText() == null){
             //Retrieve the last downloaded wordlist, if any
             long latest = 0;
             File result = null;
@@ -200,26 +203,26 @@ public class CrackFragment extends Fragment{
         currentFragment = FRAGMENT_CRACK;
         ((MainActivity) requireActivity()).refreshDrawer();
 
-        //Console text is saved/restored on pause/resume
-        consoleView.setText(console_text);
+        //Console text is saved/restored from ViewModel
+        consoleView.setText(viewModel.getConsoleText());
         consoleView.post(() -> consoleScrollView.fullScroll(View.FOCUS_DOWN));
     }
     @Override
     public void onPause(){
         super.onPause();
 
-        //Console text is saved/restored on pause/resume
-        console_text = consoleView.getText().toString();
+        //Console text is saved to ViewModel
+        viewModel.setConsoleText(consoleView.getText().toString());
     }
     @Override
     public void onStart(){
         super.onStart();
 
-        //Restore options
-        if(capfile_text!=null) capfileView.setText(capfile_text);
-        if(wordlist_text!=null) wordlistView.setText(wordlist_text);
-        if(securityChecked!=-1) securityRG.check(securityChecked);
-        if(wepChecked!=-1) wepRG.check(wepChecked);
+        //Restore options from ViewModel
+        if(viewModel.getCapfileText() != null) capfileView.setText(viewModel.getCapfileText());
+        if(viewModel.getWordlistText() != null) wordlistView.setText(viewModel.getWordlistText());
+        if(viewModel.getSecurityChecked() != -1) securityRG.check(viewModel.getSecurityChecked());
+        if(viewModel.getWepChecked() != -1) wepRG.check(viewModel.getWepChecked());
         for (int i = 0; i < wepRG.getChildCount(); i++) {
             //Reset wep options
             wepRG.getChildAt(i).setEnabled(wepRB.isChecked());
@@ -228,7 +231,7 @@ public class CrackFragment extends Fragment{
         startBtn.setText(isRunning() ? getString(R.string.stop) : getString(R.string.start));
 
         //Restore animated views
-        if(task.isRunning()){
+        if(isRunning()){
             ViewGroup.LayoutParams layoutParams = optionsContainer.getLayoutParams();
             layoutParams.height = 0;
             optionsContainer.setLayoutParams(layoutParams);
@@ -256,11 +259,11 @@ public class CrackFragment extends Fragment{
             }
         }
 
-        //Backup options
-        capfile_text = capfileView.getText().toString();
-        wordlist_text = wordlistView.getText().toString();
-        securityChecked = securityRG.getCheckedRadioButtonId();
-        wepChecked = wepRG.getCheckedRadioButtonId();
+        //Backup options to ViewModel
+        viewModel.setCapfileText(capfileView.getText().toString());
+        viewModel.setWordlistText(wordlistView.getText().toString());
+        viewModel.setSecurityChecked(securityRG.getCheckedRadioButtonId());
+        viewModel.setWepChecked(wepRG.getCheckedRadioButtonId());
 
         super.onStop();
     }
@@ -272,7 +275,7 @@ public class CrackFragment extends Fragment{
         //Does NOT completely stop the cracking process, only the app's task
         //MainActivity.stop(PROCESS_AIRCRACK) should be also called
         if(task!=null){
-            task.cancel(true);
+            task.cancel();
         }
     }
     void attemptStart(){
@@ -325,20 +328,29 @@ public class CrackFragment extends Fragment{
         task.start();
     }
     void startSpeedTest(){
+        if(isRunning()){
+            Snackbar.make(fragmentView, "Already running a task", Snackbar.LENGTH_SHORT).show();
+            return;
+        }
         capfileView.setError(null);
         wordlistView.setError(null);
+        consoleView.setText("");  // Clear console for speed test
         task = new CrackTask(CrackTask.JOB_TEST, null, null);
         task.start();
     }
     class CrackTask {
         static final int JOB_CRACK = 0, JOB_TEST = 1;
-        int mode, job;
+        int mode;
+        final int job;
         String cmd, key;
         long startTime = -1;
         AnimatorSet animator;
-        String capfile, wordlist;
+        final String capfile;
+        final String wordlist;
         private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "CrackTaskThread"));
         private volatile boolean cancelled = false;
+        private volatile boolean running = false;
+        private volatile Process process = null;
 
         CrackTask(int job, String capfile, String wordlist){
             this.job = job;
@@ -347,6 +359,7 @@ public class CrackFragment extends Fragment{
         }
         @SuppressLint("WrongThread")
         void preExecute(){
+            running = true;
             startTime = System.currentTimeMillis();
             MainActivity.setProgressIndeterminate(true);
             startBtn.setText(R.string.stop);
@@ -358,16 +371,16 @@ public class CrackFragment extends Fragment{
                     int secId = securityRG.getCheckedRadioButtonId();
                     if(secId == R.id.wpa_rb){
                         //WPA
-                        mode = WPA;
+                        mode = CrackViewModel.WPA;
                     } else if(secId == R.id.wep_rb){
                         //WEP
-                        mode = WEP;
+                        mode = CrackViewModel.WEP;
                     }
                     //Create command
                     cmd = "su -c " + aircrack_dir + " " + capfile + " -l " + path + "/aircrack-out.txt -a " + mode;
                     if(wordlist!=null)
                         cmd += " -w " + wordlist;
-                    if(mode==WEP){
+                    if(mode==CrackViewModel.WEP){
                         cmd += " -n ";
                         int wepId = wepRG.getCheckedRadioButtonId();
                         if(wepId == R.id.wep_64) cmd += "64";
@@ -421,31 +434,70 @@ public class CrackFragment extends Fragment{
                 return null;
             });
         }
-        void cancel(boolean mayInterrupt){
+        void cancel(){
             cancelled = true;
+            if(process != null){
+                try{
+                    process.destroy();
+                }catch(Exception e){
+                    Log.e("HIJACKER/CrackTask", "Error destroying process: " + e);
+                }
+            }
         }
         Boolean doInBackground(){
             if(cancelled) return false;
             try{
                 //Run aircrack and wait to either finish or be cancelled
-                Process dc = Runtime.getRuntime().exec(cmd);
-                BufferedReader out = new BufferedReader(new InputStreamReader(dc.getInputStream()));
+                process = Runtime.getRuntime().exec(cmd);
+                BufferedReader out = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                BufferedReader err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
                 switch(job){
                     case JOB_CRACK:
                         while(!cancelled && out.readLine()!=null);
                         break;
 
                     case JOB_TEST:
+                        postProgress("Running aircrack-ng speed test...\n");
                         String str = out.readLine();
+                        boolean hasOutput = false;
                         while(!cancelled && str!=null) {
+                            hasOutput = true;
                             postProgress(str);
                             str = out.readLine();
+                        }
+
+                        // Check for errors
+                        if(!hasOutput){
+                            String errStr = err.readLine();
+                            if(errStr != null){
+                                postProgress("Error: " + errStr);
+                                while((errStr = err.readLine()) != null){
+                                    postProgress(errStr);
+                                }
+                                return false;
+                            }
+                        }
+
+                        // Wait for process to complete
+                        if(!cancelled){
+                            try{
+                                int exitCode = process.waitFor();
+                                if(exitCode != 0){
+                                    postProgress("\nProcess exited with code: " + exitCode);
+                                }
+                            }catch(InterruptedException e){
+                                Log.e("HIJACKER/CrackTask", "Process interrupted: " + e);
+                            }
                         }
                         break;
                 }
             }catch(Exception e) {
-                Log.e("HIJACKER/CrackTask", e.toString());
+                Log.e("HIJACKER/CrackTask", "Error in doInBackground: " + e);
+                postProgress("Error: " + e.getMessage());
                 return false;
+            }finally{
+                process = null;
             }
 
             if(job==JOB_CRACK){
@@ -463,7 +515,7 @@ public class CrackFragment extends Fragment{
                 }
             }
 
-            return false;
+            return !cancelled && job==JOB_TEST;
         }
         void postProgress(String... progress) {
             String s = progress[0] + '\n';
@@ -472,7 +524,8 @@ public class CrackFragment extends Fragment{
                     consoleView.append(s);
                     consoleScrollView.fullScroll(View.FOCUS_DOWN);
                 }else{
-                    console_text += s;
+                    // Save to ViewModel when fragment is not visible
+                    viewModel.appendConsoleText(s);
                 }
             });
         }
@@ -485,7 +538,7 @@ public class CrackFragment extends Fragment{
                         str = "Key found: " + key + '\n';
                     }else{
                         str = "Key not found\n";
-                        if(mode==WEP)
+                        if(mode==CrackViewModel.WEP)
                             str += "Try with different wep bit selection or more IVs\n";
                     }
                 }
@@ -494,7 +547,8 @@ public class CrackFragment extends Fragment{
                     consoleScrollView.fullScroll(View.FOCUS_DOWN);
                     consoleView.append(str);
                 }else{
-                    console_text += str;
+                    // Save to ViewModel when fragment is not visible
+                    viewModel.appendConsoleText(str);
                 }
             });
         }
@@ -507,6 +561,7 @@ public class CrackFragment extends Fragment{
             });
         }
         void done() {
+            running = false;
             startBtn.setText(R.string.start);
             MainActivity.setProgressIndeterminate(false);
 
@@ -545,11 +600,12 @@ public class CrackFragment extends Fragment{
 
             notification();
         }
+        @SuppressWarnings("unused")
         int getStatus(){
             return cancelled ? 0 : 1;
         }
         boolean isRunning(){
-            return !cancelled;
+            return running;
         }
     }
 }

@@ -402,12 +402,8 @@ public class InstallFirmwareDialog extends DialogFragment {
                     neutralButton.setEnabled(new File(firm_backup_file).exists() && firmwarePath!=null);
 
                     //Update firmware textview
-                    if(firmwarePath==null){
-                        //Firmware not found
-                        firmwareView.setText(getString(R.string.firmware_not_found));
-                    }else{
-                        firmwareView.setText(firmwarePath);
-                    }
+                    //Firmware not found
+                    firmwareView.setText(Objects.requireNonNullElseGet(firmwarePath, () -> getString(R.string.firmware_not_found)));
 
                     //Update backup checkbox
                     if(!backupExists){

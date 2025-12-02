@@ -34,7 +34,7 @@ import static com.hijacker.MainActivity.background;
 
 public class StatsDialog extends DialogFragment {
     static boolean isResumed = false;
-    TextView wpa_count, wpa2_count, wep_count, opn_count, hidden_count, connected_count;
+    TextView wpa_count, wpa2_count, wep_count, opn_count, wps_count, hidden_count, connected_count;
     static Runnable runnable;
     @NonNull
     @Override
@@ -47,6 +47,7 @@ public class StatsDialog extends DialogFragment {
             wpa2_count = view.findViewById(R.id.wpa2_count);
             wep_count = view.findViewById(R.id.wep_count);
             opn_count = view.findViewById(R.id.opn_count);
+            wps_count = view.findViewById(R.id.wps_count);
             hidden_count = view.findViewById(R.id.hidden_count);
             connected_count = view.findViewById(R.id.connected_count);
         }
@@ -56,6 +57,7 @@ public class StatsDialog extends DialogFragment {
             wpa2_count.setText(String.format(Locale.getDefault(), "%d", AP.wpa2));
             wep_count.setText(String.format(Locale.getDefault(), "%d", AP.wep));
             opn_count.setText(String.format(Locale.getDefault(), "%d", AP.opn));
+            wps_count.setText(String.format(Locale.getDefault(), "%d", AP.wps_enabled));
             hidden_count.setText(String.format(Locale.getDefault(), "%d", AP.hidden));
             connected_count.setText(String.format(Locale.getDefault(), "%d/%d", ST.connected, ST.STs.size()));
         };

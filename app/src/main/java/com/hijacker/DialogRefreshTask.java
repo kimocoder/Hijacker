@@ -7,7 +7,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 class DialogRefreshTask {
-    @SuppressLint("StaticFieldLeak")        // This object will exist as long as the device dialog exists
+    @SuppressLint("StaticFieldLeak")
+    final        // This object will exist as long as the device dialog exists
     DeviceDialog deviceDialog;
     private ExecutorService executor;
     private volatile boolean shouldStop = false;

@@ -14,11 +14,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
+            android:contentDescription="@string/content_description_list_icon"
             android:maxHeight="100dp"
             android:maxWidth="50dp"
             android:paddingBottom="5dp"
-            android:paddingEnd="10dp"
             android:paddingStart="5dp"
+            android:paddingEnd="10dp"
             android:paddingTop="5dp"
             app:srcCompat="@drawable/ap2" />
 
@@ -30,7 +31,7 @@
             android:layout_alignEnd="@+id/iv"
             android:layout_marginBottom="2dp"
             android:layout_marginEnd="10dp"
-            android:text="100"
+            android:text="@string/list_dummy_count"
             android:textColor="@android:color/white"
             android:textSize="12sp" />
     </RelativeLayout>
@@ -53,7 +54,7 @@
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical"
                 android:maxLines="1"
-                android:text="Essid"
+                android:text="@string/list_dummy_essid"
                 android:textColor="?android:attr/textColorPrimary"
                 android:textSize="17sp"/>
 
@@ -65,8 +66,9 @@
                 android:layout_weight="1"
                 android:gravity="end|center_vertical"
                 android:maxLines="2"
-                android:text="Manufacturer"
+                android:text="@string/list_dummy_manufacturer"
                 android:paddingStart="4dp"
+                android:paddingEnd="4dp"
                 android:textSize="13sp"/>
         </LinearLayout>
 
@@ -83,7 +85,7 @@
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical"
                 android:maxLines="1"
-                android:text="00:11:22:33:44:55"
+                android:text="@string/list_dummy_mac"
                 android:textSize="13sp"/>
 
             <TextView
@@ -95,10 +97,9 @@
                 android:gravity="end|center_vertical"
                 android:maxLines="1"
                 android:paddingStart="4dp"
-                android:text="dsadfasdfasdfas"
+                android:paddingEnd="4dp"
+                android:text="@string/list_dummy_info"
                 android:textSize="13sp" />
         </LinearLayout>
-
     </RelativeLayout>
-
 </LinearLayout>

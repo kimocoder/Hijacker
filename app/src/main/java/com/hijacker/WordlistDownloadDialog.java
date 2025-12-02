@@ -25,8 +25,12 @@ import android.app.Dialog;
 import android.app.DownloadManager;
 import androidx.fragment.app.DialogFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import android.util.JsonReader;
@@ -59,7 +63,7 @@ public class WordlistDownloadDialog extends DialogFragment{
     ProgressBar progressBar;
     ExecutorService executor;
     WordlistAdapter adapter;
-    ArrayList<Wordlist> wordlists = new ArrayList<>();
+    final ArrayList<Wordlist> wordlists = new ArrayList<>();
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState){
@@ -95,40 +99,116 @@ public class WordlistDownloadDialog extends DialogFragment{
     }
 
     void beginDownload(Wordlist wl){
-        //Check for external storage and internet permission
-        final String[] needed = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET};
-        if(!PermissionUtils.hasPermissions(requireActivity(), needed)){
-            // Request missing permissions on UI thread and notify user
-            requireActivity().runOnUiThread(() -> PermissionUtils.requestMissingPermissions(requireActivity(), needed, 0));
-            Toast.makeText(getActivity(), getString(R.string.no_permissions), Toast.LENGTH_SHORT).show();
-            return;
+        // Check for storage permission (Android 11+ needs MANAGE_EXTERNAL_STORAGE)
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+            // Android 11+
+            if(!Environment.isExternalStorageManager()){
+                // Need to request MANAGE_EXTERNAL_STORAGE permission
+                new AlertDialog.Builder(requireContext())
+                    .setTitle("Storage Permission Required")
+                    .setMessage("To download wordlists, please grant 'Allow access to manage all files' permission in Settings.")
+                    .setPositiveButton("Open Settings", (d, w) -> {
+                        try{
+                            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                            intent.setData(Uri.parse("package:" + requireContext().getPackageName()));
+                            startActivity(intent);
+                        }catch(Exception e){
+                            Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                            startActivity(intent);
+                        }
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+                return;
+            }
+        }else{
+            // Android 6-10
+            final String[] needed = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+            if(!PermissionUtils.hasPermissions(requireActivity(), needed)){
+                // Request missing permissions on UI thread and notify user
+                requireActivity().runOnUiThread(() ->
+                    PermissionUtils.requestMissingPermissions(requireActivity(), needed, 100));
+                Toast.makeText(getActivity(), "Storage permission required to download wordlists", Toast.LENGTH_LONG).show();
+                return;
+            }
         }
 
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(wl.download_url));
         request.setTitle(wl.filename);
-        // allowScanningByMediaScanner() is deprecated. Instead, enqueue the download and
-        // scan the file with MediaScannerConnection when the file appears on disk.
+        request.setDescription("Downloading wordlist");
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        final File destFile = new File(wl_path, wl.filename);
-        request.setDestinationUri(Uri.fromFile(destFile));
+
+        // For Android 10+ (API 29+), use setDestinationInExternalPublicDir to avoid scoped storage issues
+        // This will download to /sdcard/Download/Hijacker_wordlists/ and then we move it
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+            // Android 10+ - Download to public Download directory, then move
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "Hijacker_wordlists/" + wl.filename);
+        }else{
+            // Android 9 and below - Direct download to destination
+            final File destFile = new File(wl_path, wl.filename);
+            request.setDestinationUri(Uri.fromFile(destFile));
+        }
 
         DownloadManager manager = (DownloadManager) requireActivity().getSystemService(Context.DOWNLOAD_SERVICE);
         if(manager!=null){
-            manager.enqueue(request);
+            long downloadId = manager.enqueue(request);
+            Toast.makeText(getActivity(), "Downloading " + wl.filename, Toast.LENGTH_SHORT).show();
 
-            // Background task: wait briefly for the file to appear and then scan it so it's visible
-            // to media providers (replacement for the deprecated allowScanningByMediaScanner()).
+            // Background task: wait for download to complete, then move file if needed
+            final String filename = wl.filename;
             java.util.concurrent.Executors.newSingleThreadExecutor().submit(() -> {
                 try{
+                    // Wait for download to complete (max 60 seconds)
                     int waited = 0;
-                    while(!destFile.exists() && waited < 60_000){
+                    boolean completed = false;
+
+                    while(!completed && waited < 60_000){
                         Thread.sleep(500);
                         waited += 500;
+
+                        // Check download status
+                        android.database.Cursor cursor = manager.query(new DownloadManager.Query().setFilterById(downloadId));
+                        if(cursor != null && cursor.moveToFirst()){
+                            int statusIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS);
+                            if(statusIndex >= 0){
+                                int status = cursor.getInt(statusIndex);
+                                completed = (status == DownloadManager.STATUS_SUCCESSFUL || status == DownloadManager.STATUS_FAILED);
+                            }
+                            cursor.close();
+                        }
                     }
-                    if(destFile.exists()){
+
+                    // For Android 10+, move the downloaded file from Downloads to our directory
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+                        File downloadedFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                                                       "Hijacker_wordlists/" + filename);
+                        File destFile = new File(wl_path, filename);
+
+                        if(downloadedFile.exists()){
+                            // Ensure destination directory exists
+                            destFile.getParentFile().mkdirs();
+
+                            // Move file using shell command (works with root)
+                            try{
+                                Shell shell = Shell.getFreeShell();
+                                shell.run("mv " + downloadedFile.getAbsolutePath() + " " + destFile.getAbsolutePath());
+                                shell.done();
+                            }catch(Exception e){
+                                Log.e("HIJACKER/WlDownload", "Error moving file: " + e);
+                                // Fallback: try Java file move
+                                if(downloadedFile.renameTo(destFile)){
+                                    Log.d("HIJACKER/WlDownload", "File moved successfully via renameTo");
+                                }
+                            }
+                        }
+                    }
+
+                    // Scan the final file location
+                    File finalFile = new File(wl_path, filename);
+                    if(finalFile.exists()){
                         Context ctx = null;
                         try{ ctx = requireActivity().getApplicationContext(); }catch(Throwable ignored){}
-                        if(ctx!=null) MediaScannerConnection.scanFile(ctx, new String[]{destFile.getAbsolutePath()}, null, null);
+                        if(ctx!=null) MediaScannerConnection.scanFile(ctx, new String[]{finalFile.getAbsolutePath()}, null, null);
                     }
                 }catch(InterruptedException ignored){ }
             });
@@ -261,8 +341,9 @@ public class WordlistDownloadDialog extends DialogFragment{
         }
     }
     private static class Wordlist{
-        int size;
-        String filename, download_url;
+        final int size;
+        final String filename;
+        final String download_url;
         Wordlist(String filename, int size, String url){
             this.filename = filename;
             this.size = size;

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/nav_mylist">
+
+    <!-- Airodump: separate destinations for MyList and Isolated so we can choose dynamically -->
+    <fragment
+        android:id="@+id/nav_mylist"
+        android:name="com.hijacker.MyListFragment"
+        android:label="@string/nav_airodump" />
+
+    <fragment
+        android:id="@+id/nav_isolated"
+        android:name="com.hijacker.IsolatedFragment"
+        android:label="@string/nav_airodump" />
+
+    <fragment
+        android:id="@+id/nav_mdk4"
+        android:name="com.hijacker.MDKFragment"
+        android:label="@string/nav_mdk4" />
+
+    <fragment
+        android:id="@+id/nav_reaver"
+        android:name="com.hijacker.ReaverFragment"
+        android:label="@string/nav_reaver" />
+
+    <fragment
+        android:id="@+id/nav_crack"
+        android:name="com.hijacker.CrackFragment"
+        android:label="@string/nav_crack" />
+
+    <fragment
+        android:id="@+id/nav_hcxdumptool"
+        android:name="com.hijacker.HcxdumptoolFragment"
+        android:label="@string/nav_hcxdumptool" />
+
+    <fragment
+        android:id="@+id/nav_custom_actions"
+        android:name="com.hijacker.CustomActionFragment"
+        android:label="@string/nav_custom_actions" />
+
+    <fragment
+        android:id="@+id/nav_custom_manager"
+        android:name="com.hijacker.CustomActionManagerFragment"
+        android:label="@string/nav_custom_actions">
+        <action
+            android:id="@+id/action_nav_custom_manager_to_nav_custom_editor"
+            app:destination="@id/nav_custom_editor" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_custom_editor"
+        android:name="com.hijacker.CustomActionEditorFragment"
+        android:label="@string/edit_action">
+        <argument
+            android:name="action_title"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.hijacker.SettingsFragment"
+        android:label="@string/nav_settings" />
+</navigation>

@@ -2,7 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
-    Copyright (C) 2024  Christian <kimocoder> Bremvaag
+    Copyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,10 +20,10 @@ package com.hijacker;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
-import android.app.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import android.os.Bundle;
 import com.google.android.material.snackbar.Snackbar;
 import android.util.Log;
@@ -38,45 +38,35 @@ import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static android.widget.Toast.LENGTH_SHORT;
 import static com.hijacker.AP.OPN;
 import static com.hijacker.AP.UNKNOWN;
-import static com.hijacker.MainActivity.CHROOT_BIN_MISSING;
-import static com.hijacker.MainActivity.CHROOT_DIR_MISSING;
-import static com.hijacker.MainActivity.CHROOT_FOUND;
 import static com.hijacker.MainActivity.FRAGMENT_REAVER;
-import static com.hijacker.MainActivity.NETHUNTER_BOOTKALI_BASH;
 import static com.hijacker.MainActivity.PROCESS_AIRODUMP;
 import static com.hijacker.MainActivity.PROCESS_REAVER;
 import static com.hijacker.MainActivity.background;
-import static com.hijacker.MainActivity.bootkali_init_bin;
-import static com.hijacker.MainActivity.checkChroot;
-import static com.hijacker.MainActivity.cont_on_fail;
 import static com.hijacker.MainActivity.currentFragment;
-import static com.hijacker.MainActivity.custom_chroot_cmd;
 import static com.hijacker.MainActivity.debug;
 import static com.hijacker.MainActivity.iface;
 import static com.hijacker.MainActivity.last_action;
 import static com.hijacker.MainActivity.last_reaver;
 import static com.hijacker.MainActivity.mFragmentManager;
-import static com.hijacker.MainActivity.monstart;
 import static com.hijacker.MainActivity.notification;
 import static com.hijacker.MainActivity.prefix;
 import static com.hijacker.MainActivity.reaver_dir;
+import static com.hijacker.MainActivity.pixiewps_dir;
 import static com.hijacker.MainActivity.runInHandler;
 import static com.hijacker.MainActivity.stop;
 
 public class ReaverFragment extends Fragment{
     static ReaverTask task;
+    private ReaverViewModel viewModel;
     View fragmentView, optionsContainer;
     Button start_button, select_button;
     TextView consoleView;
@@ -86,13 +76,12 @@ public class ReaverFragment extends Fragment{
     boolean autostart = false;
     //Dimensions to restore animated views
     int normalOptHeight = -1;
-    //User options
-    static String console_text = "", pin_delay="1", locked_delay="60", custom_mac=null;       //delays are always used as strings
-    static boolean pixie_dust_enabled = true, pixie_dust, ignore_locked, eap_fail, small_dh, no_nack;
-    static AP ap = null;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         fragmentView = inflater.inflate(R.layout.reaver_fragment, container, false);
+
+        // Initialize ViewModel
+        viewModel = new ViewModelProvider(requireActivity()).get(ReaverViewModel.class);
 
         optionsContainer = fragmentView.findViewById(R.id.options_container);
         consoleView = fragmentView.findViewById(R.id.console);
@@ -117,17 +106,9 @@ public class ReaverFragment extends Fragment{
 
         if(task==null) task = new ReaverTask();
 
-        int chroot_check = checkChroot();
-        if(chroot_check!=CHROOT_FOUND){
-            pixie_dust_cb.setEnabled(false);
-            pixie_dust_enabled = false;
-            if(chroot_check==CHROOT_DIR_MISSING) Toast.makeText(getActivity(), getString(R.string.chroot_notfound), LENGTH_SHORT).show();
-            else if(chroot_check==CHROOT_BIN_MISSING) Toast.makeText(getActivity(), getString(R.string.kali_notfound), LENGTH_SHORT).show();
-            else Toast.makeText(getActivity(), getString(R.string.chroot_both_notfound), LENGTH_SHORT).show();
-        }else{
-            pixie_dust_cb.setEnabled(true);
-            pixie_dust_enabled = true;
-        }
+        // Pixie dust now works without chroot using pixiewps from assets
+        pixie_dust_cb.setEnabled(true);
+        viewModel.setPixieDustEnabled(true);
 
         select_button.setOnClickListener(view -> {
             PopupMenu popup = new PopupMenu(getActivity(), view);
@@ -145,20 +126,20 @@ public class ReaverFragment extends Fragment{
             popup.setOnMenuItemClickListener(item -> {
                 //ItemId = i in for()
                 if(item.getGroupId()==0){
-                    custom_mac = null;
+                    viewModel.setCustomMac(null);
                     AP temp = AP.APs.get(item.getItemId());
-                    if(ap!=temp){
-                        ap = temp;
+                    if(viewModel.getSelectedAp()!=temp){
+                        viewModel.setSelectedAp(temp);
                     }
-                    select_button.setText(ap.toString());
+                    select_button.setText(viewModel.getSelectedAp().toString());
                 }else{
                     //Clicked custom
                     final EditTextDialog dialog = new EditTextDialog();
                     dialog.setTitle(getString(R.string.custom_ap_title));
                     dialog.setHint(getString(R.string.mac_address));
                     dialog.setRunnable(() -> {
-                        ap = null;
-                        custom_mac = dialog.result;
+                        viewModel.setSelectedAp(null);
+                        viewModel.setCustomMac(dialog.result);
                         select_button.setText(dialog.result);
                     });
                     dialog.show(mFragmentManager, "EditTextDialog");
@@ -168,11 +149,11 @@ public class ReaverFragment extends Fragment{
             popup.show();
         });
         start_button.setOnClickListener(view -> {
-            if(!task.isRunning()){
+            if(!isRunning()){
                 attemptStart();
             }else{
                 stop(PROCESS_REAVER);
-                task.cancel(true);
+                stopReaver();
             }
         });
 
@@ -182,7 +163,7 @@ public class ReaverFragment extends Fragment{
         pinDelayView.setError(null);
         lockedDelayView.setError(null);
 
-        if(ap==null && custom_mac==null){
+        if(viewModel.getSelectedAp()==null && viewModel.getCustomMac()==null){
             Snackbar.make(fragmentView, getString(R.string.select_ap), Snackbar.LENGTH_LONG).show();
         }else{
             if(pinDelayView.getText().toString().isEmpty()){
@@ -212,7 +193,7 @@ public class ReaverFragment extends Fragment{
         //Does NOT completely stop reaver, only the app's task
         //MainActivity.stop(PROCESS_REAVER) should be also called
         if(task!=null){
-            task.cancel(true);
+            task.cancel();
         }
     }
     @Override
@@ -221,40 +202,40 @@ public class ReaverFragment extends Fragment{
         currentFragment = FRAGMENT_REAVER;
         ((MainActivity) requireActivity()).refreshDrawer();
 
-        //Console text is saved/restored on pause/resume
-        consoleView.setText(console_text);
+        //Console text is saved/restored from ViewModel
+        consoleView.setText(viewModel.getConsoleText());
         consoleView.post(() -> consoleScrollView.fullScroll(View.FOCUS_DOWN));
     }
     @Override
     public void onPause(){
         super.onPause();
 
-        //Console text is saved/restored on pause/resume
-        console_text = consoleView.getText().toString();
+        //Console text is saved to ViewModel
+        viewModel.setConsoleText(consoleView.getText().toString());
     }
     @Override
     public void onStart(){
         super.onStart();
 
-        //Restore options
-        pinDelayView.setText(pin_delay);
-        lockedDelayView.setText(locked_delay);
-        pixie_dust_cb.setChecked(pixie_dust);
-        pixie_dust_cb.setEnabled(pixie_dust_enabled);
-        ignored_locked_cb.setChecked(ignore_locked);
-        eap_fail_cb.setChecked(eap_fail);
-        small_dh_cb.setChecked(small_dh);
-        no_nack_cb.setChecked(no_nack);
-        if(custom_mac!=null) select_button.setText(custom_mac);
-        else if(ap!=null) select_button.setText(ap.toString());
+        //Restore options from ViewModel
+        pinDelayView.setText(viewModel.getPinDelay());
+        lockedDelayView.setText(viewModel.getLockedDelay());
+        pixie_dust_cb.setChecked(viewModel.isPixieDust());
+        pixie_dust_cb.setEnabled(viewModel.isPixieDustEnabled());
+        ignored_locked_cb.setChecked(viewModel.isIgnoreLocked());
+        eap_fail_cb.setChecked(viewModel.isEapFail());
+        small_dh_cb.setChecked(viewModel.isSmallDh());
+        no_nack_cb.setChecked(viewModel.isNoNack());
+        if(viewModel.getCustomMac()!=null) select_button.setText(viewModel.getCustomMac());
+        else if(viewModel.getSelectedAp()!=null) select_button.setText(viewModel.getSelectedAp().toString());
         else if(!AP.marked.isEmpty()){
-            ap = AP.marked.get(AP.marked.size()-1);
-            select_button.setText(ap.toString());
+            viewModel.setSelectedAp(AP.marked.get(AP.marked.size()-1));
+            select_button.setText(viewModel.getSelectedAp().toString());
         }
         start_button.setText(isRunning() ? R.string.stop : R.string.start);
 
         //Restore animated views
-        if(task.isRunning()){
+        if(isRunning()){
             ViewGroup.LayoutParams layoutParams = optionsContainer.getLayoutParams();
             layoutParams.height = 0;
             optionsContainer.setLayoutParams(layoutParams);
@@ -279,49 +260,19 @@ public class ReaverFragment extends Fragment{
             }
         }
 
-        //Backup options
-        pin_delay = pinDelayView.getText().toString();
-        locked_delay = lockedDelayView.getText().toString();
-        pixie_dust = pixie_dust_cb.isChecked();
-        pixie_dust_enabled = pixie_dust_cb.isEnabled();
-        ignore_locked = ignored_locked_cb.isChecked();
-        eap_fail = eap_fail_cb.isChecked();
-        small_dh = small_dh_cb.isChecked();
-        no_nack = no_nack_cb.isChecked();
+        //Backup options to ViewModel
+        viewModel.setPinDelay(pinDelayView.getText().toString());
+        viewModel.setLockedDelay(lockedDelayView.getText().toString());
+        viewModel.setPixieDust(pixie_dust_cb.isChecked());
+        viewModel.setPixieDustEnabled(pixie_dust_cb.isEnabled());
+        viewModel.setIgnoreLocked(ignored_locked_cb.isChecked());
+        viewModel.setEapFail(eap_fail_cb.isChecked());
+        viewModel.setSmallDh(small_dh_cb.isChecked());
+        viewModel.setNoNack(no_nack_cb.isChecked());
 
         super.onStop();
     }
-    static String get_chroot_env(final Activity activity){
-        // add strings here , they will be in the kali env
-        String[] ENV = {
-                "USER=root",
-                "SHELL=/bin/bash",
-                "MAIL=/var/mail/root",
-                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-                "TERM=linux",
-                "HOME=/root",
-                "LOGNAME=root",
-                "SHLVL=1",
-                "YOU_KNOW_WHAT=THIS_IS_KALI_LINUX_NETHUNER_FROM_JAVA_BINKY"
-        };
-        StringBuilder ENV_OUT = new StringBuilder();
-        for (String aENV : ENV) {
-            ENV_OUT.append("export ").append(aENV).append(" && ");
-        }
-        if(monstart){
-            ENV_OUT.append("source monstart-nh");
-            ENV_OUT.append(cont_on_fail ? "; " : " && ");
-        }
-        if(!custom_chroot_cmd.isEmpty()){
-            if(custom_chroot_cmd.contains("'") && activity!=null){
-                runInHandler(() -> Toast.makeText(activity, activity.getString(R.string.custom_chroot_cmd_illegal), Toast.LENGTH_SHORT).show());
-            }else{
-                ENV_OUT.append(custom_chroot_cmd);
-                ENV_OUT.append(cont_on_fail ? "; " : " && ");
-            }
-        }
-        return ENV_OUT.toString();
-    }
+
     class ReaverTask {
         String pinDelay, lockedDelay;
         boolean ignoreLocked, eapFail, smallDH, pixieDust, noNack;
@@ -357,46 +308,95 @@ public class ReaverFragment extends Fragment{
         void start(){
             executor.submit(() -> {
                 preExecute();
-                Boolean result = doInBackground();
+                doInBackground();
                 if(cancelled) postCancel(); else postDone();
                 return null;
             });
         }
 
-        void cancel(boolean mayInterrupt){
+        void cancel(){
             cancelled = true;
         }
 
-        Boolean doInBackground(){
+        void doInBackground(){
             last_action = System.currentTimeMillis();
             stop(PROCESS_AIRODUMP);            //Can't have channels changing from anywhere else
+
+            // Set con_mode to 4 (monitor mode) if wlan0 is selected and con_mode exists
+            try{
+                if(iface!=null && iface.startsWith("wlan0")){
+                    Shell probeShell = Shell.getFreeShell();
+                    if(debug) Log.d("HIJACKER/Reaver", "Probing for /sys/module/wlan/parameters/con_mode (iface='" + iface + "')");
+                    probeShell.run("if [ -e /sys/module/wlan/parameters/con_mode ]; then echo EXISTS; else echo NO; fi; echo ENDCHK");
+                    String probeResult = MainActivity.getLastLine(probeShell.getShell_out(), "ENDCHK");
+                    probeShell.done();
+                    if(debug) Log.d("HIJACKER/Reaver", "Probe result: '" + probeResult + "'");
+                    if(probeResult != null && "EXISTS".equals(probeResult.trim())){
+                        if(debug) Log.d("HIJACKER/Reaver", "con_mode found, setting to 4 for monitor mode");
+                        try{
+                            String suWrite = "ip link set " + iface + " down; sh -c 'echo 4 > /sys/module/wlan/parameters/con_mode' 2>&1; cat /sys/module/wlan/parameters/con_mode; ip link set " + iface + " up";
+                            String out = runSuAndCapture(suWrite);
+                            if(debug) Log.d("HIJACKER/Reaver", "Direct su write output: '" + out + "'");
+                            String verifyVal = null;
+                            if(out!=null){
+                                String[] lines = out.split("\\r?\\n");
+                                for(int i=lines.length-1;i>=0;i--){
+                                    String l = lines[i].trim();
+                                    if(!l.isEmpty()){ verifyVal = l; break; }
+                                }
+                            }
+
+                            if(verifyVal==null || !"4".equals(verifyVal.trim())){
+                                if(MainActivity.busybox!=null && !MainActivity.busybox.isEmpty()){
+                                    String suBusy = "ip link set " + iface + " down; echo 4 | " + MainActivity.busybox + " tee /sys/module/wlan/parameters/con_mode 2>&1; cat /sys/module/wlan/parameters/con_mode; ip link set " + iface + " up";
+                                    String out2 = runSuAndCapture(suBusy);
+                                    if(debug) Log.d("HIJACKER/Reaver", "Direct busybox write output: '" + out2 + "'");
+                                    if(out2!=null){
+                                        String[] lines = out2.split("\\r?\\n");
+                                        for(int i=lines.length-1;i>=0;i--){
+                                            String l = lines[i].trim();
+                                            if(!l.isEmpty()){ verifyVal = l; break; }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if(verifyVal != null && verifyVal.trim().matches("\\d+") && !"0".equals(verifyVal.trim())){
+                                if(debug) Log.d("HIJACKER/Reaver", "Successfully set con_mode to '" + verifyVal.trim() + "'");
+                            }else{
+                                Log.e("HIJACKER/Reaver", "Failed to set con_mode (value='" + verifyVal + "')");
+                            }
+                        }catch(Exception w){
+                            Log.e("HIJACKER/Reaver", "Direct su -c attempt failed: " + w);
+                        }
+                    }
+                }
+            }catch(Exception e){
+                Log.e("HIJACKER/Reaver", "con_mode check failed: " + e);
+            }
+
             try{
                 BufferedReader out;
                 String args = "-i " + iface + " -vv";
-                args += ap==null ? " -b " + custom_mac : " -b " + ap.mac + " --channel " + ap.ch;
+                args += viewModel.getSelectedAp()==null ? " -b " + viewModel.getCustomMac() : " -b " + viewModel.getSelectedAp().mac + " --channel " + viewModel.getSelectedAp().ch;
                 args += " -d " + pinDelay;
                 args += " -l " + lockedDelay;
                 if(ignoreLocked) args += " -L";
                 if(eapFail) args += " -E";
                 if(smallDH) args += " -S";
                 if(noNack) args += " -N";
+
                 String cmd;
                 if(pixieDust){
-                    postProgress(getString(R.string.chroot_warning));
-                    if(bootkali_init_bin.equals(NETHUNTER_BOOTKALI_BASH)){
-                        //Not in nethunter, need to initialize the chroot environment
-                        Runtime.getRuntime().exec("su -c " + bootkali_init_bin);       //Make sure kali has booted
-                    }
+                    // Use pixiewps from assets instead of chroot
                     args += " -K 1";
-                    cmd = "chroot " + MainActivity.chroot_dir + " /bin/bash -c '" + get_chroot_env(getActivity()) + "reaver " + args + "'";
+                    // Set PATH to include our bin directory so reaver can find pixiewps
+                    String binPath = pixiewps_dir.substring(0, pixiewps_dir.lastIndexOf('/'));
+                    cmd = "su -c 'export PATH=" + binPath + ":$PATH && " + prefix + " " + reaver_dir + " " + args + "'";
                     postProgress("\nRunning: " + cmd);
-                    ProcessBuilder pb = new ProcessBuilder("su");
-                    pb.redirectErrorStream(true);
-                    Process dc = pb.start();
+                    postProgress("Using pixiewps from: " + pixiewps_dir);
+                    Process dc = Runtime.getRuntime().exec(new String[]{"su", "-c", "export PATH=" + binPath + ":$PATH && " + prefix + " " + reaver_dir + " " + args});
                     out = new BufferedReader(new InputStreamReader(dc.getInputStream()));
-                    PrintWriter in = new PrintWriter(dc.getOutputStream());
-                    in.print(cmd + "\nexit\n");
-                    in.flush();
                 }else{
                     cmd = "su -c " + prefix + " " + reaver_dir + " " + args;
                     postProgress("\nRunning: " + cmd);
@@ -415,7 +415,6 @@ public class ReaverFragment extends Fragment{
                 Log.e("HIJACKER/Exception", "Caught Exception in ReaverFragment: " + e);
             }
 
-            return true;
         }
 
         void postProgress(String... text){
@@ -425,7 +424,8 @@ public class ReaverFragment extends Fragment{
                     consoleView.append(s);
                     consoleScrollView.fullScroll(View.FOCUS_DOWN);
                 }else{
-                    console_text += s;
+                    // Save to ViewModel when fragment is not visible
+                    viewModel.appendConsoleText(s);
                 }
             });
         }
@@ -466,6 +466,7 @@ public class ReaverFragment extends Fragment{
             notification();
         }
 
+        @SuppressWarnings("unused")
         int getStatus(){
             // Deprecated-style status kept for compatibility; 1 means running.
             return cancelled ? 0 : 1;
@@ -473,6 +474,50 @@ public class ReaverFragment extends Fragment{
 
         boolean isRunning() {
             return !cancelled;
+        }
+    }
+
+    private static String runSuAndCapture(String command){
+        try{
+            Process p = Runtime.getRuntime().exec(new String[]{"su","-c",command});
+            BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            StringBuilder sb = new StringBuilder();
+
+            // Start a waiter thread that blocks on p.waitFor(); we will poll that thread to implement a timeout
+            Thread waiter = new Thread(() -> {
+                try{ p.waitFor(); }catch(InterruptedException ignored){}
+            });
+            waiter.start();
+
+            long start = System.currentTimeMillis();
+            long timeoutMs = 3000;
+
+            // Poll for output and for process termination until timeout
+            while(System.currentTimeMillis() - start < timeoutMs){
+                try{
+                    while(r.ready()){
+                        String line = r.readLine();
+                        if(line==null) break;
+                        sb.append(line).append('\n');
+                    }
+                }catch(IOException ignored){}
+
+                if(!waiter.isAlive()) break;
+
+                try{ Thread.sleep(50); }catch(InterruptedException ignored){}
+            }
+
+            try{ while(r.ready()){ String line = r.readLine(); if(line==null) break; sb.append(line).append('\n'); } }catch(IOException ignored){}
+
+            if(waiter.isAlive()){
+                try{ p.destroy(); }catch(Exception ignored){}
+                waiter.interrupt();
+            }
+
+            return sb.toString();
+        }catch(Exception e){
+            Log.e("HIJACKER/Reaver", "runSuAndCapture exception: " + e);
+            return null;
         }
     }
 }

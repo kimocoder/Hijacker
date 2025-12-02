@@ -24,7 +24,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:onClick="onCopy"
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="16sp"
         android:layout_toEndOf="@+id/mac_tv"/>
@@ -138,7 +137,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:onClick="onCopy"
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="16sp"
         android:layout_below="@+id/lastseen_st"
@@ -163,7 +161,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:onClick="onCopy"
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="16sp"
         android:layout_below="@+id/bssid_st"
@@ -191,5 +188,4 @@
         android:textSize="16sp"
         android:layout_below="@+id/manuf_st"
         android:layout_toEndOf="@+id/probes_tv"/>
-
 </RelativeLayout>

@@ -34,7 +34,6 @@ import static com.hijacker.MainActivity.FRAGMENT_SETTINGS;
 import static com.hijacker.MainActivity.NETHUNTER_BOOTKALI_BASH;
 import static com.hijacker.MainActivity.bootkali_init_bin;
 import static com.hijacker.MainActivity.currentFragment;
-import static com.hijacker.ReaverFragment.get_chroot_env;
 
 public class DevOptionsFragment extends PreferenceFragmentCompat {
     View fragmentView;
@@ -60,7 +59,8 @@ public class DevOptionsFragment extends PreferenceFragmentCompat {
                     Log.d("TESTESTEST", "No need to initialize chroot environment");
                 }
 
-                String cmd = "su -c chroot " + MainActivity.chroot_dir + " /bin/bash -c \"" + get_chroot_env(getActivity()) + "echo asd; echo asd; if [[ -r /dev/urandom ]]; then echo Success; else echo Fail; fi; \"; exit";
+                // Simple chroot test - check if we can execute basic commands
+                String cmd = "su -c chroot " + MainActivity.chroot_dir + " /bin/bash -c 'echo Testing chroot environment; if [[ -r /dev/urandom ]]; then echo Success; else echo Fail; fi;'; exit";
                 Log.d("TESTESTEST", "CMD: " + cmd);
 
                 ProcessBuilder pb = new ProcessBuilder("su");

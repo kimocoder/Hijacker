@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/hcx_title"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:paddingBottom="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/hcx_description"
+        android:paddingBottom="16dp" />
+
+    <!-- Output File -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/hcx_output_file"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/hcx_output_file"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/hcx_output_file_hint"
+        android:inputType="text"
+        android:singleLine="true"
+        android:importantForAutofill="no" />
+
+    <!-- Channel -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/hcx_channel"
+        android:textStyle="bold"
+        android:paddingTop="8dp" />
+
+    <EditText
+        android:id="@+id/hcx_channel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/hcx_channel_hint"
+        android:inputType="number"
+        android:singleLine="true"
+        android:importantForAutofill="no" />
+
+    <!-- Timeout -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/hcx_timeout"
+        android:textStyle="bold"
+        android:paddingTop="8dp" />
+
+    <EditText
+        android:id="@+id/hcx_timeout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/hcx_timeout_hint"
+        android:inputType="number"
+        android:singleLine="true"
+        android:importantForAutofill="no" />
+
+    <!-- Start/Stop Button -->
+    <Button
+        android:id="@+id/hcx_start_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/start"
+        android:layout_marginTop="16dp"
+        android:textColor="@android:color/white"
+        android:textStyle="bold" />
+
+    <!-- Status Section -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/hcx_status"
+        android:textStyle="bold"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp" />
+
+    <ScrollView
+        android:id="@+id/hcx_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@android:color/transparent"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/hcx_status_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textIsSelectable="true"
+            android:fontFamily="monospace"
+            android:textSize="12sp"
+            android:textColor="@android:color/white" />
+    </ScrollView>
+</LinearLayout>

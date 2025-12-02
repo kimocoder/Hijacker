@@ -51,6 +51,7 @@ import static com.hijacker.MainActivity.sort;
 import static com.hijacker.MainActivity.sort_reverse;
 import static com.hijacker.MainActivity.wep;
 import static com.hijacker.MainActivity.wpa;
+import static com.hijacker.MainActivity.wps;
 
 public class FiltersDialog extends DialogFragment {
     String[] sort_texts;
@@ -58,8 +59,8 @@ public class FiltersDialog extends DialogFragment {
     EditText manufView;
     TextView pwrTv;
     Button sortSelectBtn;
-    CheckBox apCb, stCb, stNaCb, wpaCb, wepCb, opnCb, sortReverseCb;
-    CheckBox[] channelCb = new CheckBox[15];
+    CheckBox apCb, stCb, stNaCb, wpaCb, wepCb, opnCb, wpsCb, sortReverseCb;
+    final CheckBox[] channelCb = new CheckBox[15];
     SeekBar seek;
     int temp_sort;
     @NonNull
@@ -169,6 +170,7 @@ public class FiltersDialog extends DialogFragment {
         wpa = wpaCb.isChecked();
         wep = wepCb.isChecked();
         opn = opnCb.isChecked();
+        wps = wpsCb.isChecked();
 
         pwr_filter = seek.getProgress();
 

@@ -34,12 +34,16 @@
     <string name="no_internet">No internet connection</string>
     <string name="unknown_error">An unknown error occurred</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>
+    <string name="loading">Loading…</string>
+    <string name="processing">Processing…</string>
+    <string name="please_wait">Please wait…</string>
 
     <!-- Navigation Drawer -->
     <string name="nav_airodump">Airodump</string>
     <string name="nav_mdk4">mdk4</string>
     <string name="nav_reaver">Reaver</string>
     <string name="nav_crack">Crack .cap file</string>
+    <string name="nav_hcxdumptool">hcxdumptool</string>
     <string name="nav_custom_actions">Custom Actions</string>
     <string name="nav_settings">Settings</string>
 
@@ -75,6 +79,16 @@
     <string name="select_wep_bits">Select how many bits the key is</string>
     <string name="capfile_invalid">Capfile is invalid</string>
     <string name="wordlist_invalid">Wordlist is invalid</string>
+    <string name="browse">…</string>
+    <string name="download_desc">Download wordlist</string>
+    <string name="wpa_label">WPA/WPA2</string>
+    <string name="wep_label">WEP</string>
+    <string name="wps_label">WPS</string>
+    <string name="wep_64_label">64</string>
+    <string name="wep_128_label">128</string>
+    <string name="wep_152_label">152</string>
+    <string name="wep_256_label">256</string>
+    <string name="wep_512_label">512</string>
 
     <!-- CustomActionFragment -->
     <string name="select_action">Select action</string>
@@ -84,6 +98,7 @@
     <string name="action_delete_message">This action will be permanently deleted. Are you sure?</string>
     <string name="manage_actions">Manage actions…</string>
     <string name="edit">Edit…</string>
+    <string name="edit_action">Edit Action</string>
 
     <!-- CustomActionEditorFragment -->
     <string name="requires_associated">Requires associated</string>
@@ -153,6 +168,9 @@
     <string name="channels">2.4Ghz Channels:</string>
     <string name="all">All</string>
     <string name="opn">OPN</string>
+    <string name="tkip">TKIP</string>
+    <string name="aes">AES</string>
+    <string name="console_label">Console Output:</string>
     <string name="sort">Sort:</string>
     <string name="reverse_sort">Reverse</string>
     <string name="sort_nosort">No sorting</string>
@@ -161,6 +179,22 @@
     <string name="sort_data_frames">By data/frames</string>
     <string name="sort_pwr">By power</string>
     <string name="manuf_filter">Manufacturer Filter</string>
+
+    <!-- Channel numbers -->
+    <string name="channel_1">1</string>
+    <string name="channel_2">2</string>
+    <string name="channel_3">3</string>
+    <string name="channel_4">4</string>
+    <string name="channel_5">5</string>
+    <string name="channel_6">6</string>
+    <string name="channel_7">7</string>
+    <string name="channel_8">8</string>
+    <string name="channel_9">9</string>
+    <string name="channel_10">10</string>
+    <string name="channel_11">11</string>
+    <string name="channel_12">12</string>
+    <string name="channel_13">13</string>
+    <string name="channel_14">14</string>
 
     <!-- FirstRunDialog -->
     <string name="first_run_title">Welcome</string>
@@ -268,7 +302,7 @@
 
     <!-- ReaverFragment -->
     <string name="select_ap">Select Access Point</string>
-    <string name="pixie_dust">Use pixie-dust (requires NetHunter chroot)</string>
+    <string name="pixie_dust">Use Pixie-Dust</string>
     <string name="ignore_locked">Ignore Locked State reported by the AP</string>
     <string name="eap_fail">Terminate each session with EAP FAIL</string>
     <string name="small_dh">Use small DH keys to improve crack speed</string>
@@ -307,6 +341,11 @@
     <string name="misc">Miscellaneous:</string>
     <string name="hidden">Hidden APs:</string>
     <string name="connected">Connected Stations:</string>
+    <string name="wpa">WPA:</string>
+    <string name="wpa2">WPA2:</string>
+    <string name="wep">WEP:</string>
+    <string name="wps">WPS-Enabled:</string>
+    <string name="wps_status">WPS Status:</string>
 
     <!-- TestDialog -->
     <string name="testing">Testing tools…</string>
@@ -317,6 +356,25 @@
     <string name="retry_enable">Retry Enable</string>
     <string name="checking_chroot">Checking chroot…</string>
     <string name="done">Done</string>
+
+    <!-- Test status labels -->
+    <string name="status_failed">Failed</string>
+    <string name="status_done">Done</string>
+    <string name="status_testing">Testing</string>
+
+    <!-- Accessibility / UI descriptions used by test layout -->
+    <string name="test_progress_desc">Tool tests progress</string>
+    <string name="current_command_desc">Current command output (scrollable)</string>
+
+    <!-- Test dialog tool names -->
+    <string name="test_airodump">Airodump-ng</string>
+    <string name="test_aireplay">Aireplay-ng</string>
+    <string name="test_mdk4">mdk4</string>
+    <string name="test_reaver">Reaver</string>
+    <string name="test_hcxdumptool">hcxdumptool</string>
+    <string name="test_pixiewps">Pixiewps</string>
+    <string name="test_cowpatty">cowpatty</string>
+    <string name="test_kali_chroot">Kali chroot</string>
 
     <!-- UpdateDialog -->
     <string name="update_title">Update available</string>
@@ -362,6 +420,10 @@
 
     <string name="always_cap_title">Save all packets</string>
     <string name="always_cap_sum">Create a .cap file every time airodump-ng starts</string>
+
+    <string name="airodump_update_title">Airodump scan update interval (ms)</string>
+    <string name="airodump_update_sum">How often airodump-ng refreshes the display (in milliseconds)</string>
+    <string name="airodump_update_desc">Set the update interval for airodump-ng display refresh. Lower values update more frequently but use more CPU. Default is 1000ms (1 second). Higher values like 5000ms (5 seconds) reduce CPU usage.</string>
 
     <string name="deauthWait_title">WPA Deauth wait (sec)</string>
     <string name="deauthWait_sum">Time to deauthenticate clients when cracking WPA</string>
@@ -416,6 +478,16 @@
     <string name="test_sum">Run all the tools to make sure that the settings are correct. Any running tasks will be stopped.</string>
 
     <string name="copy_sample_title">Copy test command</string>
+    <string name="update_oui_title">Update OUI Database</string>
+    <string name="update_oui_sum">Download latest manufacturer (OUI) database from Wireshark</string>
+    <string name="oui_update_dialog_title">Update OUI Database</string>
+    <string name="oui_update_dialog_message">This will download the latest IEEE OUI database (~4MB) from Wireshark to identify device manufacturers from MAC addresses.\n\nThe current database will be replaced. Continue?</string>
+    <string name="oui_downloading">Downloading OUI database…</string>
+    <string name="oui_processing">Processing OUI database…</string>
+    <string name="oui_update_success">OUI database updated successfully!</string>
+    <string name="oui_update_failed">Failed to update OUI database</string>
+    <string name="oui_update_in_progress">OUI update already in progress</string>
+    <string name="oui_current_entries">Current database: %d manufacturers</string>
 
     <!-- Chroot -->
     <string name="chroot">Chroot</string>
@@ -450,4 +522,51 @@
     <string name="all_files_access_message">Hijacker needs access to external storage to read and write captures, wordlists and config files. Grant "All files access" for full functionality, or continue without it.</string>
     <string name="grant_all_files_access">Grant access</string>
     <string name="continue_without_access">Continue without access</string>
+
+    <!-- Default pin and locked values -->
+    <string name="default_pin_delay">1</string>
+    <string name="default_locked_delay">60</string>
+
+    <!-- IsolatedFragment dummy text -->
+    <string name="dummy_essid">Chris</string>
+    <string name="dummy_mac">00:11:22:33:44:55</string>
+    <string name="dummy_manuf">ZTE Corporation</string>
+    <string name="dummy_sec1">Enc: WPA2 | Auth: PSK</string>
+    <string name="dummy_numbers">B: 20000 | D: 20000 | #s: 20000</string>
+    <string name="dummy_sec2">Cipher: TKIP</string>
+
+    <!-- Activity Main dummy text -->
+    <string name="default_count">0</string>
+    <string name="content_description_ap_icon">Access Points</string>
+    <string name="content_description_st_icon">Stations</string>
+
+    <!-- ListItem dummy text -->
+    <string name="list_dummy_essid">Essid</string>
+    <string name="list_dummy_manufacturer">Manufacturer</string>
+    <string name="list_dummy_mac">00:11:22:33:44:55</string>
+    <string name="list_dummy_info">dsadfasdfasdfas</string>
+    <string name="list_dummy_count">100</string>
+    <string name="content_description_list_icon">TODO</string>
+    <string name="content_description_add_action">Add action</string>
+    <string name="edit_text_hint">Enter text</string>
+    <string name="dummy_text_view">TextView</string>
+    <string name="content_description_file_icon">File icon</string>
+    <string name="content_description_back">Back</string>
+    <string name="content_description_new_folder">New folder</string>
+    <string name="content_description_notification_icon">Notification icon</string>
+
+    <!-- hcxdumptool -->
+    <string name="hcx_title">hcxdumptool - PMKID/EAPOL Capture</string>
+    <string name="hcx_description">Capture WPA/WPA2 handshakes and PMKIDs for offline cracking</string>
+    <string name="hcx_output_file">Output File (pcapng)</string>
+    <string name="hcx_output_file_hint">/path/to/capture.pcapng</string>
+    <string name="hcx_channel">Channel (1-14, 0=all)</string>
+    <string name="hcx_channel_hint">1</string>
+    <string name="hcx_timeout">Timeout (seconds)</string>
+    <string name="hcx_timeout_hint">300</string>
+    <string name="hcx_status">Status Log</string>
+    <string name="hcx_running">hcxdumptool started</string>
+    <string name="hcx_stopped">hcxdumptool stopped</string>
+    <string name="hcx_no_output_file">Please specify output file</string>
+    <string name="hcx_cant_create_dir">Cannot create output directory</string>
 </resources>

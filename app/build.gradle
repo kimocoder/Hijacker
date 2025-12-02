@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'androidx.navigation.safeargs'
 
 tasks.withType(JavaCompile).configureEach {
     options.compilerArgs += ['-Xlint:deprecation', '-Xlint:unchecked']
@@ -6,8 +7,9 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 android {
+    compileSdkVersion 36
+
     //noinspection GradleDependency
-    compileSdk = 34
     // Use Java 11 for compilation to match modern JDKs and suppress obsolete source/target warnings
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -32,8 +34,8 @@ android {
     defaultConfig {
         applicationId = "com.hijacker"
         minSdk = 21
+        targetSdk 36
         //noinspection OldTargetApi
-        targetSdk = 34
         versionCode = 40
         android.buildFeatures.buildConfig = true
         versionName = 'v2.0'
@@ -65,18 +67,30 @@ android {
 }
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    // Navigation KTX for easier Bundle creation (optional but helpful)
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.9.6'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.9.6'
     implementation 'androidx.annotation:annotation:1.9.1'
     // Preference support (AndroidX)
     implementation 'androidx.preference:preference:1.2.1'
+    // Jetpack Navigation component
+    implementation 'androidx.navigation:navigation-fragment:2.9.6'
+    implementation 'androidx.navigation:navigation-ui:2.9.6'
     androidTestImplementation('androidx.test.espresso:espresso-core:3.7.0', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.android.material:material:1.13.0'
+    implementation 'androidx.compose.material:material:1.9.5'
+    implementation 'androidx.compose.ui:ui-tooling-preview:1.9.5'
+    implementation 'androidx.compose.ui:ui:1.9.5'
     testImplementation 'junit:junit:4.13.2'
     implementation 'androidx.cardview:cardview:1.0.0'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+
+    // LeakCanary for memory leak detection (debug builds only)
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:3.0-alpha-8'
 }
 
 repositories {

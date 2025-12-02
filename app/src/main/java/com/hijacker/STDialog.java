@@ -32,7 +32,7 @@ import static com.hijacker.MainActivity.getLastSeen;
 
 public class STDialog extends DeviceDialog {
     ST st;
-    TextView[] views = {null, null, null, null, null, null, null, null};
+    final TextView[] views = {null, null, null, null, null, null, null, null};
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -47,6 +47,12 @@ public class STDialog extends DeviceDialog {
         views[5] = view.findViewById(R.id.manuf_st);
         views[6] = view.findViewById(R.id.lastseen_st);
         views[7] = view.findViewById(R.id.probes_st);
+
+        // Set click listeners explicitly
+        View.OnClickListener copyListener = v -> ((MainActivity) requireActivity()).onCopy(v);
+        views[0].setOnClickListener(copyListener);
+        views[1].setOnClickListener(copyListener);
+        views[5].setOnClickListener(copyListener);
 
         builder.setView(view);
         builder.setTitle(st.mac);

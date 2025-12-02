@@ -9,7 +9,7 @@
         android:id="@+id/main_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView"
+        android:text="@string/dummy_text_view"
         android:textColor="@android:color/white"
         android:textSize="18sp" />
 
@@ -17,5 +17,5 @@
         android:id="@+id/secondary_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:text="@string/dummy_text_view" />
 </LinearLayout>

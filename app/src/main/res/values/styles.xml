@@ -1,11 +1,8 @@
 <resources>
-
     <!-- Base application theme. -->
-
     <style name="ThemeAppCompatNoActionBarHoloBlue" parent="Theme.AppCompat.NoActionBar" >
         <item name="colorAccent">@android:color/holo_blue_dark</item>
         <item name="android:windowBackground">?android:attr/colorBackground</item>
     </style>
-
     <dimen name="actionBarIconSize">48dp</dimen>
 </resources>

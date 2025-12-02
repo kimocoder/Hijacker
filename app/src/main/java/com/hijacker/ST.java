@@ -61,7 +61,7 @@ class ST extends Device{
     static final ArrayList<ST> marked = new ArrayList<>();
     static String paired, not_connected;
     static int connected=0;     //Stations that are connected to an AP
-    int id;
+    final int id;
     private int frames, lost, total_frames=0, total_lost=0;
     AP connectedTo = null;
     String bssid, probes;

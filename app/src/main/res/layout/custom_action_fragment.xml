@@ -40,7 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="?android:attr/textColorPrimary"
-            android:textSize="10sp" />
+            android:textSize="11sp" />
     </ScrollView>
 
     <Button
@@ -50,5 +50,4 @@
         android:layout_height="wrap_content"
         android:id="@+id/start_button"
         android:enabled="false"/>
-
 </LinearLayout>

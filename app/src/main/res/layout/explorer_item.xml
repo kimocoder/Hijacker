@@ -6,20 +6,14 @@
               android:layout_height="wrap_content"
               android:padding="15dp">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:srcCompat="@drawable/file"
-        android:id="@+id/explorer_iv"
-        android:layout_gravity="center_vertical"/>
-
     <TextView
-        android:text="TextView"
+        android:text="@string/dummy_text_view"
         android:id="@+id/explorer_item_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
         android:textColor="@android:color/white"
-        android:layout_marginStart="10dp"
-        android:layout_gravity="center_vertical"/>
+        android:drawablePadding="10dp"
+        android:layout_gravity="center_vertical"
+        app:drawableStartCompat="@drawable/file" />
 </LinearLayout>

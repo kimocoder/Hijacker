@@ -30,7 +30,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/sendEmailBtn"
+        android:layout_above="@+id/buttonLayout"
         android:layout_below="@+id/textView2"
         android:layout_marginTop="8dp"
         android:background="@color/colorPrimary">
@@ -46,7 +46,7 @@
                 android:layout_height="match_parent"
                 android:padding="3dp"
                 android:textColor="?android:attr/textColorPrimary"
-                android:textSize="10sp" />
+                android:textSize="11sp" />
         </LinearLayout>
     </ScrollView>
 
@@ -59,24 +59,28 @@
         android:padding="5dp"
         android:visibility="visible" />
 
-    <Button
-        style="?android:attr/buttonBarButtonStyle"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/buttonLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:onClick="onRestart"
-        android:text="@string/restart_hijacker" />
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/sendEmailBtn"
-        style="?android:attr/buttonBarButtonStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:enabled="false"
-        android:onClick="onUseEmail"
-        android:text="@string/send_email" />
+        <Button
+            android:id="@+id/restartBtn"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/restart_hijacker" />
 
+        <Button
+            android:id="@+id/sendEmailBtn"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:enabled="false"
+            android:text="@string/send_email" />
+    </LinearLayout>
 </RelativeLayout>

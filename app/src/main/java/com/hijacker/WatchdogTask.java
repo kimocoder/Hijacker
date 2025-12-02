@@ -48,7 +48,7 @@ import static com.hijacker.MainActivity.stop;
 class WatchdogTask {
     static final int SLEEP_TIME = 5000, PAUSE_TIME = 1000;
     // store application context to avoid leaking an Activity
-    Context con;
+    final Context con;
     // Use our own stop flag to avoid calling the deprecated cancel(true) externally.
     private volatile boolean shouldStop = false;
     // Track whether task is running

@@ -17,8 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/progressBar2"
         android:layout_alignTop="@+id/progressBar2"
-        android:layout_toRightOf="@+id/progressBar2"
+        android:layout_toEndOf="@+id/progressBar2"
         android:gravity="center_vertical|center_horizontal"
         android:text="Please wait..."/>
-
 </RelativeLayout>

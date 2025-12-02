@@ -52,6 +52,22 @@ public class CustomActionEditorFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState){
         fragmentView = inflater.inflate(R.layout.custom_action_editor, container, false);
 
+        // If we were opened via NavController with an argument, read it and set 'action'
+        try{
+            android.os.Bundle args = getArguments();
+            if(args!=null && args.containsKey("action_title")){
+                String title = args.getString("action_title");
+                if(title!=null){
+                    for(int i=0;i<cmds.size();i++){
+                        if(cmds.get(i).getTitle().equals(title)){
+                            action = cmds.get(i);
+                            break;
+                        }
+                    }
+                }
+            }
+        }catch(Exception ignored){}
+
         titleView = fragmentView.findViewById(R.id.title);
         startCmdView = fragmentView.findViewById(R.id.start_cmd);
         stopCmdView = fragmentView.findViewById(R.id.stop_cmd);

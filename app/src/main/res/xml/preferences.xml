@@ -49,6 +49,17 @@
             android:title="@string/always_cap_title"
             android:summary="@string/always_cap_sum"
             android:key="always_cap"/>
+        <EditTextPreference
+            android:defaultValue="1000"
+            android:dialogMessage="@string/airodump_update_desc"
+            android:dialogTitle="@string/airodump_update_title"
+            android:inputType="number"
+            android:key="airodump_update_interval"
+            android:maxLength="8"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="@string/airodump_update_sum"
+            android:title="@string/airodump_update_title" />
         <ListPreference
             android:defaultValue="1"
             android:entries="@array/band_choices"
@@ -75,8 +86,29 @@
             android:summary="@string/target_deauth_sum"
             android:key="target_deauth"/>
     </PreferenceCategory>
-    <PreferenceCategory android:title="Interface">
 
+    <PreferenceCategory android:title="hcxdumptool">
+        <EditTextPreference
+            android:enabled="false"
+            android:defaultValue="@string/deauthWait"
+            android:dialogMessage="@string/deauthWait_desc"
+            android:dialogTitle="@string/deauthWait_title"
+            android:inputType="number"
+            android:key="deauthWait"
+            android:maxLength="8"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="@string/deauthWait_sum"
+            android:title="@string/deauthWait_title" />
+        <SwitchPreference
+            android:enabled="false"
+            android:defaultValue="@string/target_deauth"
+            android:title="@string/target_deauth_title"
+            android:summary="@string/target_deauth_sum"
+            android:key="target_deauth"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Interface">
         <EditTextPreference
             android:defaultValue="@string/iface"
             android:selectAllOnFocus="true"
@@ -122,6 +154,10 @@
         <Preference
             android:title="@string/copy_sample_title"
             android:key="copy_sample_button" />
+        <Preference
+            android:title="@string/update_oui_title"
+            android:summary="@string/update_oui_sum"
+            android:key="update_oui_db" />
     </PreferenceCategory>
     <PreferenceCategory
         android:title="@string/chroot">
@@ -172,5 +208,4 @@
             android:key="version"
             android:title="@string/version_title" />
     </PreferenceCategory>
-
 </PreferenceScreen>

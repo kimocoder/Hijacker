@@ -46,11 +46,10 @@
             android:id="@+id/feedback_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autofillHints=""
             android:ems="10"
             android:inputType="textMultiLine"
             android:lines="2"
             android:maxLines="2"/>
-
     </LinearLayout>
-
 </LinearLayout>

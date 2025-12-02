@@ -102,25 +102,58 @@ public class FileExplorerDialog extends DialogFragment{
         if(!background) super.show(fragmentManager, tag);
     }
     void goToDirectory(RootFile file){
-        while(!file.exists()){
-            file = new RootFile(file.getParentPath());
-        }
-        current = file;
-        list = file.listFiles();
-        for(int i=0;i<list.size();i++){
-            if((toSelect==SELECT_DIR && !list.get(i).isDirectory()) || list.get(i).isUnknownType()){
-                list.remove(i);
-                i--;
+        final RootFile startFile = file;
+        // Offload heavy IO (root shell listing) to a background thread to avoid UI jank
+        new Thread(() -> {
+            RootFile f = startFile;
+            try{
+                while(!f.exists()){
+                    f = new RootFile(f.getParentPath());
+                }
+            }catch(Exception e){
+                // If resolution failed, fall back to root
+                try{ f = new RootFile("/"); }catch(Exception ignored){}
             }
-        }
-        Collections.sort(list, (o1, o2) -> {
-            if(o1.isFile() && o2.isDirectory()) return 1;
-            else if(o1.isDirectory() && o2.isFile()) return -1;
-            else return o1.getName().compareToIgnoreCase(o2.getName());
-        });
-        file_explorer_adapter.notifyDataSetChanged();
-        backButton.setEnabled(!current.getAbsolutePath().equals("/"));
-        currentDir.setText(current.getAbsolutePath());
+
+            List<RootFile> newList = Collections.emptyList();
+            try{
+                newList = f.listFiles();
+            }catch(Exception ignored){
+            }
+
+            if(newList==null) newList = new ArrayList<>();
+
+            // Filter and sort on background thread
+            for(int i=0;i<newList.size();i++){
+                if((toSelect==SELECT_DIR && !newList.get(i).isDirectory()) || newList.get(i).isUnknownType()){
+                    newList.remove(i);
+                    i--;
+                }
+            }
+            Collections.sort(newList, (o1, o2) -> {
+                if(o1.isFile() && o2.isDirectory()) return 1;
+                else if(o1.isDirectory() && o2.isFile()) return -1;
+                else return o1.getName().compareToIgnoreCase(o2.getName());
+            });
+
+            final RootFile finalF = f;
+            final List<RootFile> finalList = newList;
+            // Update UI on main thread
+            MainActivity.runInHandler(() -> {
+                try{
+                    current = finalF;
+                    list = finalList;
+                    if(file_explorer_adapter!=null) file_explorer_adapter.notifyDataSetChanged();
+                    backButton.setEnabled(current!=null && !current.getAbsolutePath().equals("/"));
+                    currentDir.setText(current==null?"/":current.getAbsolutePath());
+                }catch(Exception e){
+                    // Defensive: if UI update fails, ensure dialog still shows
+                    current = finalF;
+                    list = finalList;
+                    if(file_explorer_adapter!=null) file_explorer_adapter.notifyDataSetChanged();
+                }
+            });
+        }, "FileExplorerListThread").start();
     }
     void onSelect(RootFile file){
         result = file;

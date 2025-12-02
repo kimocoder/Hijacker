@@ -18,7 +18,7 @@
 
             <TextView
                 android:id="@+id/essid"
-                android:text="Chris"
+                android:text="@string/dummy_essid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="?android:attr/textColorPrimary"
@@ -26,11 +26,10 @@
                 android:lines="1"
                 android:layout_gravity="center_vertical"
                 android:clickable="true"
-                android:onClick="onCopy"
                 android:focusable="true" />
 
             <TextView
-                android:text="00:11:22:33:44:55"
+                android:text="@string/dummy_mac"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textColor="?android:attr/textColorPrimary"
@@ -40,7 +39,6 @@
                 android:maxLines="2"
                 android:gravity="end"
                 android:clickable="true"
-                android:onClick="onCopy"
                 android:focusable="true" />
         </LinearLayout>
 
@@ -53,21 +51,21 @@
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:id="@+id/manuf"
-                android:textSize="10sp"
-                android:text="ZTE Corporation"
+                android:textSize="11sp"
+                android:text="@string/dummy_manuf"
                 android:maxLines="2"/>
 
             <TextView
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
                 android:id="@+id/sec1"
-                android:text="Enc: WPA2 | Auth: PSK"
+                android:text="@string/dummy_sec1"
                 android:maxLines="1"
                 android:layout_weight="1"
                 android:gravity="end"
-                android:textSize="10sp"/>
-
+                android:textSize="11sp"/>
         </LinearLayout>
+
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -77,20 +75,19 @@
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:id="@+id/numbers"
-                android:textSize="10sp"
-                android:text="B: 20000 | D: 20000 | #s: 20000"
+                android:textSize="11sp"
+                android:text="@string/dummy_numbers"
                 android:maxLines="2"/>
 
             <TextView
                 android:layout_height="wrap_content"
                 android:layout_width="0dp"
                 android:id="@+id/sec2"
-                android:text="Cipher: TKIP"
+                android:text="@string/dummy_sec2"
                 android:maxLines="1"
                 android:layout_weight="1"
                 android:gravity="end"
-                android:textSize="10sp"/>
-
+                android:textSize="11sp"/>
         </LinearLayout>
 
         <TextView
@@ -99,7 +96,6 @@
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:textColor="?android:attr/textColorPrimary"/>
-
     </LinearLayout>
 
     <ListView
@@ -107,7 +103,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
-
     </ListView>
 
     <LinearLayout
@@ -122,16 +117,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/crack"
-            android:layout_weight="1"
-            android:onClick="onCrack"/>
+            android:layout_weight="1" />
 
         <Button
             style="?android:attr/buttonBarButtonStyle"
             android:text="@string/disconnect_all"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="onDisconnect"/>
+            android:id="@+id/disconnect_all"
+            android:layout_weight="1" />
 
         <Button
             style="?android:attr/buttonBarButtonStyle"
@@ -139,8 +133,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/dos"
-            android:layout_weight="1"
-            android:onClick="onDos"/>
+            android:layout_weight="1" />
     </LinearLayout>
-
 </LinearLayout>

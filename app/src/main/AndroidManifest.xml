@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- Needed if the app uses a foreground service or will move to startForegroundService -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <!-- Broad file access for legacy behavior on Android 11+. Requires user to grant Manage All Files access in Settings. -->
@@ -15,13 +16,15 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:enableOnBackInvokedCallback="true"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:persistent="true"
         android:supportsRtl="true"
         android:theme="@style/ThemeAppCompatNoActionBarHoloBlue"
-        tools:ignore="GoogleAppIndexingWarning">
+        tools:ignore="GoogleAppIndexingWarning"
+        tools:targetApi="tiramisu">
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -36,7 +39,8 @@
             android:configChanges="orientation|keyboardHidden"
             android:exported="true"
             android:launchMode="singleInstance"
-            android:screenOrientation="portrait">
+            android:screenOrientation="fullSensor"
+            tools:ignore="LockedOrientationActivity,DiscouragedApi">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -53,8 +57,9 @@
         <activity
             android:name=".SendLogActivity"
             android:exported="true"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden">
+            android:screenOrientation="fullSensor"
+            android:windowSoftInputMode="stateHidden"
+            tools:ignore="LockedOrientationActivity,DiscouragedApi">
             <intent-filter>
                 <action android:name="com.hijacker.SendLogActivity"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -63,7 +68,11 @@
         <service
             android:name=".PersistenceService"
             android:enabled="true"
-            android:exported="false">
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="network_monitoring" />
         </service>
     </application>
 </manifest>

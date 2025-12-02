@@ -72,6 +72,38 @@ public class MDKFragment extends Fragment {
         ados_switch = fragmentView.findViewById(R.id.ados_switch);
         select_button = fragmentView.findViewById(R.id.select_ap_ados);
 
+        // Observe ViewModel LiveData so UI is updated when state changes elsewhere
+        viewModel.getBf().observe(getViewLifecycleOwner(), v -> {
+            if(v==null) return;
+            // avoid re-triggering listener by setting checked only when different
+            if(bf_switch.isChecked() != v){
+                bf_switch.setChecked(v);
+            }
+            bf = v; // keep static compatibility flag in sync
+        });
+        viewModel.getAdos().observe(getViewLifecycleOwner(), v -> {
+            if(v==null) return;
+            if(ados_switch.isChecked() != v){
+                ados_switch.setChecked(v);
+            }
+            ados = v; // keep static compatibility flag in sync
+        });
+        viewModel.getSsidFile().observe(getViewLifecycleOwner(), s -> {
+            if(s!=null) ssidView.setText(s);
+        });
+        viewModel.getManaged().observe(getViewLifecycleOwner(), v -> { if(v!=null) managed_cb.setChecked(v); });
+        viewModel.getAdhoc().observe(getViewLifecycleOwner(), v -> { if(v!=null) adhoc_cb.setChecked(v); });
+        viewModel.getOpn().observe(getViewLifecycleOwner(), v -> { if(v!=null) opn_cb.setChecked(v); });
+        viewModel.getWep().observe(getViewLifecycleOwner(), v -> { if(v!=null) wep_cb.setChecked(v); });
+        viewModel.getTkip().observe(getViewLifecycleOwner(), v -> { if(v!=null) tkip_cb.setChecked(v); });
+        viewModel.getAes().observe(getViewLifecycleOwner(), v -> { if(v!=null) aes_cb.setChecked(v); });
+        viewModel.getAdosAp().observe(getViewLifecycleOwner(), ap -> {
+            if(ap!=null) select_button.setText(ap.toString());
+        });
+        viewModel.getCustomMac().observe(getViewLifecycleOwner(), mac -> {
+            if(mac!=null) select_button.setText(mac);
+        });
+
         fragmentView.findViewById(R.id.ssid_file_fe_btn).setOnClickListener(v -> {
             final FileExplorerDialog dialog = new FileExplorerDialog();
             dialog.setToSelect(FileExplorerDialog.SELECT_EXISTING_FILE);
@@ -79,21 +111,31 @@ public class MDKFragment extends Fragment {
             dialog.setOnSelect(() -> {
                 ssidView.setText(dialog.result.getAbsolutePath());
                 ssidView.setError(null);
+                viewModel.setSsidFile(dialog.result.getAbsolutePath());
             });
             dialog.show(requireActivity().getSupportFragmentManager(), "FileExplorerDialog");
         });
 
+        // Update ViewModel when switches are toggled; keep static flags in sync
         bf_switch.setOnCheckedChangeListener((compoundButton, b) -> {
-            viewModel.bf = b; // persist in ViewModel
+            viewModel.setBf(b); // persist in ViewModel
             bf = b; // keep static compatibility flag in sync
             onBfSwitch(b);
         });
         ados_switch.setOnCheckedChangeListener((compoundButton, b) -> {
-            viewModel.ados = b;
+            viewModel.setAdos(b);
             ados = b; // keep static compatibility flag in sync
             onDosSwitch(b);
         });
         select_button.setOnClickListener(this::onSelectClick);
+
+        // Checkbox listeners update ViewModel
+        managed_cb.setOnCheckedChangeListener((v, checked) -> viewModel.setManaged(checked));
+        adhoc_cb.setOnCheckedChangeListener((v, checked) -> viewModel.setAdhoc(checked));
+        opn_cb.setOnCheckedChangeListener((v, checked) -> viewModel.setOpn(checked));
+        wep_cb.setOnCheckedChangeListener((v, checked) -> viewModel.setWep(checked));
+        tkip_cb.setOnCheckedChangeListener((v, checked) -> viewModel.setTkip(checked));
+        aes_cb.setOnCheckedChangeListener((v, checked) -> viewModel.setAes(checked));
 
         return fragmentView;
     }
@@ -102,43 +144,41 @@ public class MDKFragment extends Fragment {
         super.onResume();
         currentFragment = FRAGMENT_MDK;
         //Restore options
-        bf_switch.setChecked(viewModel.bf);
-        ados_switch.setChecked(viewModel.ados);
+        // Set switches from ViewModel snapshots (avoid null issues)
+        bf_switch.setChecked(viewModel.isBfValue());
+        ados_switch.setChecked(viewModel.isAdosValue());
+
         // Prefer ViewModel-held values; fall back to the static ados_ap that may be set from other classes
-        if(viewModel.custom_mac!=null) select_button.setText(viewModel.custom_mac);
-        else if(viewModel.ados_ap!=null) select_button.setText(viewModel.ados_ap.toString());
+        if(viewModel.getCustomMacValue()!=null) select_button.setText(viewModel.getCustomMacValue());
+        else if(viewModel.getAdosApValue()!=null) select_button.setText(viewModel.getAdosApValue().toString());
         else if(ados_ap!=null) select_button.setText(ados_ap.toString());
         else if(!AP.marked.isEmpty()){
-            viewModel.ados_ap = AP.marked.get(AP.marked.size()-1);
-            select_button.setText(viewModel.ados_ap.toString());
+            viewModel.setAdosAp(AP.marked.get(AP.marked.size()-1));
+            select_button.setText(viewModel.getAdosApValue().toString());
         }
-        if(viewModel.ssid_file!=null) ssidView.setText(viewModel.ssid_file);
-        managed_cb.setChecked(viewModel.managed);
-        managed_cb.setOnCheckedChangeListener((v, checked) -> viewModel.managed = checked);
-        adhoc_cb.setChecked(viewModel.adhoc);
-        adhoc_cb.setOnCheckedChangeListener((v, checked) -> viewModel.adhoc = checked);
-        opn_cb.setChecked(viewModel.opn);
-        opn_cb.setOnCheckedChangeListener((v, checked) -> viewModel.opn = checked);
-        wep_cb.setChecked(viewModel.wep);
-        wep_cb.setOnCheckedChangeListener((v, checked) -> viewModel.wep = checked);
-        tkip_cb.setChecked(viewModel.tkip);
-        tkip_cb.setOnCheckedChangeListener((v, checked) -> viewModel.tkip = checked);
-        aes_cb.setChecked(viewModel.aes);
-        aes_cb.setOnCheckedChangeListener((v, checked) -> viewModel.aes = checked);
+
+        if(viewModel.getSsidFileValue()!=null) ssidView.setText(viewModel.getSsidFileValue());
+        // Ensure checkboxes reflect ViewModel snapshot values and keep listeners already set earlier (they update ViewModel)
+        managed_cb.setChecked(viewModel.isManagedValue());
+        adhoc_cb.setChecked(viewModel.isAdhocValue());
+        opn_cb.setChecked(viewModel.isOpnValue());
+        wep_cb.setChecked(viewModel.isWepValue());
+        tkip_cb.setChecked(viewModel.isTkipValue());
+        aes_cb.setChecked(viewModel.isAesValue());
         ((MainActivity) requireActivity()).refreshDrawer();
     }
     @Override
     public void onPause(){
         super.onPause();
         //Save options
-        viewModel.ssid_file = ssidView.getText().toString();
-        // individual checkboxes update their viewModel values in their listeners; ensure they are saved
-        viewModel.managed = managed_cb.isChecked();
-        viewModel.adhoc = adhoc_cb.isChecked();
-        viewModel.opn = opn_cb.isChecked();
-        viewModel.wep = wep_cb.isChecked();
-        viewModel.tkip = tkip_cb.isChecked();
-        viewModel.aes = aes_cb.isChecked();
+        viewModel.setSsidFile(ssidView.getText().toString());
+        // individual checkboxes already update the ViewModel in their listeners; ensure snapshot values are set
+        viewModel.setManaged(managed_cb.isChecked());
+        viewModel.setAdhoc(adhoc_cb.isChecked());
+        viewModel.setOpn(opn_cb.isChecked());
+        viewModel.setWep(wep_cb.isChecked());
+        viewModel.setTkip(tkip_cb.isChecked());
+        viewModel.setAes(aes_cb.isChecked());
     }
 
     void onSelectClick(View view){
@@ -154,42 +194,44 @@ public class MDKFragment extends Fragment {
         popup.setOnMenuItemClickListener(item -> {
             //ItemId = i in for()
             if(item.getGroupId()==0){
-                viewModel.custom_mac=null;
+                // Clear custom MAC and set the selected AP into ViewModel
+                viewModel.setCustomMac(null);
                 AP temp = AP.APs.get(item.getItemId());
-                if(viewModel.ados_ap!=temp){
-                    viewModel.ados_ap = temp;
+                if(viewModel.getAdosApValue() != temp){
+                    viewModel.setAdosAp(temp);
                     runInHandler(() -> {
                         ados_switch.setChecked(false);
                         stop(PROCESS_MDK_DOS);
                     });
                 }
-                select_button.setText(viewModel.ados_ap.toString());
-            }else{
-                //Clcked custom
-                final EditTextDialog dialog = new EditTextDialog();
-                dialog.setTitle(getString(R.string.custom_ap_title));
-                dialog.setHint(getString(R.string.mac_address));
-                dialog.setRunnable(() -> {
-                    viewModel.ados_ap = null;
-                    viewModel.custom_mac = dialog.result;
+                AP current = viewModel.getAdosApValue();
+                if(current != null) select_button.setText(current.toString());
+             }else{
+                 //Clcked custom
+                 final EditTextDialog dialog = new EditTextDialog();
+                 dialog.setTitle(getString(R.string.custom_ap_title));
+                 dialog.setHint(getString(R.string.mac_address));
+                 dialog.setRunnable(() -> {
+                    viewModel.setAdosAp(null);
+                    viewModel.setCustomMac(dialog.result);
                     select_button.setText(dialog.result);
-                });
-                dialog.show(requireActivity().getSupportFragmentManager(), "EditTextDialog");
-            }
-            return true;
-        });
-        popup.show();
+                 });
+                 dialog.show(requireActivity().getSupportFragmentManager(), "EditTextDialog");
+             }
+             return true;
+         });
+         popup.show();
     }
     void onBfSwitch(boolean b){
         if(b){
             ssidView.setError(null);
             String ssid_file = ssidView.getText().toString();
-            boolean managed = viewModel.managed;
-            boolean adhoc = viewModel.adhoc;
-            boolean opn = viewModel.opn;
-            boolean wep = viewModel.wep;
-            boolean tkip = viewModel.tkip;
-            boolean aes = viewModel.aes;
+            boolean managed = viewModel.isManagedValue();
+            boolean adhoc = viewModel.isAdhocValue();
+            boolean opn = viewModel.isOpnValue();
+            boolean wep = viewModel.isWepValue();
+            boolean tkip = viewModel.isTkipValue();
+            boolean aes = viewModel.isAesValue();
              String args = "";
              if(!managed && !adhoc){
                  Snackbar.make(fragmentView, getString(R.string.select_type), Snackbar.LENGTH_LONG).show();
@@ -229,18 +271,20 @@ public class MDKFragment extends Fragment {
              }
              startBeaconFlooding(args);
         }else{
-            viewModel.bf = false;
+            viewModel.setBf(false);
             bf = false; // keep static compatibility flag in sync
             stop(PROCESS_MDK_BF);
         }
-    }
-    void onDosSwitch(boolean b){
-        if(b){
-            startAdos(viewModel.ados_ap==null ? viewModel.custom_mac : viewModel.ados_ap.mac);
-        }else{
-            viewModel.ados = false;
-            ados = false; // keep static compatibility flag in sync
-            stop(PROCESS_MDK_DOS);
-        }
-    }
+     }
+     void onDosSwitch(boolean b){
+         if(b){
+            AP a = viewModel.getAdosApValue();
+            String custom = viewModel.getCustomMacValue();
+            startAdos(a == null ? custom : a.mac);
+         }else{
+            viewModel.setAdos(false);
+             ados = false; // keep static compatibility flag in sync
+             stop(PROCESS_MDK_DOS);
+         }
+     }
 }

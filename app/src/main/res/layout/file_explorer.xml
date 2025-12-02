@@ -16,6 +16,7 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/content_description_back"
             app:srcCompat="@drawable/back"
             android:id="@+id/backButton"
             style="@android:style/Widget.Material.Button.Borderless"
@@ -24,11 +25,11 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/content_description_new_folder"
             app:srcCompat="@drawable/new_folder"
             android:id="@+id/newFolderButton"
             style="@android:style/Widget.Material.Button.Borderless"
             android:layout_alignParentEnd="true"/>
-
     </RelativeLayout>
 
     <TextView
@@ -38,7 +39,8 @@
         android:layout_below="@+id/rl_1"
         android:paddingBottom="10dp"
         android:paddingStart="5dp"
-        android:text="TextView"
+        android:paddingEnd="5dp"
+        android:text="@string/dummy_text_view"
         android:textColor="?android:attr/textColorPrimary"/>
 
     <ListView
@@ -46,5 +48,4 @@
         android:layout_height="match_parent"
         android:id="@+id/explorer_listview"
         android:layout_below="@+id/currentDir"/>
-
 </RelativeLayout>

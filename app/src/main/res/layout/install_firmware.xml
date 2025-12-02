@@ -34,6 +34,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingStart="5dp"
                 android:paddingEnd="5dp"
                 android:text="@string/firmware_location" />
 
@@ -51,6 +52,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingStart="5dp"
                 android:paddingEnd="5dp"
                 android:text="@string/device_chipset" />
 
@@ -69,6 +71,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
+                android:paddingStart="5dp"
                 android:paddingEnd="5dp"
                 android:text="@string/util_location_text" />
 
@@ -77,9 +80,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
-
         </TableRow>
-
     </TableLayout>
 
     <CheckBox
@@ -88,5 +89,4 @@
         android:layout_height="wrap_content"
         android:checked="false"
         android:text="@string/create_backup" />
-
 </LinearLayout>

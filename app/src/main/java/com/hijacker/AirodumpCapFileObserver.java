@@ -16,8 +16,8 @@ import static com.hijacker.MainActivity.cap_tmp_path;
 import static com.hijacker.Shell.getFreeShell;
 
 class AirodumpCapFileObserver {
-    static String TAG = "HIJACKER/CapFileObs";
-    String master_path;
+    static final String TAG = "HIJACKER/CapFileObs";
+    final String master_path;
     Shell shell = null;
     boolean found_cap_file = false;
     private java.util.concurrent.ScheduledExecutorService scheduler = null;
@@ -56,19 +56,19 @@ class AirodumpCapFileObserver {
                         seen.add(name);
                         long lm = f.lastModified();
                         Long prev = mtimes.get(name);
-                        if(prev==null){
+                        if (prev==null) {
                             // created
                             mtimes.put(name, lm);
                             boolean isPcap = name.endsWith(".pcap");
-                            if(isPcap){
+                            if (isPcap) {
                                 Airodump.capFile = master_path + '/' + name;
                                 found_cap_file = true;
                             }
-                        }else if(lm>prev){
+                        } else if (lm>prev) {
                             // modified
                             mtimes.put(name, lm);
                             boolean isPcap = name.endsWith(".pcap");
-                            if(!isPcap){
+                            if (!isPcap) {
                                 readCsv(master_path + '/' + name, shell);
                             }
                         }
@@ -76,24 +76,24 @@ class AirodumpCapFileObserver {
                     // Remove deleted files from mtimes
                     // remove entries not in seen (manual iterator to avoid API 24+ removeIf)
                     java.util.Iterator<java.util.Map.Entry<String, Long>> it = mtimes.entrySet().iterator();
-                    while(it.hasNext()){
+                    while(it.hasNext()) {
                         java.util.Map.Entry<String, Long> e = it.next();
-                        if(!seen.contains(e.getKey())) it.remove();
+                        if (!seen.contains(e.getKey())) it.remove();
                     }
-                }catch(Throwable t){
+                } catch(Throwable t) {
                     Log.e(TAG, "CapFilePoller error: " + t);
                 }
-            }, 0, 500, java.util.concurrent.TimeUnit.MILLISECONDS);
-        }catch(Exception e){
+            }, 0, MainActivity.airodump_update_interval, java.util.concurrent.TimeUnit.MILLISECONDS);
+        } catch(Exception e) {
             Log.e(TAG, "Failed to start CapFile poller: " + e);
             watching = false;
         }
     }
 
-    public void stopWatching(){
+    public void stopWatching() {
         watching = false;
-        if(scheduler!=null){
-            try{ scheduler.shutdownNow(); }catch(Exception ignored){}
+        if (scheduler!=null) {
+            try { scheduler.shutdownNow(); } catch(Exception ignored) {}
             scheduler = null;
         }
 
@@ -111,7 +111,7 @@ class AirodumpCapFileObserver {
         return found_cap_file;
     }
 
-    void readCsv(String csv_path, @NonNull Shell shell){
+    void readCsv(String csv_path, @NonNull Shell shell) {
         shell.clearOutput();
         shell.run(busybox + " cat " + csv_path + "; echo ENDOFCAT");
         BufferedReader out = shell.getShell_out();
@@ -119,7 +119,7 @@ class AirodumpCapFileObserver {
 
             int type = 0;           // 0 = AP, 1 = ST
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-            while(true){
+            while(true) {
                 String line = out.readLine();
                 if(line==null) break;
                 Log.d(TAG, line);
@@ -131,21 +131,44 @@ class AirodumpCapFileObserver {
                 line = line.replace(", ", ",");
                 String[] fields = line.split(",");
                 Log.i(TAG, line);
-                if(type == 0){
+                if (type == 0) {
                     String bssid = fields.length>0 ? fields[0] : "";
                     try { if(fields.length>1) sdf.parse(fields[1]); if(fields.length>2) sdf.parse(fields[2]); }catch(ParseException e){ Log.e(TAG, "Date parse error: " + e); }
                     int ch = 0, pwr = 0, beacons = 0, data = 0, id_length = 0;
-                    String enc = null, cipher = null, auth = null;
+                    String enc = null, cipher = null, auth = null, wps = null;
                     try{ if(fields.length>3) ch = Integer.parseInt(fields[3].replace(" ", "")); }catch(Exception ignored){ }
                     try{ if(fields.length>8) pwr = Integer.parseInt(fields[8].replace(" ", "")); }catch(Exception ignored){ }
                     try{ if(fields.length>9) beacons = Integer.parseInt(fields[9].replace(" ", "")); }catch(Exception ignored){ }
                     try{ if(fields.length>10) data = Integer.parseInt(fields[10].replace(" ", "")); }catch(Exception ignored){ }
                     try{ if(fields.length>12) id_length = Integer.parseInt(fields[12].replace(" ", "")); }catch(Exception ignored){ }
-                    if(fields.length>5) enc = fields[5]; if(fields.length>6) cipher = fields[6]; if(fields.length>7) auth = fields[7];
+                    if(fields.length>5) enc = fields[5];
+                    if(fields.length>6) cipher = fields[6];
+                    if(fields.length>7) auth = fields[7];
+
+                    // Check for WPS information (typically in field 11 with --wps flag)
+                    // WPS field format is usually empty or contains WPS version like "2.0"
+                    if(fields.length>11) {
+                        String wpsField = fields[11].trim();
+                        if(!wpsField.isEmpty() && !wpsField.equals("0")) {
+                            wps = wpsField;
+                        }
+                    }
+
                     String essid = null;
                     if(id_length > 0 && fields.length>13) essid = fields[13];
+
+                    // Add AP and mark WPS status if detected
                     Airodump.addAP(essid, bssid, enc, cipher, auth, pwr, beacons, data, 0, ch);
-                }else{
+
+                    // If WPS is detected, mark the AP as WPS-enabled
+                    if(wps != null) {
+                        AP ap = AP.getAPByMac(bssid);
+                        if(ap != null) {
+                            ap.setWpsEnabled();
+                            if(MainActivity.debug) Log.d(TAG, "WPS detected for " + bssid + " (version: " + wps + ")");
+                        }
+                    }
+                } else {
                     String mac = fields.length>0 ? fields[0] : null;
                     try{ if(fields.length>1) sdf.parse(fields[1]); if(fields.length>2) sdf.parse(fields[2]); }catch(ParseException e){ Log.e(TAG, "Date parse error: " + e); }
                     int pwr = 0, packets = 0;

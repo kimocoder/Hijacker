@@ -2,7 +2,7 @@ package com.hijacker;
 
 /*
     Copyright (C) 2019  Christos Kyriakopoulos
-    Copyright (C) 2024  Christian <kimocoder> Bremvaag
+    Copyright (C) 2025  Christian <kimocoder> Bremvaag
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ import static com.hijacker.MainActivity.watchdog;
 import static com.hijacker.MainActivity.currentFragment;
 
 public class SettingsFragment extends Fragment {
-    static boolean allow_prefix = false;
+    static final boolean allow_prefix = false;
     @Override
     public View onCreateView(@NonNull android.view.LayoutInflater inflater, @Nullable android.view.ViewGroup container, @Nullable Bundle savedInstanceState){
         // Create a container and host a PreferenceFragmentCompat as a child
@@ -103,6 +103,7 @@ public class SettingsFragment extends Fragment {
                     pref_edit.putBoolean("watchdog", Boolean.parseBoolean(requireContext().getString(R.string.watchdog)));
                     pref_edit.putBoolean("target_deauth", Boolean.parseBoolean(requireContext().getString(R.string.target_deauth)));
                     pref_edit.putBoolean("update_on_startup", Boolean.parseBoolean(requireContext().getString(R.string.auto_update)));
+                    pref_edit.putString("airodump_update_interval", "1000");
                     pref_edit.apply();
                     loadPreferences();
                 });
@@ -116,6 +117,21 @@ public class SettingsFragment extends Fragment {
                 new CopySampleDialog().show(requireActivity().getSupportFragmentManager(), "CopySampleDialog");
                 return false;
             });
+
+            Preference updateOui = findPreference("update_oui_db");
+            if(updateOui!=null){
+                // Show current database size
+                int currentEntries = MainActivity.manufHashMap != null ? MainActivity.manufHashMap.size() : 0;
+                updateOui.setSummary(getString(R.string.update_oui_sum) + "\n" +
+                                    getString(R.string.oui_current_entries, currentEntries));
+                updateOui.setOnPreferenceClickListener(preference -> {
+                    // Use the settings fragment's view for the Snackbar
+                    View rootView = requireActivity().findViewById(android.R.id.content);
+                    UpdateOuiDialog updateDialog = new UpdateOuiDialog(requireActivity(), rootView);
+                    updateDialog.startUpdate();
+                    return true;
+                });
+            }
 
             Preference installPref = findPreference("install_nexmon");
             if(installPref!=null) installPref.setOnPreferenceClickListener(preference -> {

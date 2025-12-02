@@ -42,12 +42,12 @@
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autofillHints=""
             android:enabled="false"
             android:hint="@string/custom_action_title"
             android:imeOptions="actionNext"
             android:inputType="text"
             android:maxLines="1"/>
-
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -58,12 +58,12 @@
             android:id="@+id/start_cmd"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autofillHints=""
             android:enabled="false"
             android:hint="@string/start_command"
             android:imeOptions="actionNext"
             android:inputType="text"
             android:maxLines="1"/>
-
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -74,12 +74,12 @@
             android:id="@+id/stop_cmd"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autofillHints=""
             android:enabled="false"
             android:hint="@string/stop_command"
             android:imeOptions="actionNext"
             android:inputType="text"
             android:maxLines="1"/>
-
     </com.google.android.material.textfield.TextInputLayout>
 
     <CheckBox
@@ -88,7 +88,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/has_process_name"
         android:enabled="false"/>
-
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -97,12 +96,12 @@
             android:id="@+id/process_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autofillHints=""
             android:enabled="false"
             android:hint="@string/process_name"
             android:imeOptions="actionDone"
             android:inputType="text"
             android:maxLines="1"/>
-
     </com.google.android.material.textfield.TextInputLayout>
 
     <CheckBox
@@ -125,5 +124,4 @@
         android:layout_height="wrap_content"
         android:id="@+id/save_button"
         android:enabled="false"/>
-
 </LinearLayout>

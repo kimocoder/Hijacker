@@ -33,7 +33,7 @@ import static com.hijacker.MainActivity.getLastSeen;
 
 public class APDialog extends DeviceDialog {
     AP ap;
-    TextView[] views = {null, null, null, null, null, null, null, null, null, null, null, null, null};
+    final TextView[] views = {null, null, null, null, null, null, null, null, null, null, null, null, null, null};
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -53,6 +53,7 @@ public class APDialog extends DeviceDialog {
         views[10] = view.findViewById(R.id.clients);
         views[11] = view.findViewById(R.id.manuf);
         views[12] = view.findViewById(R.id.lastseen);
+        views[13] = view.findViewById(R.id.wps_status);
 
         // Explicitly wire click listeners instead of using android:onClick in XML
         OnClickListener copyListener = v -> {
@@ -87,5 +88,6 @@ public class APDialog extends DeviceDialog {
         views[10].setText(String.format(Locale.getDefault(), "%d", ap.clients.size()));
         views[11].setText(ap.manuf);
         views[12].setText(getLastSeen(ap.lastseen));
+        views[13].setText(ap.wpsEnabled ? "Enabled" : "Not detected");
     }
 }

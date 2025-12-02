@@ -3,20 +3,20 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingTop="5dp">
+    android:paddingTop="5dp"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp">
 
-    <ProgressBar
+    <!-- Material 3 linear progress indicator -->
+    <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/test_progress"
-        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:max="5"
-        android:maxHeight="5dp"
-        android:minHeight="5dp"
-        android:minWidth="0dp"
-        android:progressDrawable="@drawable/progress_horizontal_holo_blue_dark"/>
+        android:layout_height="4dp"
+        app:trackThickness="4dp"
+        android:contentDescription="@string/test_progress_desc"
+        app:indicatorColor="@color/colorAccent" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,120 +26,35 @@
         android:paddingStart="20dp"
         android:paddingTop="10dp">
 
-        <LinearLayout
+        <!-- Tool rows: icon, label, status chip -->
+        <!-- RecyclerView to display tool rows dynamically -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/test_tools_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:overScrollMode="never" />
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="2dp"
-                android:text="Airodump-ng"
-                android:textColor="@android:color/white"/>
-
-            <ImageView
-                android:id="@+id/imageView1"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                app:srcCompat="@drawable/failed_drawable"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="2dp"
-                android:text="Aireplay-ng"
-                android:textColor="@android:color/white"/>
-
-            <ImageView
-                android:id="@+id/imageView2"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                app:srcCompat="@drawable/done_drawable"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="2dp"
-                android:text="mdk4"
-                android:textColor="@android:color/white"/>
-
-            <ImageView
-                android:id="@+id/imageView3"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                app:srcCompat="@drawable/testing_drawable"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="2dp"
-                android:text="Reaver"
-                android:textColor="@android:color/white"/>
-
-            <ImageView
-                android:id="@+id/imageView4"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                app:srcCompat="@drawable/testing_drawable"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="2dp"
-                android:text="Kali chroot"
-                android:textColor="@android:color/white"/>
-
-            <ImageView
-                android:id="@+id/imageView5"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                app:srcCompat="@drawable/testing_drawable"/>
-        </LinearLayout>
-
-        <TextView
+        <!-- Command output area: MaterialTextView inside a scrolling container is preferred -->
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/current_cmd"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:clickable="true"
             android:lines="4"
-            android:paddingLeft="2dp"
-            android:paddingRight="2dp"
-            android:paddingTop="5dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:paddingTop="6dp"
             android:textColor="@android:color/white"
             android:textSize="12sp"
             android:typeface="monospace"
-            android:focusable="true" />
-    </LinearLayout>
+            android:focusable="true"
+            android:ellipsize="end"
+            android:scrollbars="vertical"
+            android:paddingBottom="8dp"
+            android:contentDescription="@string/current_command_desc"
+            app:lineHeight="18sp" />
 
+    </LinearLayout>
 </LinearLayout>

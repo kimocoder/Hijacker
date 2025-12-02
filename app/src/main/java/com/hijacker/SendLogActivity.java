@@ -74,6 +74,10 @@ public class SendLogActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.reportProgressBar);
         console = findViewById(R.id.console);
         sendEmailBtn = findViewById(R.id.sendEmailBtn);
+        View restartBtn = findViewById(R.id.restartBtn);
+
+        restartBtn.setOnClickListener(this::onRestart);
+        sendEmailBtn.setOnClickListener(this::onUseEmail);
 
         busybox = getFilesDir().getAbsolutePath() + "/bin/busybox";
         stackTrace = getIntent().getStringExtra("exception");

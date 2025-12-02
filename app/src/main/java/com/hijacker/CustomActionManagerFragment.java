@@ -19,11 +19,12 @@ package com.hijacker;
  */
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.annotation.NonNull;
 
 import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,7 +38,6 @@ import static com.hijacker.MainActivity.FRAGMENT_CUSTOM;
 import static com.hijacker.MainActivity.actions_path;
 import static com.hijacker.MainActivity.currentFragment;
 import static com.hijacker.MainActivity.custom_action_adapter;
-import static com.hijacker.MainActivity.mFragmentManager;
 
 public class CustomActionManagerFragment extends Fragment {
     @Override
@@ -57,15 +57,26 @@ public class CustomActionManagerFragment extends Fragment {
             popup.setOnMenuItemClickListener(item -> {
                 switch(item.getItemId()){
                     case 0:
-                        //Open editor for this
-                        CustomActionEditorFragment fragment = new CustomActionEditorFragment();
-                        fragment.action = CustomAction.cmds.get(index);
-
-                        FragmentTransaction ft = mFragmentManager.beginTransaction();
-                        ft.replace(R.id.fragment1, fragment);
-                        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                        ft.addToBackStack(null);
-                        ft.commitAllowingStateLoss();
+                        //Open editor for this using NavController if available, otherwise fall back
+                        try{
+                            android.app.Activity act = getActivity();
+                            if(act instanceof MainActivity){
+                                MainActivity main = (MainActivity)act;
+                                // Pass selected action title via Bundle when navigating with NavController
+                                String title = CustomAction.cmds.get(index).getTitle();
+                                if(main.getNavController()!=null){
+                                    android.os.Bundle args = new android.os.Bundle();
+                                    args.putString("action_title", title);
+                                    main.getNavController().navigate(R.id.nav_custom_editor, args);
+                                }else{
+                                    Log.w("HIJACKER/Navigation", "NavController not available: can't navigate to CustomActionEditor");
+                                }
+                            }else{
+                                Log.w("HIJACKER/Navigation", "Activity is not MainActivity; cannot navigate to CustomActionEditor");
+                            }
+                        }catch(Exception e){
+                            Log.w("HIJACKER/Navigation", "Exception while navigating to CustomActionEditor", e);
+                        }
                         break;
                     case 1:
                         //Delete action
@@ -89,16 +100,26 @@ public class CustomActionManagerFragment extends Fragment {
 
         FloatingActionButton fab = v.findViewById(R.id.floatingActionButton);
         fab.setOnClickListener(view -> {
-            //Open editor for new
-            FragmentTransaction ft = mFragmentManager.beginTransaction();
-            ft.replace(R.id.fragment1, new CustomActionEditorFragment());
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-            ft.addToBackStack(null);
-            ft.commitAllowingStateLoss();
-        });
+            //Open editor for new (empty) action - prefer NavController navigation with fallback
+            try{
+                android.app.Activity act = getActivity();
+                if(act instanceof MainActivity){
+                    MainActivity main = (MainActivity)act;
+                    if(main.getNavController()!=null){
+                        android.os.Bundle args = new android.os.Bundle();
+                        args.putString("action_title", null);
+                        main.getNavController().navigate(R.id.nav_custom_editor, args);
+                    }else{
+                        Log.w("HIJACKER/Navigation", "NavController not available: can't navigate to CustomActionEditor (new)");
+                    }
+                }
+            }catch(Exception ignored){
+                Log.w("HIJACKER/Navigation", "Failed to navigate to CustomActionEditor via NavController and no fallback available");
+            }
+         });
 
-        return v;
-    }
+         return v;
+     }
     @Override
     public void onResume(){
         super.onResume();

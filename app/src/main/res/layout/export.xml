@@ -21,11 +21,11 @@
                 android:id="@+id/output_file"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:autofillHints=""
                 android:hint="@string/output_file_title"
                 android:imeOptions="actionDone"
                 android:inputType="text"
                 android:maxLines="1"/>
-
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
@@ -34,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:text="..."/>
+            android:text="@string/browse"/>
     </LinearLayout>
 
     <RadioGroup
@@ -57,5 +57,4 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"/>
     </RadioGroup>
-
 </LinearLayout>

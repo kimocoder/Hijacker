@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_airodump"
+            android:id="@+id/nav_mylist"
             android:title="@string/nav_airodump" />
         <item
             android:id="@+id/nav_mdk4"
@@ -13,6 +13,9 @@
         <item
             android:id="@+id/nav_crack"
             android:title="@string/nav_crack" />
+        <item
+            android:id="@+id/nav_hcxdumptool"
+            android:title="@string/nav_hcxdumptool" />
         <item
             android:id="@+id/nav_custom_actions"
             android:title="@string/nav_custom_actions" />

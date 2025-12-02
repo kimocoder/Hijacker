@@ -44,35 +44,35 @@
         android:layout_height="match_parent">
 
         <CheckBox
-            android:text="1"
+            android:text="@string/channel_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/cb_1"
             android:layout_weight="1" />
 
         <CheckBox
-            android:text="2"
+            android:text="@string/channel_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/cb_2"
             android:layout_weight="1" />
 
         <CheckBox
-            android:text="3"
+            android:text="@string/channel_3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/cb_3"
             android:layout_weight="1" />
 
         <CheckBox
-            android:text="4"
+            android:text="@string/channel_4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/cb_4"
             android:layout_weight="1" />
 
         <CheckBox
-            android:text="5  "
+            android:text="@string/channel_5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/cb_5"
@@ -85,35 +85,35 @@
         android:layout_height="match_parent">
 
         <CheckBox
-            android:text="6"
+            android:text="@string/channel_6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/cb_6"
             android:layout_weight="1" />
 
         <CheckBox
-            android:text="7"
+            android:text="@string/channel_7"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/cb_7"
             android:layout_weight="1" />
 
         <CheckBox
-            android:text="8"
+            android:text="@string/channel_8"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/cb_8"
             android:layout_weight="1" />
 
         <CheckBox
-            android:text="9"
+            android:text="@string/channel_9"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/cb_9"
             android:layout_weight="1" />
 
         <CheckBox
-            android:text="10"
+            android:text="@string/channel_10"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/cb_10"
@@ -126,28 +126,28 @@
         android:layout_height="match_parent">
 
         <CheckBox
-            android:text="11"
+            android:text="@string/channel_11"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/cb_11"
             android:layout_weight="1" />
 
         <CheckBox
-            android:text="12"
+            android:text="@string/channel_12"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/cb_12"
             android:layout_weight="1" />
 
         <CheckBox
-            android:text="13"
+            android:text="@string/channel_13"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/cb_13"
             android:layout_weight="1" />
 
         <CheckBox
-            android:text="14"
+            android:text="@string/channel_14"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/cb_14"
@@ -183,7 +183,7 @@
             android:checked="true"  />
 
         <CheckBox
-            android:text="WEP"
+            android:text="@string/wep_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/cb_wep"
@@ -191,13 +191,20 @@
             android:checked="true"  />
 
         <CheckBox
-            android:text="WPA/WPA2"
+            android:text="@string/wpa_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/cb_wpa"
             android:layout_weight="1"
             android:checked="true"  />
 
+        <CheckBox
+            android:text="@string/wps_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/cb_wps"
+            android:layout_weight="1"
+            android:checked="true"  />
     </LinearLayout>
 
     <LinearLayout
@@ -221,8 +228,8 @@
             android:id="@+id/pwr"
             android:textSize="18sp"
             android:textColor="@android:color/white" />
-
     </LinearLayout>
+
     <SeekBar
         style="@style/Widget.AppCompat.SeekBar"
         android:layout_width="match_parent"
@@ -259,7 +266,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/select_sort"/>
-
     </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -270,11 +276,10 @@
             android:id="@+id/manuf_filter_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autofillHints=""
             android:hint="@string/manuf_filter"
             android:imeOptions="actionDone"
             android:inputType="text|textFilter"
             android:maxLines="1"/>
-
     </com.google.android.material.textfield.TextInputLayout>
-
 </LinearLayout>

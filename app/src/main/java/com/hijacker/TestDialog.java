@@ -29,11 +29,16 @@ import androidx.fragment.app.FragmentManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.widget.TextView;
-import android.widget.ImageView;
 
 import java.io.IOException;
 import java.io.BufferedReader;
+import java.util.List;
+import java.util.ArrayList;
+import com.hijacker.ToolStatus;
+import com.hijacker.ToolStatusAdapter;
 
 import static com.hijacker.MainActivity.CHROOT_BIN_MISSING;
 import static com.hijacker.MainActivity.CHROOT_DIR_MISSING;
@@ -71,15 +76,13 @@ public class TestDialog extends DialogFragment {
     private boolean conModeEnabled = false;
     private boolean fallbackMonEnabled = false;
     Thread thread;
-    ImageView[] status = new ImageView[5];
+    ToolStatusAdapter toolAdapter;
 
     // Build the command body that will be passed to 'su -c'. Include prefix only when non-empty.
-    private String buildBody(String exe, String args){
-        String trimmedPrefix = (prefix==null) ? "" : prefix.trim();
-        String body;
-        if(!trimmedPrefix.isEmpty()) body = trimmedPrefix + " " + exe + (args==null||args.isEmpty() ? "" : " " + args);
-        else body = exe + (args==null||args.isEmpty() ? "" : " " + args);
-        return body;
+    private String buildBody(String exe, String args) {
+        String trimmedPrefix = (prefix == null) ? "" : prefix.trim();
+        String formattedArgs = (args == null || args.isEmpty()) ? "" : " " + args;
+        return trimmedPrefix.isEmpty() ? exe + formattedArgs : trimmedPrefix + " " + exe + formattedArgs;
     }
 
     // Helper to retry enabling monitor mode from UI (runs in background)
@@ -211,7 +214,7 @@ public class TestDialog extends DialogFragment {
     final Runnable runnable = new Runnable(){
         @Override
         public void run(){
-            final boolean[] results = {false, false, false, false, false};
+            final boolean[] results = {false, false, false, false, false, false, false, false};
             final String cmdMonMode = enable_monMode;
             // Build tool command bodies (include prefix only when non-empty via buildBody)
             final String cmdAirodumpBody = buildBody(airodump_dir, iface);
@@ -285,7 +288,7 @@ public class TestDialog extends DialogFragment {
                 try{ Thread.sleep(monEnabled ? 300 : 700); }catch(InterruptedException ie){ Thread.currentThread().interrupt(); }
                 //stop everything and turn on monitor mode
                 runInHandler(() -> {
-                    status[0].setImageResource(R.drawable.testing_drawable);
+                    toolAdapter.updateStatusById("airodump", R.drawable.testing_drawable, getString(R.string.status_testing));
                     test_cur_cmd.setText(cmdAirodumpBody);
                 });
 
@@ -301,11 +304,11 @@ public class TestDialog extends DialogFragment {
                     results[0] = true;
                 }
                 runInHandler(() -> {
-                    status[0].setImageResource(results[0] ? R.drawable.done_drawable : R.drawable.failed_drawable);
+                    toolAdapter.updateStatusById("airodump", results[0] ? R.drawable.done_drawable : R.drawable.failed_drawable, results[0] ? getString(R.string.status_done) : getString(R.string.status_failed));
                     test_progress.setProgress(1);
 
                     test_cur_cmd.setText(cmdAireplayBody);
-                    status[1].setImageResource(R.drawable.testing_drawable);
+                    toolAdapter.updateStatusById("aireplay", R.drawable.testing_drawable, getString(R.string.status_testing));
                 });
 
                 //Aireplay
@@ -320,10 +323,10 @@ public class TestDialog extends DialogFragment {
                     results[1] = true;
                 }
                 runInHandler(() -> {
-                    status[1].setImageResource(results[1] ? R.drawable.done_drawable : R.drawable.failed_drawable);
+                    toolAdapter.updateStatusById("aireplay", results[1] ? R.drawable.done_drawable : R.drawable.failed_drawable, results[1] ? getString(R.string.status_done) : getString(R.string.status_failed));
                     test_progress.setProgress(2);
 
-                    status[2].setImageResource(R.drawable.testing_drawable);
+                    toolAdapter.updateStatusById("mdk4", R.drawable.testing_drawable, getString(R.string.status_testing));
                     test_cur_cmd.setText(cmdMdkBody);
                 });
 
@@ -342,10 +345,10 @@ public class TestDialog extends DialogFragment {
                     results[2] = true;
                 }
                 runInHandler(() -> {
-                    status[2].setImageResource(results[2] ? R.drawable.done_drawable : R.drawable.failed_drawable);
+                    toolAdapter.updateStatusById("mdk4", results[2] ? R.drawable.done_drawable : R.drawable.failed_drawable, results[2] ? getString(R.string.status_done) : getString(R.string.status_failed));
                     test_progress.setProgress(3);
 
-                    status[3].setImageResource(R.drawable.testing_drawable);
+                    toolAdapter.updateStatusById("reaver", R.drawable.testing_drawable, getString(R.string.status_testing));
                     test_cur_cmd.setText(cmdReaverBody);
                 });
 
@@ -363,36 +366,90 @@ public class TestDialog extends DialogFragment {
                     results[3] = true;
                 }
                 runInHandler(() -> {
-                    status[3].setImageResource(results[3] ? R.drawable.done_drawable : R.drawable.failed_drawable);
+                    toolAdapter.updateStatusById("reaver", results[3] ? R.drawable.done_drawable : R.drawable.failed_drawable, results[3] ? getString(R.string.status_done) : getString(R.string.status_failed));
                     test_progress.setProgress(4);
 
-                    status[4].setImageResource(R.drawable.testing_drawable);
+                    // Start hcxdumptool quick check
+                    toolAdapter.updateStatusById("hcxdumptool", R.drawable.testing_drawable, getString(R.string.status_testing));
+                    test_cur_cmd.setText(getString(R.string.test_hcxdumptool));
+                });
+
+                // hcxdumptool: quick --version check
+                try{
+                    final String cmdHcxBody = buildBody(MainActivity.hcxdumptool_dir, "--version");
+                    String outHcx = runSuAndCapture(cmdHcxBody);
+                    results[4] = outHcx!=null && !outHcx.trim().isEmpty();
+                }catch(Exception e){ results[4] = false; }
+
+                runInHandler(() -> {
+                    toolAdapter.updateStatusById("hcxdumptool", results[4] ? R.drawable.done_drawable : R.drawable.failed_drawable, results[4] ? getString(R.string.status_done) : getString(R.string.status_failed));
+                    test_progress.setProgress(5);
+
+                    // Start pixiewps test (non-persistent binary)
+                    toolAdapter.updateStatusById("pixiewps", R.drawable.testing_drawable, getString(R.string.status_testing));
+                    test_cur_cmd.setText(getString(R.string.test_pixiewps));
+                });
+
+                // Pixiewps: run a quick --version (or equivalent) check and consider success if output is produced
+                try{
+                    final String cmdPixBody = buildBody(MainActivity.pixiewps_dir, "--version");
+                    String outPix = runSuAndCapture(cmdPixBody);
+                    results[5] = outPix!=null && !outPix.trim().isEmpty();
+                }catch(Exception e){ results[5] = false; }
+
+                runInHandler(() -> {
+                    toolAdapter.updateStatusById("pixiewps", results[5] ? R.drawable.done_drawable : R.drawable.failed_drawable, results[5] ? getString(R.string.status_done) : getString(R.string.status_failed));
+                    test_progress.setProgress(6);
+
+                    // Start cowpatty check
+                    toolAdapter.updateStatusById("cowpatty", R.drawable.testing_drawable, getString(R.string.status_testing));
+                    test_cur_cmd.setText(getString(R.string.test_cowpatty));
+                });
+
+                // Cowpatty quick --help check (outputs usage), treat any output as success
+                try{
+                    final String cmdCowBody = buildBody(MainActivity.cowpatty_dir, "-h");
+                    String outCow = runSuAndCapture(cmdCowBody);
+                    results[6] = outCow!=null && !outCow.trim().isEmpty();
+                }catch(Exception e){ results[6] = false; }
+
+                runInHandler(() -> {
+                    toolAdapter.updateStatusById("cowpatty", results[6] ? R.drawable.done_drawable : R.drawable.failed_drawable, results[6] ? getString(R.string.status_done) : getString(R.string.status_failed));
+                    test_progress.setProgress(7);
+
+                    // Now run chroot check
+                    toolAdapter.updateStatusById("chroot", R.drawable.testing_drawable, getString(R.string.status_testing));
                     test_cur_cmd.setText(R.string.checking_chroot);
                 });
 
                 //Chroot
                 final int chroot_check = checkChroot();
-                results[4] = chroot_check==CHROOT_FOUND;
+                results[7] = chroot_check==CHROOT_FOUND;
                 runInHandler(() -> {
                     if(chroot_check!=CHROOT_FOUND){
-                        status[4].setImageResource(R.drawable.failed_drawable);
+                        toolAdapter.updateStatusById("chroot", R.drawable.failed_drawable, getString(R.string.status_failed));
                         if(chroot_check==CHROOT_DIR_MISSING) test_cur_cmd.setText(R.string.chroot_notfound);
                         else if(chroot_check==CHROOT_BIN_MISSING) test_cur_cmd.setText(R.string.kali_notfound);
                         else test_cur_cmd.setText(R.string.chroot_both_notfound);
                     }else{
                         test_cur_cmd.setText(R.string.done);
-                        status[4].setImageResource(R.drawable.done_drawable);
+                        toolAdapter.updateStatusById("chroot", R.drawable.done_drawable, getString(R.string.status_done));
                     }
-                    test_progress.setProgress(5);
+                    test_progress.setProgress(8);
                 });
 
             }catch(IOException | InterruptedException e){
                 Log.e("HIJACKER/test_thread", e.toString());
                 runInHandler(() -> {
-                    for(int i=0;i<status.length;i++){
-                        status[i].setImageResource(results[i] ? R.drawable.done_drawable : R.drawable.failed_drawable);
-                    }
-                    test_progress.setProgress(5);
+                    toolAdapter.updateStatusById("airodump", results[0] ? R.drawable.done_drawable : R.drawable.failed_drawable, results[0] ? getString(R.string.status_done) : getString(R.string.status_failed));
+                    toolAdapter.updateStatusById("aireplay", results[1] ? R.drawable.done_drawable : R.drawable.failed_drawable, results[1] ? getString(R.string.status_done) : getString(R.string.status_failed));
+                    toolAdapter.updateStatusById("mdk4", results[2] ? R.drawable.done_drawable : R.drawable.failed_drawable, results[2] ? getString(R.string.status_done) : getString(R.string.status_failed));
+                    toolAdapter.updateStatusById("reaver", results[3] ? R.drawable.done_drawable : R.drawable.failed_drawable, results[3] ? getString(R.string.status_done) : getString(R.string.status_failed));
+                    toolAdapter.updateStatusById("hcxdumptool", results[4] ? R.drawable.done_drawable : R.drawable.failed_drawable, results[4] ? getString(R.string.status_done) : getString(R.string.status_failed));
+                    toolAdapter.updateStatusById("pixiewps", results[5] ? R.drawable.done_drawable : R.drawable.failed_drawable, results[5] ? getString(R.string.status_done) : getString(R.string.status_failed));
+                    toolAdapter.updateStatusById("cowpatty", results[6] ? R.drawable.done_drawable : R.drawable.failed_drawable, results[6] ? getString(R.string.status_done) : getString(R.string.status_failed));
+                    toolAdapter.updateStatusById("chroot", results[7] ? R.drawable.done_drawable : R.drawable.failed_drawable, results[7] ? getString(R.string.status_done) : getString(R.string.status_failed));
+                    test_progress.setProgress(8);
                 });
             }finally{
                 // Best-effort: destroy any spawned processes
@@ -432,21 +489,27 @@ public class TestDialog extends DialogFragment {
         dialogView = requireActivity().getLayoutInflater().inflate(R.layout.test, null);
 
         test_progress = dialogView.findViewById(R.id.test_progress);
-        status[0] = dialogView.findViewById(R.id.imageView1);
-        status[1] = dialogView.findViewById(R.id.imageView2);
-        status[2] = dialogView.findViewById(R.id.imageView3);
-        status[3] = dialogView.findViewById(R.id.imageView4);
-        status[4] = dialogView.findViewById(R.id.imageView5);
+        RecyclerView toolsList = dialogView.findViewById(R.id.test_tools_list);
+        toolAdapter = new ToolStatusAdapter();
+        toolsList.setLayoutManager(new LinearLayoutManager(requireContext()));
+        toolsList.setAdapter(toolAdapter);
         test_cur_cmd = dialogView.findViewById(R.id.current_cmd);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
 
+        test_progress.setMax(8);
         test_progress.setProgress(0);
-        status[0].setImageResource(android.R.color.transparent);
-        status[1].setImageResource(android.R.color.transparent);
-        status[2].setImageResource(android.R.color.transparent);
-        status[3].setImageResource(android.R.color.transparent);
-        status[4].setImageResource(android.R.color.transparent);
+        // Initialize adapter items for the five tools
+        List<ToolStatus> initial = new java.util.ArrayList<>();
+        initial.add(new ToolStatus("airodump", getString(R.string.test_airodump), R.drawable.testing_drawable, getString(R.string.status_testing)));
+        initial.add(new ToolStatus("aireplay", getString(R.string.test_aireplay), R.drawable.testing_drawable, getString(R.string.status_testing)));
+        initial.add(new ToolStatus("mdk4", getString(R.string.test_mdk4), R.drawable.testing_drawable, getString(R.string.status_testing)));
+        initial.add(new ToolStatus("reaver", getString(R.string.test_reaver), R.drawable.testing_drawable, getString(R.string.status_testing)));
+        initial.add(new ToolStatus("hcxdumptool", getString(R.string.test_hcxdumptool), R.drawable.testing_drawable, getString(R.string.status_testing)));
+        initial.add(new ToolStatus("pixiewps", getString(R.string.test_pixiewps), R.drawable.testing_drawable, getString(R.string.status_testing)));
+        initial.add(new ToolStatus("cowpatty", getString(R.string.test_cowpatty), R.drawable.testing_drawable, getString(R.string.status_testing)));
+        initial.add(new ToolStatus("chroot", getString(R.string.test_kali_chroot), R.drawable.testing_drawable, getString(R.string.status_testing)));
+        toolAdapter.setItems(initial);
 
         thread = new Thread(runnable);
         thread.start();

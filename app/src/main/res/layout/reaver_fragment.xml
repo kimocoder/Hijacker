@@ -1,111 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:focusable="true"
-              android:focusableInTouchMode="true"
-              android:padding="5dp">
-
-    <LinearLayout
-        android:id="@+id/options_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <Button
-            android:id="@+id/select_ap"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/select_ap" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/pin_delay"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/pin_delay"
-                android:imeOptions="actionNext"
-                android:inputType="number"
-                android:maxLines="1"
-                android:text="1" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/locked_delay"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/locked_delay"
-                android:imeOptions="actionDone"
-                android:inputType="number"
-                android:maxLines="1"
-                android:text="60" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <CheckBox
-            android:id="@+id/pixie_dust"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:checked="false"
-            android:text="@string/pixie_dust" />
-
-        <CheckBox
-            android:id="@+id/ignore_locked"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/ignore_locked" />
-
-        <CheckBox
-            android:id="@+id/eap_fail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/eap_fail" />
-
-        <CheckBox
-            android:id="@+id/small_dh"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/small_dh" />
-
-        <CheckBox
-            android:id="@+id/no_nack"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/no_nack" />
-
-    </LinearLayout>
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:padding="5dp">
 
     <ScrollView
-        android:id="@+id/console_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@color/colorPrimary"
-        android:padding="3dp">
+        android:layout_weight="1">
 
-        <TextView
-            android:id="@+id/console"
+        <LinearLayout
+            android:id="@+id/options_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="?android:attr/textColorPrimary"
-            android:textSize="10sp" />
+            android:orientation="vertical"
+            android:layout_margin="5dp"
+            android:padding="10dp">
+
+            <Button
+                android:id="@+id/select_ap"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/select_ap" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/pin_delay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:hint="@string/pin_delay"
+                        android:imeOptions="actionNext"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:text="@string/default_pin_delay"
+                        android:textSize="11sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/locked_delay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:hint="@string/locked_delay"
+                        android:imeOptions="actionDone"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:text="@string/default_locked_delay"
+                        android:textSize="11sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/pixie_dust"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:checked="false"
+                android:text="@string/pixie_dust" />
+
+            <CheckBox
+                android:id="@+id/ignore_locked"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/ignore_locked" />
+
+            <CheckBox
+                android:id="@+id/eap_fail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/eap_fail" />
+
+            <CheckBox
+                android:id="@+id/small_dh"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/small_dh" />
+
+            <CheckBox
+                android:id="@+id/no_nack"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/no_nack" />
+
+            <TextView
+                android:text="@string/console_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:textStyle="bold"
+                android:textSize="14sp"/>
+
+            <ScrollView
+                android:id="@+id/console_scroll_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="100dp"
+                android:padding="10dp"
+                android:background="?attr/colorPrimary">
+
+                <TextView
+                    android:id="@+id/console"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textSize="11sp"
+                    android:fontFamily="monospace" />
+            </ScrollView>
+        </LinearLayout>
     </ScrollView>
 
     <Button
+        android:id="@+id/start_button"
         style="?android:attr/buttonBarButtonStyle"
-        android:text="@string/start"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/start_button"/>
-
+        android:text="@string/start"
+        android:textSize="16sp"
+        android:padding="16dp"/>
 </LinearLayout>
+

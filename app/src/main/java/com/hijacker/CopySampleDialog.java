@@ -30,14 +30,13 @@ import static com.hijacker.MainActivity.aircrack_dir;
 import static com.hijacker.MainActivity.aireplay_dir;
 import static com.hijacker.MainActivity.airodump_dir;
 import static com.hijacker.MainActivity.cap_path;
-import static com.hijacker.MainActivity.chroot_dir;
 import static com.hijacker.MainActivity.copy;
 import static com.hijacker.MainActivity.iface;
 import static com.hijacker.MainActivity.background;
 import static com.hijacker.MainActivity.mdk4bf_dir;
 import static com.hijacker.MainActivity.prefix;
 import static com.hijacker.MainActivity.reaver_dir;
-import static com.hijacker.ReaverFragment.get_chroot_env;
+import static com.hijacker.MainActivity.pixiewps_dir;
 
 public class CopySampleDialog extends DialogFragment {
     @NonNull
@@ -74,7 +73,11 @@ public class CopySampleDialog extends DialogFragment {
                     copy(prefPart + reaver_dir + " -i " + iface + " -vv -b 00:11:22:33:44:55 --channel 6 -L -E -S", getView());
                     break;
                 case 5:
-                    copy("chroot " + chroot_dir + " /bin/bash -c '" + get_chroot_env(getActivity()) + "reaver -i " + iface + " -vv -b 00:11:22:33:44:55 --channel 6 -L -E -S'", getView());
+                    // Pixiewps attack using pixiewps from assets
+                    pfx = (prefix==null) ? "" : prefix.trim();
+                    prefPart = pfx.isEmpty() ? "" : pfx + " ";
+                    String binPath = pixiewps_dir.substring(0, pixiewps_dir.lastIndexOf('/'));
+                    copy("export PATH=" + binPath + ":$PATH && " + prefPart + reaver_dir + " -i " + iface + " -vv -b 00:11:22:33:44:55 --channel 6 -K 1", getView());
                     break;
             }
             dismissAllowingStateLoss();

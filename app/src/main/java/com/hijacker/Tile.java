@@ -51,12 +51,13 @@ import static com.hijacker.MainActivity.sort_reverse;
 import static com.hijacker.MainActivity.toSort;
 import static com.hijacker.MainActivity.wep;
 import static com.hijacker.MainActivity.wpa;
+import static com.hijacker.MainActivity.wps;
 
 class Tile {
     static final ArrayList<Tile> tiles = new ArrayList<>();
     static final List<Tile> allTiles = new ArrayList<>();
     static int i=0;                                //End of APs in items
-    Device device;
+    final Device device;
     boolean show=true;
     Tile(int index, Device dev){
         this.device = dev;
@@ -86,9 +87,12 @@ class Tile {
             if(device instanceof AP){
                 AP ap = (AP)device;
                 boolean channel = (ap.ch<0 || ap.ch>14) || (show_ch[0] || show_ch[ap.ch]);    //Channel might be -1 or over 14 (5ghz) so avoid OutOfRangeException in array access
-                this.show = show_ap && channel && ap.pwr>=pwr_filter*(-1) &&
-                        ((wpa && (ap.sec == WPA || ap.sec == WPA2)) || (wep && ap.sec == WEP) ||
-                                (opn && ap.sec == OPN) || ap.sec==UNKNOWN) && ap.manuf.contains(manuf_filter);
+                // Check encryption type filters
+                boolean encMatch = ((wpa && (ap.sec == WPA || ap.sec == WPA2)) || (wep && ap.sec == WEP) ||
+                        (opn && ap.sec == OPN) || ap.sec==UNKNOWN);
+                // If wps filter is on, also show WPS-enabled networks regardless of encryption
+                if(wps && ap.wpsEnabled) encMatch = true;
+                this.show = show_ap && channel && ap.pwr>=pwr_filter*(-1) && encMatch && ap.manuf.contains(manuf_filter);
             }else{
                 ST st = (ST)device;
                 this.show = show_st && (show_na_st || st.bssid != null) && st.pwr>=pwr_filter*(-1)  &&
@@ -186,23 +190,23 @@ class Tile {
         notification();
     }
 
-    static Comparator<Tile> AP_ESSID = (o1, o2) -> {
+    static final Comparator<Tile> AP_ESSID = (o1, o2) -> {
         if(sort_reverse) return ((AP)o2.device).getESSID().compareToIgnoreCase(((AP)o1.device).getESSID());
         else return ((AP)o1.device).getESSID().compareToIgnoreCase(((AP)o2.device).getESSID());
     };
-    static Comparator<Tile> AP_BEACONS = (o1, o2) -> {
+    static final Comparator<Tile> AP_BEACONS = (o1, o2) -> {
         if(sort_reverse) return ((AP)o1.device).getBeacons() - ((AP)o2.device).getBeacons();
         else return ((AP)o2.device).getBeacons() - ((AP)o1.device).getBeacons();
     };
-    static Comparator<Tile> AP_DATA = (o1, o2) -> {
+    static final Comparator<Tile> AP_DATA = (o1, o2) -> {
         if(sort_reverse) return ((AP)o1.device).getData() - ((AP)o2.device).getData();
         else return ((AP)o2.device).getData() - ((AP)o1.device).getData();
     };
-    static Comparator<Tile> ST_FRAMES = (o1, o2) -> {
+    static final Comparator<Tile> ST_FRAMES = (o1, o2) -> {
         if(sort_reverse) return ((ST)o1.device).getFrames() - ((ST)o2.device).getFrames();
         else return ((ST)o2.device).getFrames() - ((ST)o1.device).getFrames();
     };
-    static Comparator<Tile> AP_ST_PWR = (o1, o2) -> {
+    static final Comparator<Tile> AP_ST_PWR = (o1, o2) -> {
         if(sort_reverse) return o1.device.pwr - o2.device.pwr;
         else return o2.device.pwr - o1.device.pwr;
     };
