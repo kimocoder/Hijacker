@@ -23,7 +23,7 @@
             android:textStyle="normal|bold" />
 
         <TextView
-            android:text="WPA:"
+            android:text="@string/wpa"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="5dp"
@@ -31,7 +31,7 @@
             android:textSize="16sp" />
 
         <TextView
-            android:text="WPA2:"
+            android:text="@string/wpa2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="5dp"
@@ -39,7 +39,7 @@
             android:textSize="16sp" />
 
         <TextView
-            android:text="WEP:"
+            android:text="@string/wep"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="5dp"
@@ -77,7 +77,6 @@
             android:padding="5dp"
             android:textColor="@android:color/white"
             android:textSize="16sp" />
-
     </LinearLayout>
 
     <LinearLayout
@@ -118,6 +117,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/opn_count"
+            android:padding="5dp"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/wps_count"
             android:padding="5dp"
             android:textColor="@android:color/white"
             android:textSize="16sp" />

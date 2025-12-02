@@ -303,4 +303,27 @@
         android:textSize="16sp"
         android:layout_below="@+id/essid"
         android:layout_toEndOf="@+id/manuf_tv"/>
+
+    <TextView
+        android:id="@+id/wps_tv"
+        android:text="@string/wps_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="16sp"
+        android:layout_below="@+id/manuf_tv"
+        android:layout_alignTop="@+id/wps_status"
+        android:layout_alignBottom="@+id/wps_status"
+        android:layout_alignEnd="@+id/auth_tv"/>
+
+    <TextView
+        android:id="@+id/wps_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="16sp"
+        android:layout_below="@+id/manuf"
+        android:layout_toEndOf="@+id/wps_tv"/>
 </RelativeLayout>
