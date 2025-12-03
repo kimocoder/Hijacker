@@ -11,9 +11,6 @@ The Nexmon firmware and management utility for **BCM4339** and **BCM4358** are a
 
 Root access is also necessary, as these tools need root to work.
 
-## Discontinued
-The app has been discontinued since a completely new iteration is currently under development. Since the new version will not be available for a long time, this repo remains open for recommendations and feature requests which will be implemented in the new version. Critical changes may still be provided, along with help for building, maintaining, and updating the code (though I wouldn't recomment it). Bug reports are also welcome as long as they come from the latest released version, since some of this code might be used in the new project. 
-
 
 ## Features
 ### Information Gathering
@@ -30,7 +27,7 @@ The app has been discontinued since a completely new iteration is currently unde
 * MDK4 **Beacon Flooding** with custom options and SSID list
 * MDK4 **Authentication DoS** for a specific network or to every nearby AP
 * Capture a **WPA handshake** or gather **IVs** to crack a WEP network
-* **Reaver WPS** cracking (pixie-dust attack using NetHunter chroot and external adapter)
+* **Reaver WPS** cracking (pixie-dust attack using external adapter)
 
 ### Other
 * Leave the app running in the background, optionally with a notification
@@ -56,7 +53,7 @@ Make sure:
 
 #### Download the latest version [here](https://github.com/chrisk44/Hijacker/releases).
 
-When you run Hijacker for the first time, you will be asked whether you want to install the nexmon firmware or go to home screen. If you have installed your firmware or use an external adapter, you can just go to the home screen. Otherwise, and if your device is supported, click 'Install Nexmon' to install the Nexmon firmware. When you're done, you will land on the home screen and airodump will start. Make sure you have enabled your WiFi and it's in monitor mode.
+When you run Hijacker for the first time, you will be asked whether you want to install the Nexmon firmware or go to home screen. If you have installed your firmware or use an external adapter, you can just go to the home screen. Otherwise, and if your device is supported, click 'Install Nexmon' to install the Nexmon firmware. When you're done, you will land on the home screen and airodump will start. Make sure you have enabled your WiFi and it's in monitor mode.
 
 ##### Note: On some devices, changing files in `/system` might trigger an Android security feature and your system partition will be restored when you reboot.
 

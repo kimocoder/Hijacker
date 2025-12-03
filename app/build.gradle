@@ -7,7 +7,7 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 android {
-    compileSdkVersion 36
+    compileSdk = 36
 
     //noinspection GradleDependency
     // Use Java 11 for compilation to match modern JDKs and suppress obsolete source/target warnings
@@ -34,7 +34,7 @@ android {
     defaultConfig {
         applicationId = "com.hijacker"
         minSdk = 21
-        targetSdk 36
+        targetSdk = 36
         //noinspection OldTargetApi
         versionCode = 40
         android.buildFeatures.buildConfig = true
@@ -64,6 +64,7 @@ android {
             useLegacyPackaging = false
         }
     }
+    compileSdkMinor = 1
 }
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
