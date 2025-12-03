@@ -1,0 +1,15 @@
+<resources>
+    <!-- Base application theme for Android 15+ (API 35) with edge-to-edge support -->
+    <style name="ThemeAppCompatNoActionBarHoloBlue" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorAccent">@android:color/holo_blue_dark</item>
+        <item name="android:windowBackground">?android:attr/colorBackground</item>
+
+        <!-- Enable edge-to-edge by default on Android 15+ -->
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:enforceNavigationBarContrast">true</item>
+        <item name="android:enforceStatusBarContrast">true</item>
+    </style>
+</resources>
+

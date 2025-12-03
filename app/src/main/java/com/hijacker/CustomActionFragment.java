@@ -23,7 +23,7 @@ import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -50,7 +50,6 @@ import static com.hijacker.MainActivity.busybox;
 import static com.hijacker.MainActivity.currentFragment;
 import static com.hijacker.MainActivity.debug;
 import static com.hijacker.MainActivity.getPIDs;
-import static com.hijacker.MainActivity.mFragmentManager;
 import static com.hijacker.MainActivity.notification;
 import static com.hijacker.Shell.runOne;
 
@@ -63,10 +62,15 @@ public class CustomActionFragment extends Fragment {
     ScrollView consoleScrollView;
     //Dimensions to restore animated views
     int normalOptHeight = -1;
+
     //User options
-    static CustomAction selectedAction = null;
+    // Keep legacy static fields for compatibility but primary state lives in ViewModel
+    static CustomAction selectedAction = null; // kept in sync with ViewModel
     static Device targetDevice;
-    static String console_text = "";
+    static String console_text = ""; // fallback cache
+
+    CustomActionViewModel viewModel;
+
     @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState){
@@ -79,7 +83,32 @@ public class CustomActionFragment extends Fragment {
         targetBtn = fragmentView.findViewById(R.id.select_target);
         actionBtn = fragmentView.findViewById(R.id.select_action);
 
+        viewModel = new ViewModelProvider(requireActivity()).get(CustomActionViewModel.class);
+
+        // Restore ViewModel-backed state into UI
         if(task==null) task = new CustomActionTask();
+
+        // Observe ViewModel
+        viewModel.getSelectedAction().observe(getViewLifecycleOwner(), a -> {
+            selectedAction = a; // keep legacy static in sync
+            if(a!=null){ actionBtn.setText(a.getTitle()); targetBtn.setEnabled(true); }
+            else { actionBtn.setText(getString(R.string.select_action)); targetBtn.setEnabled(false); }
+        });
+        viewModel.getTargetDevice().observe(getViewLifecycleOwner(), d -> {
+            targetDevice = d; // legacy sync
+            if(d!=null){ targetBtn.setText(d.toString()); startBtn.setEnabled(true); }
+        });
+        viewModel.getConsoleText().observe(getViewLifecycleOwner(), s -> {
+            console_text = s == null ? "" : s; // cache
+            if(consoleView!=null){ consoleView.setText(console_text); consoleView.post(() -> consoleScrollView.fullScroll(View.FOCUS_DOWN)); }
+        });
+        viewModel.isRunning().observe(getViewLifecycleOwner(), r -> {
+            boolean running = r != null && r;
+            if(startBtn!=null) startBtn.setText(running ? R.string.stop : R.string.start);
+        });
+        viewModel.getOptionsHeight().observe(getViewLifecycleOwner(), h -> {
+            if(h!=null && h!=-1) normalOptHeight = h;
+        });
 
         actionBtn.setOnClickListener(view -> showActionSelector());
         targetBtn.setOnClickListener(view -> showTargetSelector());
@@ -87,7 +116,6 @@ public class CustomActionFragment extends Fragment {
             if(isRunning()){
                 //Stop
                 startBtn.setEnabled(false);
-                // Use requestCancel() instead of deprecated AsyncTask.cancel(boolean)
                 task.requestCancel();
             }else{
                 task = new CustomActionTask();
@@ -104,30 +132,27 @@ public class CustomActionFragment extends Fragment {
         ((MainActivity) requireActivity()).refreshDrawer();
 
         //Console text is saved/restored on pause/resume
-        consoleView.setText(console_text);
+        consoleView.setText(viewModel.getConsoleTextValue());
         consoleView.post(() -> consoleScrollView.fullScroll(View.FOCUS_DOWN));
     }
     @Override
     public void onPause(){
         super.onPause();
 
-        //Console text is saved/restored on pause/resume
-        console_text = consoleView.getText().toString();
+        // Save console text to ViewModel
+        viewModel.setConsoleText(consoleView.getText().toString());
     }
     @Override
     public void onStart(){
         super.onStart();
 
         //Restore options
-        if(selectedAction!=null){
-            actionBtn.setText(selectedAction.getTitle());
-            targetBtn.setEnabled(true);
-            if(targetDevice!=null){
-                targetBtn.setText(targetDevice.toString());
-                startBtn.setEnabled(true);
-            }
-        }
-        startBtn.setText(isRunning() ? R.string.stop : R.string.start);
+        // ViewModel observers will update UI appropriately; ensure buttons reflect cached values
+        CustomAction sa = viewModel.getSelectedActionValue();
+        Device td = viewModel.getTargetDeviceValue();
+        if(sa!=null){ actionBtn.setText(sa.getTitle()); targetBtn.setEnabled(true); }
+        if(td!=null){ targetBtn.setText(td.toString()); startBtn.setEnabled(true); }
+        startBtn.setText(viewModel.isRunningValue() ? R.string.stop : R.string.start);
 
         //Restore animated views
         if(task!=null && task.isRunning()){
@@ -144,16 +169,24 @@ public class CustomActionFragment extends Fragment {
     }
     @Override
     public void onStop(){
-        if(task!=null){
-            if(task.sizeAnimator!=null){
-                task.sizeAnimator.cancel();
-            }
-        }
+        if(task!=null){ if(task.sizeAnimator!=null) task.sizeAnimator.cancel(); }
         super.onStop();
     }
     static boolean isRunning(){
+        // Prefer ViewModel's running state if available
+        // Fall back to task runtime flag if ViewModel unavailable
+        try{
+            MainActivity ma = MainActivity.getInstance();
+            if (ma != null){
+                CustomActionViewModel vm = new ViewModelProvider(ma).get(CustomActionViewModel.class);
+                return vm.isRunningValue();
+            }
+            // No activity instance available; fall through to task check
+        }catch(Exception e){
+            if(task==null) return false;
+            return task.isRunning();
+        }
         if(task==null) return false;
-        // Avoid deprecated AsyncTask.getStatus()/Status.RUNNING; use task's own running flag
         return task.isRunning();
     }
 
@@ -170,12 +203,22 @@ public class CustomActionFragment extends Fragment {
 
         popup.setOnMenuItemClickListener(item -> {
             if(item.getGroupId()==-1){
-                //Open actions manager
-                FragmentTransaction ft = mFragmentManager.beginTransaction();
-                ft.replace(R.id.fragment1, new CustomActionManagerFragment());
-                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                ft.addToBackStack(null);
-                ft.commitAllowingStateLoss();
+                //Open actions manager via NavController if available, otherwise fall back
+                try{
+                    android.app.Activity act = getActivity();
+                    if(act instanceof MainActivity){
+                        MainActivity main = (MainActivity)act;
+                        if(main.getNavController()!=null){
+                            main.getNavController().navigate(R.id.nav_custom_manager);
+                        }else{
+                            Log.w("HIJACKER/Navigation", "NavController not available: cannot navigate to CustomActionManager");
+                        }
+                    }else{
+                        Log.w("HIJACKER/Navigation", "Activity is not MainActivity: cannot navigate to CustomActionManager");
+                    }
+                }catch(Exception e){
+                    Log.w("HIJACKER/Navigation", "Exception while navigating to CustomActionManager", e);
+                }
             }else{
                 onActionSelected(cmds.get(item.getItemId()));
             }
@@ -261,14 +304,17 @@ public class CustomActionFragment extends Fragment {
         @SuppressLint("WrongThread")
         private void onPreExecute(){
             running = true;
+            viewModel.setRunning(true);
+            viewModel.setOptionsHeight(optionsContainer.getHeight());
             startBtn.setText(R.string.stop);
             MainActivity.setProgressIndeterminate(true);
 
-            postProgress("\nRunning: " + selectedAction.getStartCmd());
+            postProgress("\nRunning: " + (selectedAction != null ? selectedAction.getStartCmd() : "<unknown>"));
             consoleScrollView.fullScroll(View.FOCUS_DOWN);
             if(debug) Log.d("HIJACKER/CustomCMDFrag", "Running: " + selectedAction.getStartCmd());
 
             normalOptHeight = optionsContainer.getHeight();
+            viewModel.setOptionsHeight(normalOptHeight);
 
             sizeAnimator = ValueAnimator.ofInt(optionsContainer.getHeight(), 0);
             sizeAnimator.setTarget(optionsContainer);
@@ -327,20 +373,20 @@ public class CustomActionFragment extends Fragment {
 
             if(shell!=null) shell.done();
 
+            // Update ViewModel running state
+            viewModel.setRunning(false);
             return true;
         }
 
         private void onPostExecute(final Boolean success){
-            mainHandler.post(this::done);
-        }
-
-        private void onCancelled(){
+            if(debug) Log.d("HIJACKER/CustomCMDFrag", "onPostExecute success=" + success);
             mainHandler.post(this::done);
         }
 
         private void done(){
             // mark not running before restoring UI
             running = false;
+            viewModel.setRunning(false);
             startBtn.setEnabled(true);
             startBtn.setText(R.string.start);
             MainActivity.setProgressIndeterminate(false);
@@ -389,9 +435,9 @@ public class CustomActionFragment extends Fragment {
                 if(currentFragment==FRAGMENT_CUSTOM && !background){
                     consoleView.append(s);
                     consoleScrollView.fullScroll(View.FOCUS_DOWN);
-                }else{
-                    console_text += s;
                 }
+                // Always append to ViewModel console so it survives rotation
+                viewModel.appendConsole(s);
             });
         }
 

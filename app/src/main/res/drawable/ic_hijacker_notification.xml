@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="96"
+    android:viewportHeight="96">
+
+    <!-- High-end tech-themed WiFi + Hijacker logo -->
+
+    <!-- soft drop shadow -->
+    <path
+        android:fillColor="#33000000"
+        android:pathData="M48,16 A34,34 0 1,1 47.999,16 Z" />
+
+    <!-- main circular background with radial gradient -->
+    <path android:pathData="M48,8 A40,40 0 1,1 47.999,8 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="0.5" android:centerY="0.5" android:gradientRadius="0.5" android:startColor="#0B1A2A" android:endColor="#071826" />
+        </aapt:attr>
+    </path>
+
+    <!-- outer highlight ring -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeWidth="2"
+        android:strokeColor="#4DFFFFFF"
+        android:pathData="M48,8 A40,40 0 1,1 47.999,8 Z" />
+
+    <!-- inner depth ring -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeWidth="3"
+        android:strokeColor="#1A000000"
+        android:pathData="M48,12 A36,36 0 1,1 47.999,12 Z" />
+
+    <!-- wifi symbol in back (four arcs for more detail) -->
+    <!-- outermost arc -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeWidth="2"
+        android:strokeColor="#80FFFFFF"
+        android:strokeLineCap="round"
+        android:pathData="M16,32 A32,32 0 0,1 80,32" />
+
+    <!-- third arc -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeWidth="2.5"
+        android:strokeColor="#A0FFFFFF"
+        android:strokeLineCap="round"
+        android:pathData="M22,36 A26,26 0 0,1 74,36" />
+
+    <!-- second arc -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeWidth="3"
+        android:strokeColor="#CCFFFFFF"
+        android:strokeLineCap="round"
+        android:pathData="M28,42 A20,20 0 0,1 68,42" />
+
+    <!-- innermost arc -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeWidth="3.5"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeLineCap="round"
+        android:pathData="M34,48 A14,14 0 0,1 62,48" />
+
+    <!-- center dot -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M46,58 h4 v4 h-4 z" />
+
+    <!-- full "HIJACKER" text in bold block style, centered and fitted -->
+    <!-- Letter H -->
+    <path android:fillColor="#FFFFFFFF" android:pathData="M16,68 h6 v18 h-6 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M28,68 h6 v18 h-6 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M22,76 h8 v4 h-8 z" />
+
+    <!-- Letter I -->
+    <path android:fillColor="#FFFFFFFF" android:pathData="M38,68 h6 v18 h-6 z" />
+
+    <!-- Letter J -->
+    <path android:fillColor="#FFFFFFFF" android:pathData="M48,68 h10 v4 h-10 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M52,72 h6 v12 h-6 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M48,86 h8 v4 h-8 z" />
+
+    <!-- Letter A -->
+    <path android:fillColor="#FFFFFFFF" android:pathData="M62,68 h6 v18 h-6 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M74,68 h6 v18 h-6 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M66,76 h8 v4 h-8 z" />
+
+    <!-- Letter C -->
+    <path android:fillColor="#FFFFFFFF" android:pathData="M84,68 h-8 v4 h8 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M76,72 h-6 v8 h6 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M84,82 h-8 v4 h8 z" />
+
+    <!-- Letter K -->
+    <path android:fillColor="#FFFFFFFF" android:pathData="M88,68 h6 v18 h-6 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M98,68 h6 v4 h-6 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M98,76 h6 v4 h-6 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M98,84 h6 v4 h-6 z" />
+
+    <!-- Letter E -->
+    <path android:fillColor="#FFFFFFFF" android:pathData="M8,68 h6 v18 h-6 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M8,68 h12 v4 h-12 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M8,76 h8 v4 h-8 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M8,86 h12 v4 h-12 z" />
+
+    <!-- Letter R -->
+    <path android:fillColor="#FFFFFFFF" android:pathData="M104,68 h6 v18 h-6 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M104,68 h12 v4 h-12 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M104,76 h8 v4 h-8 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M112,72 h6 v4 h-6 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M112,80 h6 v4 h-6 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M116,84 h6 v4 h-6 z" />
+
+</vector>
