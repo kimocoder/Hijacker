@@ -13,6 +13,8 @@ public class CrackViewModel extends ViewModel {
     private int wepChecked = -1;
     private boolean taskRunning = false;
     private int speedTestResult = -1;
+    private boolean pcapngEnabled = false;
+    private boolean cowpattyEnabled = false;
     public String getConsoleText() { return consoleText; }
     public String getCapfileText() { return capfileText; }
     public String getWordlistText() { return wordlistText; }
@@ -20,6 +22,8 @@ public class CrackViewModel extends ViewModel {
     public int getWepChecked() { return wepChecked; }
     public boolean isTaskRunning() { return taskRunning; }
     public int getSpeedTestResult() { return speedTestResult; }
+    public boolean isPcapngEnabled() { return pcapngEnabled; }
+    public boolean isCowpattyEnabled() { return cowpattyEnabled; }
     public void setConsoleText(String text) { this.consoleText = text; }
     public void setCapfileText(String text) { this.capfileText = text; }
     public void setWordlistText(String text) { this.wordlistText = text; }
@@ -27,6 +31,8 @@ public class CrackViewModel extends ViewModel {
     public void setWepChecked(int checked) { this.wepChecked = checked; }
     public void setTaskRunning(boolean running) { this.taskRunning = running; }
     public void setSpeedTestResult(int result) { this.speedTestResult = result; }
+    public void setPcapngEnabled(boolean enabled) { this.pcapngEnabled = enabled; }
+    public void setCowpattyEnabled(boolean enabled) { this.cowpattyEnabled = enabled; }
     public void appendConsoleText(String text) { this.consoleText += text; }
     public void clearConsole() { this.consoleText = ""; }
     @Override

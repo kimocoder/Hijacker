@@ -35,6 +35,7 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
@@ -60,6 +61,7 @@ import static com.hijacker.MainActivity.notification;
 import static com.hijacker.MainActivity.path;
 import static com.hijacker.MainActivity.stop;
 import static com.hijacker.MainActivity.wl_path;
+import static com.hijacker.MainActivity.cowpatty_dir;
 
 public class CrackFragment extends Fragment{
     // Use ViewModel constants instead of local ones
@@ -73,6 +75,7 @@ public class CrackFragment extends Fragment{
     RadioGroup wepRG, securityRG;
     RadioButton wepRB, wpaRB;
     ScrollView consoleScrollView;
+    CheckBox pcapngCheckbox, cowpattyCheckbox; // new controls
     //Dimensions to restore animated views
     int normalOptHeight = -1, normalTestBtnWidth = -1;
     @Override
@@ -90,6 +93,8 @@ public class CrackFragment extends Fragment{
         capFeBtn = fragmentView.findViewById(R.id.cap_fe_btn);
         wordlistFeBtn = fragmentView.findViewById(R.id.wordlist_fe_btn);
         wordlistDownloadBtn = fragmentView.findViewById(R.id.wordlist_download_btn);
+        pcapngCheckbox = fragmentView.findViewById(R.id.pcapng_checkbox);
+        cowpattyCheckbox = fragmentView.findViewById(R.id.cowpatty_checkbox);
         wepRG = fragmentView.findViewById(R.id.wep_rg);
         securityRG = fragmentView.findViewById(R.id.radio_group);
         wepRB = fragmentView.findViewById(R.id.wep_rb);
@@ -195,6 +200,10 @@ public class CrackFragment extends Fragment{
             }
         }
 
+        // Restore checkbox states from ViewModel if present
+        if(viewModel.isPcapngEnabled()) pcapngCheckbox.setChecked(true);
+        if(viewModel.isCowpattyEnabled()) cowpattyCheckbox.setChecked(true);
+
         return fragmentView;
     }
     @Override
@@ -223,6 +232,9 @@ public class CrackFragment extends Fragment{
         if(viewModel.getWordlistText() != null) wordlistView.setText(viewModel.getWordlistText());
         if(viewModel.getSecurityChecked() != -1) securityRG.check(viewModel.getSecurityChecked());
         if(viewModel.getWepChecked() != -1) wepRG.check(viewModel.getWepChecked());
+        // Restore checkboxes
+        pcapngCheckbox.setChecked(viewModel.isPcapngEnabled());
+        cowpattyCheckbox.setChecked(viewModel.isCowpattyEnabled());
         for (int i = 0; i < wepRG.getChildCount(); i++) {
             //Reset wep options
             wepRG.getChildAt(i).setEnabled(wepRB.isChecked());
@@ -264,6 +276,8 @@ public class CrackFragment extends Fragment{
         viewModel.setWordlistText(wordlistView.getText().toString());
         viewModel.setSecurityChecked(securityRG.getCheckedRadioButtonId());
         viewModel.setWepChecked(wepRG.getCheckedRadioButtonId());
+        viewModel.setPcapngEnabled(pcapngCheckbox.isChecked());
+        viewModel.setCowpattyEnabled(cowpattyCheckbox.isChecked());
 
         super.onStop();
     }
@@ -377,17 +391,33 @@ public class CrackFragment extends Fragment{
                         mode = CrackViewModel.WEP;
                     }
                     //Create command
-                    cmd = "su -c " + aircrack_dir + " " + capfile + " -l " + path + "/aircrack-out.txt -a " + mode;
+                    // If pcapng is enabled and input is .pcapng, convert using hcxpcapngtool to a temporary .cap file
+                    String effectiveCap = capfile;
+                    if(pcapngCheckbox.isChecked() && capfile.endsWith(".pcapng")){
+                        effectiveCap = path + "/tmp_conv_" + System.currentTimeMillis() + ".cap";
+                        // Use hcxpcapngtool to convert: hcxpcapngtool -o <out.cap> <in.pcapng>
+                        cmd = "su -c " + MainActivity.path + "/hcxpcapngtool -o " + effectiveCap + " " + capfile + " && ";
+                    } else {
+                        cmd = "";
+                    }
+                    // Aircrack command appended
+                    cmd += "su -c " + aircrack_dir + " " + effectiveCap + " -l " + path + "/aircrack-out.txt -a " + mode;
                     if(wordlist!=null)
                         cmd += " -w " + wordlist;
                     if(mode==CrackViewModel.WEP){
-                        cmd += " -n ";
-                        int wepId = wepRG.getCheckedRadioButtonId();
-                        if(wepId == R.id.wep_64) cmd += "64";
-                        else if(wepId == R.id.wep_128) cmd += "128";
-                        else if(wepId == R.id.wep_152) cmd += "152";
-                        else if(wepId == R.id.wep_256) cmd += "256";
-                        else if(wepId == R.id.wep_512) cmd += "512";
+                        // Use cowpatty if selected. Otherwise use aircrack-ng's native WEP options
+                        if(cowpattyCheckbox.isChecked()){
+                            // cowpatty uses different arguments; create a cowpatty command instead
+                            cmd = "su -c " + cowpatty_dir + " -r " + effectiveCap + " -f " + wordlist + " -v 2";
+                        } else {
+                            cmd += " -n ";
+                            int wepId = wepRG.getCheckedRadioButtonId();
+                            if(wepId == R.id.wep_64) cmd += "64";
+                            else if(wepId == R.id.wep_128) cmd += "128";
+                            else if(wepId == R.id.wep_152) cmd += "152";
+                            else if(wepId == R.id.wep_256) cmd += "256";
+                            else if(wepId == R.id.wep_512) cmd += "512";
+                        }
                     }
                     break;
 

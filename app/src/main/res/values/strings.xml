@@ -569,4 +569,8 @@
     <string name="hcx_stopped">hcxdumptool stopped</string>
     <string name="hcx_no_output_file">Please specify output file</string>
     <string name="hcx_cant_create_dir">Cannot create output directory</string>
+
+    <!-- New strings for pcapng and cowpatty UI labels and messages -->
+    <string name="pcapng_label">Convert/Use pcapng (hcxpcapngtool)</string>
+    <string name="use_cowpatty_label">Use cowpatty for WEP</string>
 </resources>

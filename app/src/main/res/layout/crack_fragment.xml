@@ -83,6 +83,30 @@
                 android:text="@string/browse" />
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp">
+
+            <CheckBox
+                android:id="@+id/pcapng_checkbox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/pcapng_label"
+                android:checked="false" />
+
+            <CheckBox
+                android:id="@+id/cowpatty_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/use_cowpatty_label"
+                android:checked="false" />
+        </LinearLayout>
+
         <RadioGroup
             android:id="@+id/radio_group"
             android:layout_width="match_parent"
